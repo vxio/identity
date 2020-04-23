@@ -291,7 +291,7 @@ components:
       maxLength: 24
 
     SubjectID:
-      description: ID of the remove OIDC server gives to this identity
+      description: ID of the remote OIDC server gives to this identity
       type: string
       pattern: ^[0-9a-zA-Z_-]+$
       example: aSDDfasd23Dfasdf
