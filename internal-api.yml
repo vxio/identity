@@ -6,10 +6,7 @@ info:
     Handles all identities for tracking the users of the Moov platform.
 
 servers:
-  - url: https://local.moov.io/
-    description: Local Testing
-  - url: https://api.moov.io/
-    description: Production
+  - url: https://identity.srvs.moov.local/
 
 paths:
 
@@ -24,7 +21,7 @@ paths:
       security:
       - ServiceAuth: []
       tags:
-        - private
+      - private
       requestBody:
         description: Arguments needed to match up the OIDC user data with a user in the system
         required: true
@@ -54,7 +51,7 @@ paths:
       security:
       - ServiceAuth: []
       tags:
-        - private
+      - private
       requestBody:
         description: Arguments needed register a user with OIDC credentials.
         required: true
