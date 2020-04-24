@@ -1,0 +1,481 @@
+openapi: 3.0.2
+info:
+  title: Moov Identity API
+  version: 0.0.1
+  description: |
+    Handles all identities for tracking the users of the Moov platform.
+
+servers:
+  - url: https://local.moov.io/
+    description: Local Testing
+  - url: https://api.moov.io/
+    description: Production
+
+paths:
+
+  /invites:
+    get:
+      summary: List outstanding invites
+      security:
+      - GatewayAuth: []
+      parameters:
+      - in: query
+        name: orgID
+        description: Filter in only for specific Organization
+        schema: 
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Invites that are outstanding
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 300
+                items:
+                  $ref: '#/components/schemas/Invite'
+        default:
+          $ref: '#/components/responses/Empty'
+                    
+    post:
+      summary: Send an email invite to a new user
+      security:
+      - GatewayAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invite'
+      responses:
+        '200':
+          description: Invite sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invite'
+        default:
+          $ref: '#/components/responses/Empty'
+
+
+  /invites/{inviteID}:
+    delete:
+      summary: Delete an invite that was sent and invalidate the token.
+      parameters:
+      - in: path
+        name: inviteID
+        description: ID of the invite to delete
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      security:
+      - GatewayAuth: []
+      responses:
+        '204':
+          description: Invite was removed
+        '404':
+          description: Invite was not found.
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+
+  /identities:
+    get:
+      summary: List identities and associates userId
+      security:
+      - GatewayAuth: []
+      parameters:
+      - in: query
+        name: orgID
+        description: Filter in only for specific Organization
+        schema: 
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of identities/users in the system
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 300
+                items:
+                  $ref: '#/components/schemas/Identity'
+        default:
+          $ref: '#/components/responses/Empty'
+
+  /identities/{identityID}:
+    get:
+      summary: List identities and associates userId
+      security:
+      - GatewayAuth: []
+      parameters:
+      - in: path
+        name: identityID
+        description: ID of the Identity to lookup
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of identities/users in the system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identity'
+        '404':
+          description: Identity was not found
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+    put:
+      summary: Update a specific Identity
+      security:
+      - GatewayAuth: []
+      parameters:
+      - in: path
+        name: identityID
+        description: ID of the Identity to lookup
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Identity'
+      responses:
+        '200':
+          description: Identity was updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identity'
+        '404':
+          description: Identity was not found
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+
+  /identities/{identityID}/credentials:
+    get:
+      summary: List the credentials this user has used.
+      security:
+      - GatewayAuth: []
+      parameters:
+      - in: path
+        name: identityID
+        description: ID of the Identity to lookup
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of credentials tied to this identity
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 300
+                items:
+                  $ref: '#/components/schemas/Credential'
+        '404':
+          description: IdentityID doesn't exist
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+
+components:
+  responses:
+    Empty:
+      description: Empty response for unauthorized or any other returned http status code
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: ""
+            maxLength: 0
+            pattern: "//i"
+
+  securitySchemes:
+    GatewayAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT that comes from the gateway that validates against the gateways public RSA key
+
+  schemas:
+    UUID:
+      description: UUID v4
+      type: string
+      format: uuid
+      maxLength: 36
+      pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+
+    Email:
+      description: Email Address
+      type: string
+      format: email
+      example: "john.doe@gmail.com"
+      pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+      maxLength: 255
+
+    DateTime:
+      type: string
+      format: date-time
+      maxLength: 24
+
+    SubjectID:
+      description: ID of the remote OIDC server gives to this identity
+      type: string
+      pattern: ^[0-9a-zA-Z_-]+$
+      example: aSDDfasd23Dfasdf
+      maxLength: 255
+      readOnly: true
+
+    Provider:
+      description: OIDC provider that was used to handle authentication of this user.
+      type: string
+      example: google
+      pattern: ^\w+$
+      maxLength: 255
+      readOnly: true
+
+    Invite:
+      description: Describes an invite that was sent to a user to join.
+      type: object
+      additionalProperties: false
+      properties:
+        inviteID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        tenantID:
+          $ref: '#/components/schemas/UUID'
+        email:
+          $ref: '#/components/schemas/Email'
+        invitedBy:
+          description: identityID of the person who invited this person.
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        invitedOn:
+          description: date time the user was invited.
+          $ref: '#/components/schemas/DateTime'
+          readOnly: true
+        expiresOn:
+          description: Point at which this invite is no longer valid.
+          $ref: '#/components/schemas/DateTime'
+        redeemed:
+          description: If this invite has been redeemed for a registration
+          type: boolean
+          readOnly: true
+
+    Identity:
+      description: |
+        Properties of an Identity. These users will under-go KYC checks thus all the information
+      type: object
+      additionalProperties: false
+      properties:
+        identityID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        firstName:
+          type: string
+          example: John
+          maxLength: 255
+          pattern: ^\w+$
+        middleName:
+          type: string
+          example: Jimmy
+          maxLength: 255
+          pattern: ^\w+$
+        lastName:
+          type: string
+          example: Doe
+          maxLength: 255
+          pattern: ^\w+$
+        nickName:
+          type: string
+          nullable: true
+          maxLength: 255
+          pattern: ^\w+$
+        suffix:
+          type: string
+          nullable: true
+          pattern: ^\w+$
+          maxLength: 255
+        birthDate:
+          type: string
+          format: date
+          example: 2020-12-31
+          maxLength: 10
+        status: 
+          type: string
+          enum:
+          - rejected
+          - none
+          - review-required
+          - kyc
+          - ofac
+          - cip
+        email:
+          $ref: '#/components/schemas/Email'
+        emailVerified:
+          type: boolean
+          description: The user has verified they have access to this email
+          readOnly: true
+        phones:
+          type: array
+          maxItems: 300
+          items:
+            $ref: '#/components/schemas/Phone'
+        addresses:
+          type: array
+          maxItems: 300
+          items:
+            $ref: '#/components/schemas/Address'
+        registeredOn:
+          description: Describes when the user completed registration
+          readOnly: true
+          nullable: true
+          $ref: '#/components/schemas/DateTime'
+        lastLogin:
+          $ref: '#/components/schemas/LastLogin'
+          nullable: true
+          readOnly: true
+      required:
+        - firstName
+        - lastName
+        - email
+    
+    LastLogin:
+      description: |
+        Defines when and what credential was used for the last login
+      type: object
+      additionalProperties: false
+      properties:
+        credentialId:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        on:
+          $ref: '#/components/schemas/DateTime'
+          readOnly: true
+
+    Credential:
+      description: |
+        Description of a successful OpenID connect credential
+      type: object
+      additionalProperties: false
+      properties:
+        credentialID:
+          $ref: '#/components/schemas/UUID'
+          description: Unique identifier for this specific credential
+          readOnly: true
+        provider:
+          $ref: '#/components/schemas/Provider'
+          readOnly: true
+        subjectID:
+          $ref: '#/components/schemas/SubjectID'
+          readOnly: true
+        identityID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        enabled:
+          type: boolean
+          description: If disabled user will be unable to use this method of authentication without help from support removing the lock.
+        createdOn:
+          $ref: '#/components/schemas/DateTime'
+          readOnly: true
+        lastUsedOn:
+          $ref: '#/components/schemas/DateTime'
+          readOnly: true
+
+    OFACSearch:
+      type: object
+      properties:
+        entityId:
+          type: string
+          description: SDN EntityID of the Entity
+          example: "2141"
+        sdnName:
+          type: string
+          description: Name of the SDN entity
+          example: John Smith
+        sdnType:
+          type: string
+          description: SDN entity type
+          example: Individual
+        match:
+          type: number
+          example: 0.91
+          description: Percentage of similarity between the Customer name and this OFAC entity
+        createdAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+    
+    Phone:
+      description: Phone number
+      type: object
+      additionalProperties: false
+      properties:
+        number:
+          type: string
+          format: phone
+          pattern: ^[0-9]+$
+          maxLength: 15
+        valid:
+          type: boolean
+        type:
+          type: string
+          enum:
+          - home
+          - mobile
+          - work
+
+    Address:
+      description: Address of the Identity
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          enum:
+          - primary
+          - secondary
+        address1:
+          type: string
+          example: 111 Main St.
+          pattern: ^\w+$
+          maxLength: 255
+        address2:
+          type: string
+          pattern: ^\w*$
+          maxLength: 255
+          nullable: true
+        city:
+          type: string
+          example: Cedar Falls
+          pattern: ^\w+$
+          maxLength: 255
+        state:
+          type: string
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          example: IA
+        postalCode:
+          type: string
+          minLength: 5
+          maxLength: 5
+          pattern: ^\d+$
+          example: 50613
+        country:
+          type: string
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          example: US
+        validated: 
+          type: boolean
+        active: 
+          type: boolean
