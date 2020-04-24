@@ -13,7 +13,7 @@ servers:
 
 paths:
 
-  /public/invites:
+  /invites:
     get:
       summary: List outstanding invites
       security:
@@ -58,7 +58,7 @@ paths:
           $ref: '#/components/responses/Empty'
 
 
-  /public/invites/{inviteID}:
+  /invites/{inviteID}:
     delete:
       summary: Delete an invite that was sent and invalidate the token.
       parameters:
@@ -79,7 +79,7 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
-  /public/identities:
+  /identities:
     get:
       summary: List identities and associates userId
       security:
@@ -103,7 +103,7 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
-  /public/identities/{identityID}:
+  /identities/{identityID}:
     get:
       summary: List identities and associates userId
       security:
@@ -157,7 +157,7 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
-  /public/identities/{identityID}/credentials:
+  /identities/{identityID}/credentials:
     get:
       summary: List the credentials this user has used.
       security:

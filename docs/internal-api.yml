@@ -10,7 +10,7 @@ servers:
 
 paths:
 
-  /internal/login:
+  /login:
     post:
       summary: |
         Complete a login via a OIDC.
@@ -42,7 +42,7 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
-  /internal/register:
+  /register:
     post:
       summary: |
         Register user based on OIDC credentials. 
