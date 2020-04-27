@@ -18,3 +18,6 @@ openapitools:
 		-u $(USERID):$(GROUPID) \
 		-e OPENAPI_GENERATOR_VERSION='4.2.0' \
 		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/.openapi-generator/client-generator-config.yml /local/.openapi-generator/server-generator-config.yml
+
+run: binary
+	./bin/identity

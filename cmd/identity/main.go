@@ -10,25 +10,120 @@
 package main
 
 import (
+	"context"
+	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
+	"github.com/gorilla/mux"
 	identityserver "github.com/moov-io/identity/pkg/server"
+
+	"github.com/moov-io/base/admin"
 )
+
+var logger log.Logger
 
 func main() {
 	log.Printf("Server started")
 
-	IdentitiesApiService := identityserver.NewIdentitiesApiService()
-	IdentitiesApiController := identityserver.NewIdentitiesApiController(IdentitiesApiService)
+	// Listen for application termination.
+	errs := make(chan error)
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		errs <- fmt.Errorf("%s", <-c)
+	}()
+
+	//internal admin server
 
 	InternalApiService := identityserver.NewInternalApiService()
 	InternalApiController := identityserver.NewInternalApiController(InternalApiService)
 
+	adminRouter := identityserver.NewRouter(InternalApiController)
+
+	adminServer := bootAdminServer(adminRouter, errs)
+	defer adminServer.Shutdown()
+
+	// public server
+
+	IdentitiesApiService := identityserver.NewIdentitiesApiService()
+	IdentitiesApiController := identityserver.NewIdentitiesApiController(IdentitiesApiService)
+
 	InvitesApiService := identityserver.NewInvitesApiService()
 	InvitesApiController := identityserver.NewInvitesApiController(InvitesApiService)
 
-	router := identityserver.NewRouter(IdentitiesApiController, InternalApiController, InvitesApiController)
+	publicRouter := identityserver.NewRouter(IdentitiesApiController, InvitesApiController, InternalApiController)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	_, shutdownServer := bootPublicServer(publicRouter, errs)
+	defer shutdownServer()
+
+	if err := <-errs; err != nil {
+		log.Printf("app exit: %s", err)
+	}
+}
+
+func bootAdminServer(adminRouter *mux.Router, errs chan<- error) *admin.Server {
+	adminAddr := os.Getenv("HTTP_ADMIN_BIND_ADDRESS")
+	if adminAddr == "" {
+		adminAddr = ":8201"
+	}
+
+	adminServer := admin.NewServer(adminAddr)
+	adminServer.AddHandler("/", adminRouter.ServeHTTP)
+
+	go func() {
+		log.Printf("binding to %s for Admin server", adminServer.BindAddr())
+		//logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
+		if err := adminServer.Listen(); err != nil {
+			err = fmt.Errorf("problem starting admin http: %v", err)
+			//logger.Log("admin", err)
+			errs <- err // send err to shutdown channel
+		}
+	}()
+
+	return adminServer
+}
+
+func bootPublicServer(routes *mux.Router, errs chan<- error) (*http.Server, func()) {
+	httpAddr := os.Getenv("HTTP_BIND_ADDRESS")
+	if httpAddr == "" {
+		httpAddr = ":8200"
+	}
+
+	// Create main HTTP server
+	serve := &http.Server{
+		Addr:    httpAddr,
+		Handler: routes,
+		TLSConfig: &tls.Config{
+			InsecureSkipVerify:       false,
+			PreferServerCipherSuites: true,
+			MinVersion:               tls.VersionTLS12,
+		},
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	// Start main HTTP server
+	go func() {
+		log.Printf("binding to %s for HTTP server", httpAddr)
+		if err := serve.ListenAndServe(); err != nil {
+			err = fmt.Errorf("problem starting http: %v", err)
+			//log.Printf("exit %s", err)
+			errs <- err // send err to shutdown channel
+		}
+	}()
+
+	shutdownServer := func() {
+		if err := serve.Shutdown(context.TODO()); err != nil {
+			//cfg.Logger.Log("shutdown", err)
+		}
+	}
+
+	return serve, shutdownServer
 }

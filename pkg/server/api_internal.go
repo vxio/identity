@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"strings"
 	// None of these endpoints use this but the api generator adds it so if we need to use it again enable in the .openapi-generator-ignore
-	//"github.com/gorilla/mux"
+	// "github.com/gorilla/mux"
 )
 
 // A InternalApiController binds http requests to an api service and writes the service results to the http response
