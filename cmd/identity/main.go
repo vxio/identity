@@ -12,15 +12,17 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/identity/pkg/database"
 	identityserver "github.com/moov-io/identity/pkg/server"
 
 	"github.com/moov-io/base/admin"
@@ -29,15 +31,14 @@ import (
 var logger log.Logger
 
 func main() {
-	log.Printf("Server started")
+	logger = log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 
 	// Listen for application termination.
-	errs := make(chan error)
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		errs <- fmt.Errorf("%s", <-c)
-	}()
+	terminationListener := newTerminationListener()
+
+	//db setup
+	_, close := initializeDatabase(logger)
+	defer close()
 
 	//internal admin server
 
@@ -46,7 +47,7 @@ func main() {
 
 	adminRouter := identityserver.NewRouter(InternalApiController)
 
-	adminServer := bootAdminServer(adminRouter, errs)
+	adminServer := bootAdminServer(adminRouter, terminationListener, logger)
 	defer adminServer.Shutdown()
 
 	// public server
@@ -59,15 +60,30 @@ func main() {
 
 	publicRouter := identityserver.NewRouter(IdentitiesApiController, InvitesApiController, InternalApiController)
 
-	_, shutdownServer := bootPublicServer(publicRouter, errs)
+	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger)
 	defer shutdownServer()
 
-	if err := <-errs; err != nil {
-		log.Printf("app exit: %s", err)
+	awaitTermination(terminationListener)
+}
+
+func newTerminationListener() chan error {
+	errs := make(chan error)
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		errs <- fmt.Errorf("%s", <-c)
+	}()
+
+	return errs
+}
+
+func awaitTermination(terminationListener chan error) {
+	if err := <-terminationListener; err != nil {
+		logger.Log("exit", err)
 	}
 }
 
-func bootAdminServer(adminRouter *mux.Router, errs chan<- error) *admin.Server {
+func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logger) *admin.Server {
 	adminAddr := os.Getenv("HTTP_ADMIN_BIND_ADDRESS")
 	if adminAddr == "" {
 		adminAddr = ":8201"
@@ -77,11 +93,10 @@ func bootAdminServer(adminRouter *mux.Router, errs chan<- error) *admin.Server {
 	adminServer.AddHandler("/", adminRouter.ServeHTTP)
 
 	go func() {
-		log.Printf("binding to %s for Admin server", adminServer.BindAddr())
-		//logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
+		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
 		if err := adminServer.Listen(); err != nil {
 			err = fmt.Errorf("problem starting admin http: %v", err)
-			//logger.Log("admin", err)
+			logger.Log("admin", err)
 			errs <- err // send err to shutdown channel
 		}
 	}()
@@ -89,7 +104,7 @@ func bootAdminServer(adminRouter *mux.Router, errs chan<- error) *admin.Server {
 	return adminServer
 }
 
-func bootPublicServer(routes *mux.Router, errs chan<- error) (*http.Server, func()) {
+func bootPublicServer(routes *mux.Router, errs chan<- error, logger log.Logger) (*http.Server, func()) {
 	httpAddr := os.Getenv("HTTP_BIND_ADDRESS")
 	if httpAddr == "" {
 		httpAddr = ":8200"
@@ -111,19 +126,38 @@ func bootPublicServer(routes *mux.Router, errs chan<- error) (*http.Server, func
 
 	// Start main HTTP server
 	go func() {
-		log.Printf("binding to %s for HTTP server", httpAddr)
+		logger.Log("http", fmt.Sprintf("listening on %s", httpAddr))
 		if err := serve.ListenAndServe(); err != nil {
 			err = fmt.Errorf("problem starting http: %v", err)
-			//log.Printf("exit %s", err)
+			logger.Log("http", err)
 			errs <- err // send err to shutdown channel
 		}
 	}()
 
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
-			//cfg.Logger.Log("shutdown", err)
+			logger.Log("exit", err)
 		}
 	}
 
 	return serve, shutdownServer
+}
+
+func initializeDatabase(logger log.Logger) (*sql.DB, func()) {
+	ctx, cancelFunc := context.WithCancel(context.Background())
+
+	// migrate database
+	db, err := database.New(ctx, logger, database.Type())
+	if err != nil {
+		panic(fmt.Sprintf("error creating database: %v", err))
+	}
+
+	shutdown := func() {
+		cancelFunc()
+		if err := db.Close(); err != nil {
+			logger.Log("exit", err)
+		}
+	}
+
+	return db, shutdown
 }

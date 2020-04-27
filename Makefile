@@ -7,7 +7,7 @@ GEN_CODE_LOCATION := "pkg/gen"
 build: binary
 #openapitools
 
-binary: openapitools
+binary: #openapitools
 	cd ./cmd/identity && go build -o $(PWD)/bin/identity
 
 # Generate the go code from the public and internal api's
