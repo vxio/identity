@@ -25,3 +25,5 @@
 
 main.go
 pkg/server/api_*_service.go
+
+pkg/server/api_internal.go

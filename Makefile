@@ -4,8 +4,11 @@ GROUPID:= $(shell id -g $$USER)
 
 GEN_CODE_LOCATION := "pkg/gen"
 
-build: openapitools
+build: binary
+#openapitools
 
+binary: openapitools
+	cd ./cmd/identity && go build -o $(PWD)/bin/identity
 
 # Generate the go code from the public and internal api's
 openapitools:
@@ -14,4 +17,4 @@ openapitools:
 	docker run --rm \
 		-u $(USERID):$(GROUPID) \
 		-e OPENAPI_GENERATOR_VERSION='4.2.0' \
-		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/cfg/client-generator-config.yml /local/cfg/server-generator-config.yml
+		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/.openapi-generator/client-generator-config.yml /local/.openapi-generator/server-generator-config.yml
