@@ -55,10 +55,13 @@ func main() {
 	IdentitiesApiService := identityserver.NewIdentitiesApiService()
 	IdentitiesApiController := identityserver.NewIdentitiesApiController(IdentitiesApiService)
 
+	CredentialsApiService := identityserver.NewCredentialsApiService()
+	CredentialsApiController := identityserver.NewCredentialsApiController(CredentialsApiService)
+
 	InvitesApiService := identityserver.NewInvitesApiService()
 	InvitesApiController := identityserver.NewInvitesApiController(InvitesApiService)
 
-	publicRouter := identityserver.NewRouter(IdentitiesApiController, InvitesApiController, InternalApiController)
+	publicRouter := identityserver.NewRouter(IdentitiesApiController, CredentialsApiController, InvitesApiController, InternalApiController)
 
 	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger)
 	defer shutdownServer()
