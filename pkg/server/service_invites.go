@@ -13,34 +13,31 @@ import (
 	"errors"
 )
 
-// InvitesService is a service that implents the logic for the InvitesApiServicer
-// This service should implement the business logic for every endpoint for the InvitesApi API.
-// Include any external packages or services that will be required by this service.
 type InvitesService struct {
+	repository InvitesRepository
 }
 
-// NewInvitesService creates a default api service
-func NewInvitesService() InvitesApiServicer {
-	return &InvitesService{}
+func NewInvitesService(repository InvitesRepository) InvitesApiServicer {
+	return &InvitesService{
+		repository: repository,
+	}
 }
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
 func (s *InvitesService) DeleteInvite(inviteID string) (interface{}, error) {
-	// TODO - update DeleteInvite with the required logic for this service method.
-	// Add api_invites_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return nil, errors.New("service method 'DeleteInvite' not implemented")
 }
 
 // ListInvites - List outstanding invites
 func (s *InvitesService) ListInvites(orgID string) (interface{}, error) {
-	// TODO - update ListInvites with the required logic for this service method.
-	// Add api_invites_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return nil, errors.New("service method 'ListInvites' not implemented")
 }
 
 // SendInvite - Send an email invite to a new user
 func (s *InvitesService) SendInvite(invite Invite) (interface{}, error) {
-	// TODO - update SendInvite with the required logic for this service method.
-	// Add api_invites_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	// add to DB
+
+	// send email
 	return nil, errors.New("service method 'SendInvite' not implemented")
 }

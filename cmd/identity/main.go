@@ -39,31 +39,31 @@ func main() {
 	db, close := initializeDatabase(logger)
 	defer close()
 
-	CredentialRepository := identityserver.NewCredentialRepository(db)
-	IdentityRepository := identityserver.NewIdentityRepository(db)
-
 	//internal admin server
 
-	InternalApiService := identityserver.NewInternalService()
-	InternalApiController := identityserver.NewInternalApiController(InternalApiService)
+	InternalService := identityserver.NewInternalService()
+	InternalController := identityserver.NewInternalAPIController(InternalService)
 
-	adminRouter := identityserver.NewRouter(InternalApiController)
+	adminRouter := identityserver.NewRouter(InternalController)
 
 	adminServer := bootAdminServer(adminRouter, terminationListener, logger)
 	defer adminServer.Shutdown()
 
 	// public server
 
-	IdentitiesApiService := identityserver.NewIdentitiesService(IdentityRepository)
-	IdentitiesApiController := identityserver.NewIdentitiesApiController(IdentitiesApiService)
+	IdentityRepository := identityserver.NewIdentityRepository(db)
+	IdentitiesService := identityserver.NewIdentitiesService(IdentityRepository)
+	IdentitiesController := identityserver.NewIdentitiesApiController(IdentitiesService)
 
-	CredentialsApiService := identityserver.NewCredentialsService(CredentialRepository)
-	CredentialsApiController := identityserver.NewCredentialsApiController(CredentialsApiService)
+	CredentialRepository := identityserver.NewCredentialRepository(db)
+	CredentialsService := identityserver.NewCredentialsService(CredentialRepository)
+	CredentialsController := identityserver.NewCredentialsApiController(CredentialsService)
 
-	InvitesApiService := identityserver.NewInvitesService()
-	InvitesApiController := identityserver.NewInvitesController(InvitesApiService)
+	InvitesRepository := identityserver.NewInvitesRepository(db)
+	InvitesService := identityserver.NewInvitesService(InvitesRepository)
+	InvitesController := identityserver.NewInvitesController(InvitesService)
 
-	publicRouter := identityserver.NewRouter(IdentitiesApiController, CredentialsApiController, InvitesApiController, InternalApiController)
+	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, InternalController)
 
 	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger)
 	defer shutdownServer()
