@@ -31,37 +31,63 @@ func NewIdentitiesApiController(s IdentitiesApiServicer) Router {
 func (c *IdentitiesApiController) Routes() Routes {
 	return Routes{ 
 		{
-			"IdentitiesGet",
+			"DisableIdentity",
+			strings.ToUpper("Delete"),
+			"/identities/{identityID}",
+			c.DisableIdentity,
+		},
+		{
+			"GetIdentity",
+			strings.ToUpper("Get"),
+			"/identities/{identityID}",
+			c.GetIdentity,
+		},
+		{
+			"ListIdentities",
 			strings.ToUpper("Get"),
 			"/identities",
-			c.IdentitiesGet,
+			c.ListIdentities,
 		},
 		{
-			"IdentitiesIdentityIDCredentialsGet",
-			strings.ToUpper("Get"),
-			"/identities/{identityID}/credentials",
-			c.IdentitiesIdentityIDCredentialsGet,
-		},
-		{
-			"IdentitiesIdentityIDGet",
-			strings.ToUpper("Get"),
-			"/identities/{identityID}",
-			c.IdentitiesIdentityIDGet,
-		},
-		{
-			"IdentitiesIdentityIDPut",
+			"UpdateIdentity",
 			strings.ToUpper("Put"),
 			"/identities/{identityID}",
-			c.IdentitiesIdentityIDPut,
+			c.UpdateIdentity,
 		},
 	}
 }
 
-// IdentitiesGet - List identities and associates userId
-func (c *IdentitiesApiController) IdentitiesGet(w http.ResponseWriter, r *http.Request) { 
+// DisableIdentity - Disable an identity. Its left around for historical reporting
+func (c *IdentitiesApiController) DisableIdentity(w http.ResponseWriter, r *http.Request) { 
+	params := mux.Vars(r)
+	identityID := params["identityID"]
+	result, err := c.service.DisableIdentity(identityID)
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+	
+	EncodeJSONResponse(result, nil, w)
+}
+
+// GetIdentity - List identities and associates userId
+func (c *IdentitiesApiController) GetIdentity(w http.ResponseWriter, r *http.Request) { 
+	params := mux.Vars(r)
+	identityID := params["identityID"]
+	result, err := c.service.GetIdentity(identityID)
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+	
+	EncodeJSONResponse(result, nil, w)
+}
+
+// ListIdentities - List identities and associates userId
+func (c *IdentitiesApiController) ListIdentities(w http.ResponseWriter, r *http.Request) { 
 	query := r.URL.Query()
 	orgID := query.Get("orgID")
-	result, err := c.service.IdentitiesGet(orgID)
+	result, err := c.service.ListIdentities(orgID)
 	if err != nil {
 		w.WriteHeader(500)
 		return
@@ -70,34 +96,8 @@ func (c *IdentitiesApiController) IdentitiesGet(w http.ResponseWriter, r *http.R
 	EncodeJSONResponse(result, nil, w)
 }
 
-// IdentitiesIdentityIDCredentialsGet - List the credentials this user has used.
-func (c *IdentitiesApiController) IdentitiesIdentityIDCredentialsGet(w http.ResponseWriter, r *http.Request) { 
-	params := mux.Vars(r)
-	identityID := params["identityID"]
-	result, err := c.service.IdentitiesIdentityIDCredentialsGet(identityID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
-	
-	EncodeJSONResponse(result, nil, w)
-}
-
-// IdentitiesIdentityIDGet - List identities and associates userId
-func (c *IdentitiesApiController) IdentitiesIdentityIDGet(w http.ResponseWriter, r *http.Request) { 
-	params := mux.Vars(r)
-	identityID := params["identityID"]
-	result, err := c.service.IdentitiesIdentityIDGet(identityID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
-	
-	EncodeJSONResponse(result, nil, w)
-}
-
-// IdentitiesIdentityIDPut - Update a specific Identity
-func (c *IdentitiesApiController) IdentitiesIdentityIDPut(w http.ResponseWriter, r *http.Request) { 
+// UpdateIdentity - Update a specific Identity
+func (c *IdentitiesApiController) UpdateIdentity(w http.ResponseWriter, r *http.Request) { 
 	params := mux.Vars(r)
 	identityID := params["identityID"]
 	identity := &Identity{}
@@ -106,7 +106,7 @@ func (c *IdentitiesApiController) IdentitiesIdentityIDPut(w http.ResponseWriter,
 		return
 	}
 	
-	result, err := c.service.IdentitiesIdentityIDPut(identityID, *identity)
+	result, err := c.service.UpdateIdentity(identityID, *identity)
 	if err != nil {
 		w.WriteHeader(500)
 		return

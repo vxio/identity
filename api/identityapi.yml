@@ -17,6 +17,7 @@ paths:
 
   /invites:
     get:
+      operationId: ListInvites
       summary: List outstanding invites
       tags:
       - invites
@@ -42,6 +43,7 @@ paths:
           $ref: '#/components/responses/Empty'
                     
     post:
+      operationId: SendInvite
       summary: Send an email invite to a new user
       tags:
       - invites
@@ -66,6 +68,7 @@ paths:
 
   /invites/{inviteID}:
     delete:
+      operationId: DeleteInvite
       summary: Delete an invite that was sent and invalidate the token.
       tags:
       - invites
@@ -89,6 +92,7 @@ paths:
 
   /identities:
     get:
+      operationId: ListIdentities
       summary: List identities and associates userId
       tags:
       - identities
@@ -115,6 +119,7 @@ paths:
 
   /identities/{identityID}:
     get:
+      operationId: GetIdentity
       summary: List identities and associates userId
       tags:
       - identities
@@ -140,6 +145,7 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
     put:
+      operationId: UpdateIdentity
       summary: Update a specific Identity
       tags:
       - identities
@@ -170,12 +176,36 @@ paths:
           $ref: '#/components/responses/Empty'
         default:
           $ref: '#/components/responses/Empty'
+    delete:
+      operationId: DisableIdentity
+      summary: Disable an identity. Its left around for historical reporting
+      tags:
+        - identities
+      security:
+      - GatewayAuth: []
+      parameters:
+      - in: path
+        name: identityID
+        description: ID of the Identity to lookup
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '204':
+          description: Invite was removed
+        '404':
+          description: Invite was not found.
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+        
 
   /identities/{identityID}/credentials:
     get:
+      operationId: ListCredentials
       summary: List the credentials this user has used.
       tags:
-      - identities
+      - credentials
       security:
       - GatewayAuth: []
       parameters:
@@ -201,9 +231,48 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
+
+  /identities/{identityID}/credentials/{credentialID}:
+    get:
+      operationId: DisableCredentials
+      summary: Disables a credential so it can't be used anymore to login
+      tags:
+      - credentials
+      security:
+      - GatewayAuth: []
+      parameters:
+      - in: path
+        name: identityID
+        description: ID of the Identity for the credential
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - in: path
+        name: credentialID
+        description: ID of the credential to disable
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of credentials tied to this identity
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 300
+                items:
+                  $ref: '#/components/schemas/Credential'
+        '404':
+          description: IdentityID doesn't exist
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+
 # Internal only
   /login:
     post:
+      operationId: LoginWithCredentials
       summary: |
         Complete a login via a OIDC.
         Once the OIDC client service has authenticated their identity the client service will call 
@@ -236,6 +305,7 @@ paths:
 
   /register:
     post:
+      operationId: RegisterWithCredentials
       summary: |
         Register user based on OIDC credentials. 
         This is called by the OIDC client services we create to register the user with what 

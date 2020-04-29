@@ -24,30 +24,30 @@ func NewIdentitiesApiService() IdentitiesApiServicer {
 	return &IdentitiesApiService{}
 }
 
-// IdentitiesGet - List identities and associates userId
-func (s *IdentitiesApiService) IdentitiesGet(orgID string) (interface{}, error) {
-	// TODO - update IdentitiesGet with the required logic for this service method.
+// DisableIdentity - Disable an identity. Its left around for historical reporting
+func (s *IdentitiesApiService) DisableIdentity(identityID string) (interface{}, error) {
+	// TODO - update DisableIdentity with the required logic for this service method.
 	// Add api_identities_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'IdentitiesGet' not implemented")
+	return nil, errors.New("service method 'DisableIdentity' not implemented")
 }
 
-// IdentitiesIdentityIDCredentialsGet - List the credentials this user has used.
-func (s *IdentitiesApiService) IdentitiesIdentityIDCredentialsGet(identityID string) (interface{}, error) {
-	// TODO - update IdentitiesIdentityIDCredentialsGet with the required logic for this service method.
+// GetIdentity - List identities and associates userId
+func (s *IdentitiesApiService) GetIdentity(identityID string) (interface{}, error) {
+	// TODO - update GetIdentity with the required logic for this service method.
 	// Add api_identities_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'IdentitiesIdentityIDCredentialsGet' not implemented")
+	return nil, errors.New("service method 'GetIdentity' not implemented")
 }
 
-// IdentitiesIdentityIDGet - List identities and associates userId
-func (s *IdentitiesApiService) IdentitiesIdentityIDGet(identityID string) (interface{}, error) {
-	// TODO - update IdentitiesIdentityIDGet with the required logic for this service method.
+// ListIdentities - List identities and associates userId
+func (s *IdentitiesApiService) ListIdentities(orgID string) (interface{}, error) {
+	// TODO - update ListIdentities with the required logic for this service method.
 	// Add api_identities_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'IdentitiesIdentityIDGet' not implemented")
+	return nil, errors.New("service method 'ListIdentities' not implemented")
 }
 
-// IdentitiesIdentityIDPut - Update a specific Identity
-func (s *IdentitiesApiService) IdentitiesIdentityIDPut(identityID string, identity Identity) (interface{}, error) {
-	// TODO - update IdentitiesIdentityIDPut with the required logic for this service method.
+// UpdateIdentity - Update a specific Identity
+func (s *IdentitiesApiService) UpdateIdentity(identityID string, identity Identity) (interface{}, error) {
+	// TODO - update UpdateIdentity with the required logic for this service method.
 	// Add api_identities_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'IdentitiesIdentityIDPut' not implemented")
+	return nil, errors.New("service method 'UpdateIdentity' not implemented")
 }

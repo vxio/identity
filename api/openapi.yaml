@@ -14,6 +14,7 @@ servers:
 paths:
   /invites:
     get:
+      operationId: ListInvites
       parameters:
       - description: Filter in only for specific Organization
         explode: true
@@ -48,6 +49,7 @@ paths:
       tags:
       - invites
     post:
+      operationId: SendInvite
       requestBody:
         content:
           application/json:
@@ -77,6 +79,7 @@ paths:
       - invites
   /invites/{inviteID}:
     delete:
+      operationId: DeleteInvite
       parameters:
       - description: ID of the invite to delete
         explode: false
@@ -114,6 +117,7 @@ paths:
       - invites
   /identities:
     get:
+      operationId: ListIdentities
       parameters:
       - description: Filter in only for specific Organization
         explode: true
@@ -148,7 +152,45 @@ paths:
       tags:
       - identities
   /identities/{identityID}:
+    delete:
+      operationId: DisableIdentity
+      parameters:
+      - description: ID of the Identity to lookup
+        explode: false
+        in: path
+        name: identityID
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+        style: simple
+      responses:
+        "204":
+          description: Invite was removed
+        "404":
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - GatewayAuth: []
+      summary: Disable an identity. Its left around for historical reporting
+      tags:
+      - identities
     get:
+      operationId: GetIdentity
       parameters:
       - description: ID of the Identity to lookup
         explode: false
@@ -189,6 +231,7 @@ paths:
       tags:
       - identities
     put:
+      operationId: UpdateIdentity
       parameters:
       - description: ID of the Identity to lookup
         explode: false
@@ -236,6 +279,7 @@ paths:
       - identities
   /identities/{identityID}/credentials:
     get:
+      operationId: ListCredentials
       parameters:
       - description: ID of the Identity to lookup
         explode: false
@@ -277,9 +321,63 @@ paths:
       - GatewayAuth: []
       summary: List the credentials this user has used.
       tags:
-      - identities
+      - credentials
+  /identities/{identityID}/credentials/{credentialID}:
+    get:
+      operationId: DisableCredentials
+      parameters:
+      - description: ID of the Identity for the credential
+        explode: false
+        in: path
+        name: identityID
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+        style: simple
+      - description: ID of the credential to disable
+        explode: false
+        in: path
+        name: credentialID
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Credential'
+                maxItems: 300
+                type: array
+          description: List of credentials tied to this identity
+        "404":
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - GatewayAuth: []
+      summary: Disables a credential so it can't be used anymore to login
+      tags:
+      - credentials
   /login:
     post:
+      operationId: LoginWithCredentials
       requestBody:
         content:
           application/json:
@@ -325,6 +423,7 @@ paths:
       - internal
   /register:
     post:
+      operationId: RegisterWithCredentials
       requestBody:
         content:
           application/json:

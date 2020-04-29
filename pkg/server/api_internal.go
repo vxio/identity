@@ -13,8 +13,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-	// None of these endpoints use this but the api generator adds it so if we need to use it again enable in the .openapi-generator-ignore
-	// "github.com/gorilla/mux"
+	//"github.com/gorilla/mux"
 )
 
 // A InternalApiController binds http requests to an api service and writes the service results to the http response
@@ -31,29 +30,29 @@ func NewInternalApiController(s InternalApiServicer) Router {
 func (c *InternalApiController) Routes() Routes {
 	return Routes{
 		{
-			"LoginPost",
+			"LoginWithCredentials",
 			strings.ToUpper("Post"),
 			"/login",
-			c.LoginPost,
+			c.LoginWithCredentials,
 		},
 		{
-			"RegisterPost",
+			"RegisterWithCredentials",
 			strings.ToUpper("Post"),
 			"/register",
-			c.RegisterPost,
+			c.RegisterWithCredentials,
 		},
 	}
 }
 
-// LoginPost - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
-func (c *InternalApiController) LoginPost(w http.ResponseWriter, r *http.Request) {
+// LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
+func (c *InternalApiController) LoginWithCredentials(w http.ResponseWriter, r *http.Request) {
 	login := &Login{}
 	if err := json.NewDecoder(r.Body).Decode(&login); err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
-	result, err := c.service.LoginPost(*login)
+	result, err := c.service.LoginWithCredentials(*login)
 	if err != nil {
 		w.WriteHeader(500)
 		return
@@ -62,15 +61,15 @@ func (c *InternalApiController) LoginPost(w http.ResponseWriter, r *http.Request
 	EncodeJSONResponse(result, nil, w)
 }
 
-// RegisterPost - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
-func (c *InternalApiController) RegisterPost(w http.ResponseWriter, r *http.Request) {
+// RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
+func (c *InternalApiController) RegisterWithCredentials(w http.ResponseWriter, r *http.Request) {
 	register := &Register{}
 	if err := json.NewDecoder(r.Body).Decode(&register); err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
-	result, err := c.service.RegisterPost(*register)
+	result, err := c.service.RegisterWithCredentials(*register)
 	if err != nil {
 		w.WriteHeader(500)
 		return

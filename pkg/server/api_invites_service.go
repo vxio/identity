@@ -24,23 +24,23 @@ func NewInvitesApiService() InvitesApiServicer {
 	return &InvitesApiService{}
 }
 
-// InvitesGet - List outstanding invites
-func (s *InvitesApiService) InvitesGet(orgID string) (interface{}, error) {
-	// TODO - update InvitesGet with the required logic for this service method.
+// DeleteInvite - Delete an invite that was sent and invalidate the token.
+func (s *InvitesApiService) DeleteInvite(inviteID string) (interface{}, error) {
+	// TODO - update DeleteInvite with the required logic for this service method.
 	// Add api_invites_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'InvitesGet' not implemented")
+	return nil, errors.New("service method 'DeleteInvite' not implemented")
 }
 
-// InvitesInviteIDDelete - Delete an invite that was sent and invalidate the token.
-func (s *InvitesApiService) InvitesInviteIDDelete(inviteID string) (interface{}, error) {
-	// TODO - update InvitesInviteIDDelete with the required logic for this service method.
+// ListInvites - List outstanding invites
+func (s *InvitesApiService) ListInvites(orgID string) (interface{}, error) {
+	// TODO - update ListInvites with the required logic for this service method.
 	// Add api_invites_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'InvitesInviteIDDelete' not implemented")
+	return nil, errors.New("service method 'ListInvites' not implemented")
 }
 
-// InvitesPost - Send an email invite to a new user
-func (s *InvitesApiService) InvitesPost(invite Invite) (interface{}, error) {
-	// TODO - update InvitesPost with the required logic for this service method.
+// SendInvite - Send an email invite to a new user
+func (s *InvitesApiService) SendInvite(invite Invite) (interface{}, error) {
+	// TODO - update SendInvite with the required logic for this service method.
 	// Add api_invites_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'InvitesPost' not implemented")
+	return nil, errors.New("service method 'SendInvite' not implemented")
 }

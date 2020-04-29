@@ -4,14 +4,14 @@ All URIs are relative to *https://local.moov.io*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**LoginPost**](InternalApi.md#LoginPost) | **Post** /login | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
-[**RegisterPost**](InternalApi.md#RegisterPost) | **Post** /register | Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
+[**LoginWithCredentials**](InternalApi.md#LoginWithCredentials) | **Post** /login | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
+[**RegisterWithCredentials**](InternalApi.md#RegisterWithCredentials) | **Post** /register | Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
 
 
 
-## LoginPost
+## LoginWithCredentials
 
-> LoggedIn LoginPost(ctx, login)
+> LoggedIn LoginWithCredentials(ctx, login)
 
 Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
 
@@ -41,9 +41,9 @@ Name | Type | Description  | Notes
 [[Back to README]](../README.md)
 
 
-## RegisterPost
+## RegisterWithCredentials
 
-> LoggedIn RegisterPost(ctx, register)
+> LoggedIn RegisterWithCredentials(ctx, register)
 
 Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
 

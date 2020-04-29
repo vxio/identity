@@ -31,44 +31,31 @@ func NewInvitesApiController(s InvitesApiServicer) Router {
 func (c *InvitesApiController) Routes() Routes {
 	return Routes{ 
 		{
-			"InvitesGet",
-			strings.ToUpper("Get"),
-			"/invites",
-			c.InvitesGet,
-		},
-		{
-			"InvitesInviteIDDelete",
+			"DeleteInvite",
 			strings.ToUpper("Delete"),
 			"/invites/{inviteID}",
-			c.InvitesInviteIDDelete,
+			c.DeleteInvite,
 		},
 		{
-			"InvitesPost",
+			"ListInvites",
+			strings.ToUpper("Get"),
+			"/invites",
+			c.ListInvites,
+		},
+		{
+			"SendInvite",
 			strings.ToUpper("Post"),
 			"/invites",
-			c.InvitesPost,
+			c.SendInvite,
 		},
 	}
 }
 
-// InvitesGet - List outstanding invites
-func (c *InvitesApiController) InvitesGet(w http.ResponseWriter, r *http.Request) { 
-	query := r.URL.Query()
-	orgID := query.Get("orgID")
-	result, err := c.service.InvitesGet(orgID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
-	
-	EncodeJSONResponse(result, nil, w)
-}
-
-// InvitesInviteIDDelete - Delete an invite that was sent and invalidate the token.
-func (c *InvitesApiController) InvitesInviteIDDelete(w http.ResponseWriter, r *http.Request) { 
+// DeleteInvite - Delete an invite that was sent and invalidate the token.
+func (c *InvitesApiController) DeleteInvite(w http.ResponseWriter, r *http.Request) { 
 	params := mux.Vars(r)
 	inviteID := params["inviteID"]
-	result, err := c.service.InvitesInviteIDDelete(inviteID)
+	result, err := c.service.DeleteInvite(inviteID)
 	if err != nil {
 		w.WriteHeader(500)
 		return
@@ -77,15 +64,28 @@ func (c *InvitesApiController) InvitesInviteIDDelete(w http.ResponseWriter, r *h
 	EncodeJSONResponse(result, nil, w)
 }
 
-// InvitesPost - Send an email invite to a new user
-func (c *InvitesApiController) InvitesPost(w http.ResponseWriter, r *http.Request) { 
+// ListInvites - List outstanding invites
+func (c *InvitesApiController) ListInvites(w http.ResponseWriter, r *http.Request) { 
+	query := r.URL.Query()
+	orgID := query.Get("orgID")
+	result, err := c.service.ListInvites(orgID)
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+	
+	EncodeJSONResponse(result, nil, w)
+}
+
+// SendInvite - Send an email invite to a new user
+func (c *InvitesApiController) SendInvite(w http.ResponseWriter, r *http.Request) { 
 	invite := &Invite{}
 	if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
 		w.WriteHeader(500)
 		return
 	}
 	
-	result, err := c.service.InvitesPost(*invite)
+	result, err := c.service.SendInvite(*invite)
 	if err != nil {
 		w.WriteHeader(500)
 		return

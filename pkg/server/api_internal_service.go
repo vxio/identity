@@ -24,16 +24,16 @@ func NewInternalApiService() InternalApiServicer {
 	return &InternalApiService{}
 }
 
-// LoginPost - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
-func (s *InternalApiService) LoginPost(login Login) (interface{}, error) {
-	// TODO - update LoginPost with the required logic for this service method.
+// LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
+func (s *InternalApiService) LoginWithCredentials(login Login) (interface{}, error) {
+	// TODO - update LoginWithCredentials with the required logic for this service method.
 	// Add api_internal_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'LoginPost' not implemented")
+	return nil, errors.New("service method 'LoginWithCredentials' not implemented")
 }
 
-// RegisterPost - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
-func (s *InternalApiService) RegisterPost(register Register) (interface{}, error) {
-	// TODO - update RegisterPost with the required logic for this service method.
+// RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
+func (s *InternalApiService) RegisterWithCredentials(register Register) (interface{}, error) {
+	// TODO - update RegisterWithCredentials with the required logic for this service method.
 	// Add api_internal_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'RegisterPost' not implemented")
+	return nil, errors.New("service method 'RegisterWithCredentials' not implemented")
 }

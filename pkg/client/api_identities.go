@@ -26,122 +26,29 @@ var (
 // IdentitiesApiService IdentitiesApi service
 type IdentitiesApiService service
 
-// IdentitiesGetOpts Optional parameters for the method 'IdentitiesGet'
-type IdentitiesGetOpts struct {
-    OrgID optional.Interface
-}
-
 /*
-IdentitiesGet List identities and associates userId
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param optional nil or *IdentitiesGetOpts - Optional Parameters:
- * @param "OrgID" (optional.Interface of string) -  Filter in only for specific Organization
-@return []Identity
-*/
-func (a *IdentitiesApiService) IdentitiesGet(ctx _context.Context, localVarOptionals *IdentitiesGetOpts) ([]Identity, *_nethttp.Response, error) {
-	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
-		localVarPostBody     interface{}
-		localVarFormFileName string
-		localVarFileName     string
-		localVarFileBytes    []byte
-		localVarReturnValue  []Identity
-	)
-
-	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/identities"
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
-
-	if localVarOptionals != nil && localVarOptionals.OrgID.IsSet() {
-		localVarQueryParams.Add("orgID", parameterToString(localVarOptionals.OrgID.Value(), ""))
-	}
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "text/plain"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-			var v string
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-/*
-IdentitiesIdentityIDCredentialsGet List the credentials this user has used.
+DisableIdentity Disable an identity. Its left around for historical reporting
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param identityID ID of the Identity to lookup
-@return []Credential
 */
-func (a *IdentitiesApiService) IdentitiesIdentityIDCredentialsGet(ctx _context.Context, identityID string) ([]Credential, *_nethttp.Response, error) {
+func (a *IdentitiesApiService) DisableIdentity(ctx _context.Context, identityID string) (*_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  []Credential
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/identities/{identityID}/credentials"
+	localVarPath := a.client.cfg.BasePath + "/identities/{identityID}"
 	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.QueryEscape(parameterToString(identityID, "")) , -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 	if strlen(identityID) > 36 {
-		return localVarReturnValue, nil, reportError("identityID must have less than 36 elements")
+		return nil, reportError("identityID must have less than 36 elements")
 	}
 
 	// to determine the Content-Type header
@@ -154,7 +61,7 @@ func (a *IdentitiesApiService) IdentitiesIdentityIDCredentialsGet(ctx _context.C
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "text/plain"}
+	localVarHTTPHeaderAccepts := []string{"text/plain"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
@@ -163,18 +70,18 @@ func (a *IdentitiesApiService) IdentitiesIdentityIDCredentialsGet(ctx _context.C
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse, err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -187,40 +94,31 @@ func (a *IdentitiesApiService) IdentitiesIdentityIDCredentialsGet(ctx _context.C
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
+			return localVarHTTPResponse, newErr
 		}
 			var v string
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 			newErr.model = v
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarHTTPResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
+	return localVarHTTPResponse, nil
 }
 
 /*
-IdentitiesIdentityIDGet List identities and associates userId
+GetIdentity List identities and associates userId
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param identityID ID of the Identity to lookup
 @return Identity
 */
-func (a *IdentitiesApiService) IdentitiesIdentityIDGet(ctx _context.Context, identityID string) (Identity, *_nethttp.Response, error) {
+func (a *IdentitiesApiService) GetIdentity(ctx _context.Context, identityID string) (Identity, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -311,14 +209,105 @@ func (a *IdentitiesApiService) IdentitiesIdentityIDGet(ctx _context.Context, ide
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+// ListIdentitiesOpts Optional parameters for the method 'ListIdentities'
+type ListIdentitiesOpts struct {
+    OrgID optional.Interface
+}
+
 /*
-IdentitiesIdentityIDPut Update a specific Identity
+ListIdentities List identities and associates userId
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param optional nil or *ListIdentitiesOpts - Optional Parameters:
+ * @param "OrgID" (optional.Interface of string) -  Filter in only for specific Organization
+@return []Identity
+*/
+func (a *IdentitiesApiService) ListIdentities(ctx _context.Context, localVarOptionals *ListIdentitiesOpts) ([]Identity, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  []Identity
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/identities"
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.OrgID.IsSet() {
+		localVarQueryParams.Add("orgID", parameterToString(localVarOptionals.OrgID.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/plain"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+			var v string
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+/*
+UpdateIdentity Update a specific Identity
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param identityID ID of the Identity to lookup
  * @param identity
 @return Identity
 */
-func (a *IdentitiesApiService) IdentitiesIdentityIDPut(ctx _context.Context, identityID string, identity Identity) (Identity, *_nethttp.Response, error) {
+func (a *IdentitiesApiService) UpdateIdentity(ctx _context.Context, identityID string, identity Identity) (Identity, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPut
 		localVarPostBody     interface{}

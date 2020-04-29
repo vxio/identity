@@ -33,15 +33,17 @@ All URIs are relative to *https://local.moov.io*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*IdentitiesApi* | [**IdentitiesGet**](docs/IdentitiesApi.md#identitiesget) | **Get** /identities | List identities and associates userId
-*IdentitiesApi* | [**IdentitiesIdentityIDCredentialsGet**](docs/IdentitiesApi.md#identitiesidentityidcredentialsget) | **Get** /identities/{identityID}/credentials | List the credentials this user has used.
-*IdentitiesApi* | [**IdentitiesIdentityIDGet**](docs/IdentitiesApi.md#identitiesidentityidget) | **Get** /identities/{identityID} | List identities and associates userId
-*IdentitiesApi* | [**IdentitiesIdentityIDPut**](docs/IdentitiesApi.md#identitiesidentityidput) | **Put** /identities/{identityID} | Update a specific Identity
-*InternalApi* | [**LoginPost**](docs/InternalApi.md#loginpost) | **Post** /login | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
-*InternalApi* | [**RegisterPost**](docs/InternalApi.md#registerpost) | **Post** /register | Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
-*InvitesApi* | [**InvitesGet**](docs/InvitesApi.md#invitesget) | **Get** /invites | List outstanding invites
-*InvitesApi* | [**InvitesInviteIDDelete**](docs/InvitesApi.md#invitesinviteiddelete) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
-*InvitesApi* | [**InvitesPost**](docs/InvitesApi.md#invitespost) | **Post** /invites | Send an email invite to a new user
+*CredentialsApi* | [**DisableCredentials**](docs/CredentialsApi.md#disablecredentials) | **Get** /identities/{identityID}/credentials/{credentialID} | Disables a credential so it can&#39;t be used anymore to login
+*CredentialsApi* | [**ListCredentials**](docs/CredentialsApi.md#listcredentials) | **Get** /identities/{identityID}/credentials | List the credentials this user has used.
+*IdentitiesApi* | [**DisableIdentity**](docs/IdentitiesApi.md#disableidentity) | **Delete** /identities/{identityID} | Disable an identity. Its left around for historical reporting
+*IdentitiesApi* | [**GetIdentity**](docs/IdentitiesApi.md#getidentity) | **Get** /identities/{identityID} | List identities and associates userId
+*IdentitiesApi* | [**ListIdentities**](docs/IdentitiesApi.md#listidentities) | **Get** /identities | List identities and associates userId
+*IdentitiesApi* | [**UpdateIdentity**](docs/IdentitiesApi.md#updateidentity) | **Put** /identities/{identityID} | Update a specific Identity
+*InternalApi* | [**LoginWithCredentials**](docs/InternalApi.md#loginwithcredentials) | **Post** /login | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
+*InternalApi* | [**RegisterWithCredentials**](docs/InternalApi.md#registerwithcredentials) | **Post** /register | Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
+*InvitesApi* | [**DeleteInvite**](docs/InvitesApi.md#deleteinvite) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
+*InvitesApi* | [**ListInvites**](docs/InvitesApi.md#listinvites) | **Get** /invites | List outstanding invites
+*InvitesApi* | [**SendInvite**](docs/InvitesApi.md#sendinvite) | **Post** /invites | Send an email invite to a new user
 
 
 ## Documentation For Models

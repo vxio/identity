@@ -25,12 +25,12 @@ var (
 type InternalApiService service
 
 /*
-LoginPost Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
+LoginWithCredentials Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param login Arguments needed to match up the OIDC user data with a user in the system
 @return LoggedIn
 */
-func (a *InternalApiService) LoginPost(ctx _context.Context, login Login) (LoggedIn, *_nethttp.Response, error) {
+func (a *InternalApiService) LoginWithCredentials(ctx _context.Context, login Login) (LoggedIn, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -131,12 +131,12 @@ func (a *InternalApiService) LoginPost(ctx _context.Context, login Login) (Logge
 }
 
 /*
-RegisterPost Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
+RegisterWithCredentials Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param register Arguments needed register a user with OIDC credentials.
 @return LoggedIn
 */
-func (a *InternalApiService) RegisterPost(ctx _context.Context, register Register) (LoggedIn, *_nethttp.Response, error) {
+func (a *InternalApiService) RegisterWithCredentials(ctx _context.Context, register Register) (LoggedIn, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
