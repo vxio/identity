@@ -11,18 +11,22 @@ package identityserver
 
 import (
 	"errors"
+
+	"github.com/google/uuid"
 )
 
 // CredentialsService is a service that implents the logic for the CredentialsApiServicer
 // This service should implement the business logic for every endpoint for the CredentialsApi API.
 // Include any external packages or services that will be required by this service.
 type CredentialsService struct {
+	time       TimeService
 	repository CredentialRepository
 }
 
 // NewCredentialsService creates a default api service
-func NewCredentialsService(repository CredentialRepository) CredentialsApiServicer {
+func NewCredentialsService(time TimeService, repository CredentialRepository) *CredentialsService {
 	return &CredentialsService{
+		time:       time,
 		repository: repository,
 	}
 }
@@ -39,4 +43,37 @@ func (s *CredentialsService) ListCredentials(identityID string) (interface{}, er
 	// TODO - update ListCredentials with the required logic for this service method.
 	// Add api_credentials_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return nil, errors.New("service method 'ListCredentials' not implemented")
+}
+
+func (s *CredentialsService) Login(login Login) (*Credential, error) {
+	// look into the repo for any matches
+	cred, err := s.repository.lookup(login.Provider, login.SubjectID)
+	if err != nil {
+		return nil, nil
+	}
+
+	// @TODO record login in a queue
+
+	return &cred, nil
+}
+
+func (s *CredentialsService) Register(identityID string, provider string, subjectID string) (*Credential, error) {
+	cred := Credential{
+		CredentialID: uuid.New().String(),
+		Provider:     provider,
+		SubjectID:    subjectID,
+		IdentityID:   identityID,
+		Enabled:      true,
+		CreatedOn:    s.time.Now(),
+		LastUsedOn:   s.time.Now(),
+	}
+
+	saved, err := s.repository.add(cred)
+	if err != nil {
+		return nil, err
+	}
+
+	// @TODO record new registered credential
+
+	return &saved, err
 }

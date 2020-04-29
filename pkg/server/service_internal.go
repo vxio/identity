@@ -17,23 +17,25 @@ import (
 // This service should implement the business logic for every endpoint for the InternalApi API.
 // Include any external packages or services that will be required by this service.
 type InternalService struct {
+	credentials CredentialsService
 }
 
 // NewInternalService creates a default api service
-func NewInternalService() InternalApiServicer {
-	return &InternalService{}
+func NewInternalService(credentials CredentialsService) InternalApiServicer {
+	return &InternalService{
+		credentials: credentials,
+	}
 }
 
 // LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
 func (s *InternalService) LoginWithCredentials(login Login) (interface{}, error) {
-	// TODO - update LoginWithCredentials with the required logic for this service method.
-	// Add api_internal_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	// check if they exist in the credentials service and if its enabled.
+	s.credentials.Login(login)
+
 	return nil, errors.New("service method 'LoginWithCredentials' not implemented")
 }
 
 // RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
 func (s *InternalService) RegisterWithCredentials(register Register) (interface{}, error) {
-	// TODO - update RegisterWithCredentials with the required logic for this service method.
-	// Add api_internal_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return nil, errors.New("service method 'RegisterWithCredentials' not implemented")
 }

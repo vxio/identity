@@ -6,7 +6,8 @@ import (
 
 type CredentialRepository interface {
 	list(tenantID string, identityID string) ([]Credential, error)
-	add(tenantID string, identityID string, credentials Credential) (Credential, error)
+	add(credentials Credential) (Credential, error)
+	lookup(providerID string, subjectID string) (Credential, error)
 }
 
 func NewCredentialRepository(db *sql.DB) CredentialRepository {
@@ -21,6 +22,14 @@ func (r *sqlCredsRepo) list(tenantID string, identityID string) ([]Credential, e
 	return nil, nil
 }
 
-func (r *sqlCredsRepo) add(tenantID string, identityID string, credentials Credential) (Credential, error) {
+func (r *sqlCredsRepo) add(credentials Credential) (Credential, error) {
 	return credentials, nil
+}
+
+func (r *sqlCredsRepo) lookup(providerID string, subjectID string) (Credential, error) {
+	// demo one for now.
+	return Credential{
+		Provider:  providerID,
+		SubjectID: subjectID,
+	}, nil
 }

@@ -39,32 +39,30 @@ func main() {
 	db, close := initializeDatabase(logger)
 	defer close()
 
-	//internal admin server
+	TimeService := identityserver.NewSystemTimeService()
 
-	InternalService := identityserver.NewInternalService()
+	IdentityRepository := identityserver.NewIdentityRepository(db)
+	IdentitiesService := identityserver.NewIdentitiesService(IdentityRepository)
+
+	CredentialRepository := identityserver.NewCredentialRepository(db)
+	CredentialsService := identityserver.NewCredentialsService(TimeService, CredentialRepository)
+
+	InvitesRepository := identityserver.NewInvitesRepository(db)
+	InvitesService := identityserver.NewInvitesService(InvitesRepository)
+
+	InternalService := identityserver.NewInternalService(*CredentialsService)
+
+	// internal admin server
 	InternalController := identityserver.NewInternalAPIController(InternalService)
-
 	adminRouter := identityserver.NewRouter(InternalController)
-
 	adminServer := bootAdminServer(adminRouter, terminationListener, logger)
 	defer adminServer.Shutdown()
 
 	// public server
-
-	IdentityRepository := identityserver.NewIdentityRepository(db)
-	IdentitiesService := identityserver.NewIdentitiesService(IdentityRepository)
 	IdentitiesController := identityserver.NewIdentitiesApiController(IdentitiesService)
-
-	CredentialRepository := identityserver.NewCredentialRepository(db)
-	CredentialsService := identityserver.NewCredentialsService(CredentialRepository)
 	CredentialsController := identityserver.NewCredentialsApiController(CredentialsService)
-
-	InvitesRepository := identityserver.NewInvitesRepository(db)
-	InvitesService := identityserver.NewInvitesService(InvitesRepository)
 	InvitesController := identityserver.NewInvitesController(InvitesService)
-
 	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, InternalController)
-
 	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger)
 	defer shutdownServer()
 
