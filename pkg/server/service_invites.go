@@ -34,7 +34,7 @@ func (s *InvitesService) ListInvites(orgID string) (interface{}, error) {
 }
 
 // SendInvite - Send an email invite to a new user
-func (s *InvitesService) SendInvite(invite Invite) (interface{}, error) {
+func (s *InvitesService) SendInvite(invite SendInvite) (interface{}, error) {
 
 	// add to DB
 

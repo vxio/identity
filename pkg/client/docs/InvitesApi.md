@@ -85,7 +85,7 @@ Name | Type | Description  | Notes
 
 ## SendInvite
 
-> Invite SendInvite(ctx, invite)
+> Invite SendInvite(ctx, sendInvite)
 
 Send an email invite to a new user
 
@@ -95,7 +95,7 @@ Send an email invite to a new user
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**invite** | [**Invite**](Invite.md)|  | 
+**sendInvite** | [**SendInvite**](SendInvite.md)|  | 
 
 ### Return type
 

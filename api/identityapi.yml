@@ -54,7 +54,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Invite'
+              $ref: '#/components/schemas/SendInvite'
       responses:
         '200':
           description: Invite sent
@@ -163,7 +163,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Identity'
+              $ref: '#/components/schemas/UpdateIdentity'
       responses:
         '200':
           description: Identity was updated.
@@ -393,6 +393,14 @@ components:
       maxLength: 255
       readOnly: true
 
+    SendInvite:
+      description: Describes an invite that was sent to a user to join.
+      type: object
+      additionalProperties: false
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+
     Invite:
       description: Describes an invite that was sent to a user to join.
       type: object
@@ -499,6 +507,66 @@ components:
         - lastName
         - email
     
+    UpdateIdentity:
+      description: |
+        Properties of an Identity. These users will under-go KYC checks thus all the information
+      type: object
+      additionalProperties: false
+      properties:
+        firstName:
+          type: string
+          example: John
+          maxLength: 255
+          pattern: ^\w+$
+        middleName:
+          type: string
+          example: Jimmy
+          maxLength: 255
+          pattern: ^\w+$
+        lastName:
+          type: string
+          example: Doe
+          maxLength: 255
+          pattern: ^\w+$
+        nickName:
+          type: string
+          nullable: true
+          maxLength: 255
+          pattern: ^\w+$
+        suffix:
+          type: string
+          nullable: true
+          pattern: ^\w+$
+          maxLength: 255
+        birthDate:
+          type: string
+          format: date
+          example: 2020-12-31
+          maxLength: 10
+        status: 
+          type: string
+          enum:
+          - rejected
+          - none
+          - review-required
+          - kyc
+          - ofac
+          - cip
+        phones:
+          type: array
+          maxItems: 300
+          items:
+            $ref: '#/components/schemas/Phone'
+        addresses:
+          type: array
+          maxItems: 300
+          items:
+            $ref: '#/components/schemas/Address'
+      required:
+        - firstName
+        - lastName
+        - email
+
     LastLogin:
       description: |
         Defines when and what credential was used for the last login

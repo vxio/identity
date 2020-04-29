@@ -54,7 +54,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Invite'
+              $ref: '#/components/schemas/SendInvite'
         required: true
       responses:
         "200":
@@ -245,7 +245,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Identity'
+              $ref: '#/components/schemas/UpdateIdentity'
         required: true
       responses:
         "200":
@@ -497,6 +497,20 @@ components:
       pattern: ^\w+$
       readOnly: true
       type: string
+    SendInvite:
+      additionalProperties: false
+      description: Describes an invite that was sent to a user to join.
+      example:
+        email: john.doe@gmail.com
+      properties:
+        email:
+          description: Email Address
+          example: john.doe@gmail.com
+          format: email
+          maxLength: 255
+          pattern: ^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$
+          type: string
+      type: object
     Invite:
       additionalProperties: false
       description: Describes an invite that was sent to a user to join.
@@ -701,6 +715,135 @@ components:
           type: string
         lastLogin:
           $ref: '#/components/schemas/LastLogin'
+      required:
+      - email
+      - firstName
+      - lastName
+      type: object
+    UpdateIdentity:
+      additionalProperties: false
+      description: |
+        Properties of an Identity. These users will under-go KYC checks thus all the information
+      example:
+        firstName: John
+        lastName: Doe
+        addresses:
+        - country: US
+          validated: true
+          address2: address2
+          city: Cedar Falls
+          address1: 111 Main St.
+          postalCode: "50613"
+          active: true
+          state: IA
+          type: primary
+        - country: US
+          validated: true
+          address2: address2
+          city: Cedar Falls
+          address1: 111 Main St.
+          postalCode: "50613"
+          active: true
+          state: IA
+          type: primary
+        - country: US
+          validated: true
+          address2: address2
+          city: Cedar Falls
+          address1: 111 Main St.
+          postalCode: "50613"
+          active: true
+          state: IA
+          type: primary
+        - country: US
+          validated: true
+          address2: address2
+          city: Cedar Falls
+          address1: 111 Main St.
+          postalCode: "50613"
+          active: true
+          state: IA
+          type: primary
+        - country: US
+          validated: true
+          address2: address2
+          city: Cedar Falls
+          address1: 111 Main St.
+          postalCode: "50613"
+          active: true
+          state: IA
+          type: primary
+        nickName: nickName
+        phones:
+        - valid: true
+          number: number
+          type: home
+        - valid: true
+          number: number
+          type: home
+        - valid: true
+          number: number
+          type: home
+        - valid: true
+          number: number
+          type: home
+        - valid: true
+          number: number
+          type: home
+        middleName: Jimmy
+        suffix: suffix
+        birthDate: 2020-12-31T00:00:00.000+0000
+        status: rejected
+      properties:
+        firstName:
+          example: John
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        middleName:
+          example: Jimmy
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        lastName:
+          example: Doe
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        nickName:
+          maxLength: 255
+          nullable: true
+          pattern: ^\w+$
+          type: string
+        suffix:
+          maxLength: 255
+          nullable: true
+          pattern: ^\w+$
+          type: string
+        birthDate:
+          example: 2020-12-31
+          format: date
+          maxLength: 10
+          type: string
+        status:
+          enum:
+          - rejected
+          - none
+          - review-required
+          - kyc
+          - ofac
+          - cip
+          type: string
+        phones:
+          items:
+            $ref: '#/components/schemas/Phone'
+          maxItems: 300
+          type: array
+        addresses:
+          items:
+            $ref: '#/components/schemas/Address'
+          maxItems: 300
+          type: array
       required:
       - email
       - firstName

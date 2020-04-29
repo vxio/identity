@@ -206,10 +206,10 @@ func (a *InvitesApiService) ListInvites(ctx _context.Context, localVarOptionals 
 /*
 SendInvite Send an email invite to a new user
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param invite
+ * @param sendInvite
 @return Invite
 */
-func (a *InvitesApiService) SendInvite(ctx _context.Context, invite Invite) (Invite, *_nethttp.Response, error) {
+func (a *InvitesApiService) SendInvite(ctx _context.Context, sendInvite SendInvite) (Invite, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -243,7 +243,7 @@ func (a *InvitesApiService) SendInvite(ctx _context.Context, invite Invite) (Inv
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = &invite
+	localVarPostBody = &sendInvite
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err

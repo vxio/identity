@@ -58,6 +58,8 @@ Class | Method | HTTP request | Description
  - [OfacSearch](docs/OfacSearch.md)
  - [Phone](docs/Phone.md)
  - [Register](docs/Register.md)
+ - [SendInvite](docs/SendInvite.md)
+ - [UpdateIdentity](docs/UpdateIdentity.md)
 
 
 ## Documentation For Authorization

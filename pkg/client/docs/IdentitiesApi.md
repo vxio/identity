@@ -118,7 +118,7 @@ Name | Type | Description  | Notes
 
 ## UpdateIdentity
 
-> Identity UpdateIdentity(ctx, identityID, identity)
+> Identity UpdateIdentity(ctx, identityID, updateIdentity)
 
 Update a specific Identity
 
@@ -129,7 +129,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **identityID** | [**string**](.md)| ID of the Identity to lookup | 
-**identity** | [**Identity**](Identity.md)|  | 
+**updateIdentity** | [**UpdateIdentity**](UpdateIdentity.md)|  | 
 
 ### Return type
 

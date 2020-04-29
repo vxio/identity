@@ -304,10 +304,10 @@ func (a *IdentitiesApiService) ListIdentities(ctx _context.Context, localVarOpti
 UpdateIdentity Update a specific Identity
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param identityID ID of the Identity to lookup
- * @param identity
+ * @param updateIdentity
 @return Identity
 */
-func (a *IdentitiesApiService) UpdateIdentity(ctx _context.Context, identityID string, identity Identity) (Identity, *_nethttp.Response, error) {
+func (a *IdentitiesApiService) UpdateIdentity(ctx _context.Context, identityID string, updateIdentity UpdateIdentity) (Identity, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPut
 		localVarPostBody     interface{}
@@ -346,7 +346,7 @@ func (a *IdentitiesApiService) UpdateIdentity(ctx _context.Context, identityID s
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = &identity
+	localVarPostBody = &updateIdentity
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err

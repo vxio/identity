@@ -79,7 +79,7 @@ func (c *InvitesController) ListInvites(w http.ResponseWriter, r *http.Request) 
 
 // SendInvite - Send an email invite to a new user
 func (c *InvitesController) SendInvite(w http.ResponseWriter, r *http.Request) {
-	invite := &Invite{}
+	invite := &SendInvite{}
 	if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
 		w.WriteHeader(500)
 		return

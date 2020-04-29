@@ -65,7 +65,7 @@ type IdentitiesApiServicer interface {
 	DisableIdentity(string) (interface{}, error)
 	GetIdentity(string) (interface{}, error)
 	ListIdentities(string) (interface{}, error)
-	UpdateIdentity(string, Identity) (interface{}, error)
+	UpdateIdentity(string, UpdateIdentity) (interface{}, error)
 }
 
 
@@ -86,5 +86,5 @@ type InternalApiServicer interface {
 type InvitesApiServicer interface { 
 	DeleteInvite(string) (interface{}, error)
 	ListInvites(string) (interface{}, error)
-	SendInvite(Invite) (interface{}, error)
+	SendInvite(SendInvite) (interface{}, error)
 }

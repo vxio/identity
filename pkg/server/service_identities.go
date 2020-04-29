@@ -51,7 +51,7 @@ func (s *IdentitiesService) ListIdentities(orgID string) (interface{}, error) {
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *IdentitiesService) UpdateIdentity(identityID string, identity Identity) (interface{}, error) {
+func (s *IdentitiesService) UpdateIdentity(identityID string, identity UpdateIdentity) (interface{}, error) {
 	// TODO - update UpdateIdentity with the required logic for this service method.
 	// Add api_identities_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return nil, errors.New("service method 'UpdateIdentity' not implemented")
