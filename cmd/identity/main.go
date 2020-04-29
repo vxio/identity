@@ -42,7 +42,7 @@ func main() {
 	TimeService := identityserver.NewSystemTimeService()
 
 	IdentityRepository := identityserver.NewIdentityRepository(db)
-	IdentitiesService := identityserver.NewIdentitiesService(IdentityRepository)
+	IdentitiesService := identityserver.NewIdentitiesService(TimeService, IdentityRepository)
 
 	CredentialRepository := identityserver.NewCredentialRepository(db)
 	CredentialsService := identityserver.NewCredentialsService(TimeService, CredentialRepository)
@@ -50,7 +50,7 @@ func main() {
 	InvitesRepository := identityserver.NewInvitesRepository(db)
 	InvitesService := identityserver.NewInvitesService(InvitesRepository)
 
-	InternalService := identityserver.NewInternalService(*CredentialsService)
+	InternalService := identityserver.NewInternalService(*CredentialsService, *IdentitiesService)
 
 	// internal admin server
 	InternalController := identityserver.NewInternalAPIController(InternalService)

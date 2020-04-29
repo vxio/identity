@@ -11,18 +11,22 @@ package identityserver
 
 import (
 	"errors"
+
+	"github.com/google/uuid"
 )
 
 // IdentitiesApiService is a service that implents the logic for the IdentitiesApiServicer
 // This service should implement the business logic for every endpoint for the IdentitiesApi API.
 // Include any external packages or services that will be required by this service.
 type IdentitiesService struct {
+	time       TimeService
 	repository IdentityRepository
 }
 
 // NewIdentitiesApiService creates a default api service
-func NewIdentitiesService(repository IdentityRepository) IdentitiesApiServicer {
+func NewIdentitiesService(time TimeService, repository IdentityRepository) *IdentitiesService {
 	return &IdentitiesService{
+		time:       time,
 		repository: repository,
 	}
 }
@@ -55,4 +59,34 @@ func (s *IdentitiesService) UpdateIdentity(identityID string, identity UpdateIde
 	// TODO - update UpdateIdentity with the required logic for this service method.
 	// Add api_identities_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return nil, errors.New("service method 'UpdateIdentity' not implemented")
+}
+
+func (s *IdentitiesService) Register(register Register) (*Identity, error) {
+	identity := Identity{
+		IdentityID:    uuid.New().String(),
+		FirstName:     register.FirstName,
+		MiddleName:    register.MiddleName,
+		LastName:      register.LastName,
+		NickName:      register.NickName,
+		Suffix:        register.Suffix,
+		BirthDate:     register.BirthDate,
+		Status:        "none",
+		Email:         register.Email,
+		EmailVerified: false,
+		Phones:        register.Phones,
+		Addresses:     register.Addresses,
+		RegisteredOn:  s.time.Now(),
+		LastLogin:     LastLogin{},
+	}
+
+	saved, err := s.repository.add(identity)
+	if err != nil {
+		return nil, err
+	}
+
+	// @TODO record user was registered
+
+	// @TODO send email notification to get registered email verified
+
+	return &saved, nil
 }

@@ -8,6 +8,7 @@ type IdentityRepository interface {
 	list(tenantID string) ([]Identity, error)
 	get(tenantID string, identityID string) (Identity, error)
 	update(tenantID string, updated Identity) (Identity, error)
+	add(identity Identity) (Identity, error)
 }
 
 func NewIdentityRepository(db *sql.DB) IdentityRepository {
@@ -29,4 +30,8 @@ func (r *sqlIdentityRepo) get(tenantID string, identityID string) (Identity, err
 
 func (r *sqlIdentityRepo) update(tenantID string, updated Identity) (Identity, error) {
 	return updated, nil
+}
+
+func (r *sqlIdentityRepo) add(identity Identity) (Identity, error) {
+	return identity, nil
 }
