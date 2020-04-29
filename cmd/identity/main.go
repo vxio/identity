@@ -22,10 +22,9 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/admin"
 	"github.com/moov-io/identity/pkg/database"
 	identityserver "github.com/moov-io/identity/pkg/server"
-
-	"github.com/moov-io/base/admin"
 )
 
 var logger log.Logger
@@ -37,12 +36,15 @@ func main() {
 	terminationListener := newTerminationListener()
 
 	//db setup
-	_, close := initializeDatabase(logger)
+	db, close := initializeDatabase(logger)
 	defer close()
+
+	CredentialRepository := identityserver.NewCredentialRepository(db)
+	IdentityRepository := identityserver.NewIdentityRepository(db)
 
 	//internal admin server
 
-	InternalApiService := identityserver.NewInternalApiService()
+	InternalApiService := identityserver.NewInternalService()
 	InternalApiController := identityserver.NewInternalApiController(InternalApiService)
 
 	adminRouter := identityserver.NewRouter(InternalApiController)
@@ -52,14 +54,14 @@ func main() {
 
 	// public server
 
-	IdentitiesApiService := identityserver.NewIdentitiesApiService()
+	IdentitiesApiService := identityserver.NewIdentitiesService(IdentityRepository)
 	IdentitiesApiController := identityserver.NewIdentitiesApiController(IdentitiesApiService)
 
-	CredentialsApiService := identityserver.NewCredentialsApiService()
+	CredentialsApiService := identityserver.NewCredentialsService(CredentialRepository)
 	CredentialsApiController := identityserver.NewCredentialsApiController(CredentialsApiService)
 
-	InvitesApiService := identityserver.NewInvitesApiService()
-	InvitesApiController := identityserver.NewInvitesApiController(InvitesApiService)
+	InvitesApiService := identityserver.NewInvitesService()
+	InvitesApiController := identityserver.NewInvitesController(InvitesApiService)
 
 	publicRouter := identityserver.NewRouter(IdentitiesApiController, CredentialsApiController, InvitesApiController, InternalApiController)
 

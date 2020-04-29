@@ -24,8 +24,4 @@
 
 
 main.go
-pkg/server/api_*_service.go
-
-# Only ignored because of unused import errors
-pkg/server/api_internal.go
-pkg/server/api_credentials.go
+pkg/server/api_*.go
