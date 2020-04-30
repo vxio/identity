@@ -10,6 +10,8 @@
 package identityserver
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"time"
 
@@ -52,14 +54,31 @@ func (s *InvitesService) SendInvite(send SendInvite) (interface{}, error) {
 		Redeemed:  false,
 	}
 
+	code, err1 := generateInviteCode()
+	if err1 != nil {
+		return nil, err1
+	}
+
 	// add to DB
-	invite, err := s.repository.add("1", invite) // @TODO tenantID
-	if err != nil {
-		return nil, err
+	invite, err2 := s.repository.add("1", invite, *code) // @TODO tenantID
+	if err2 != nil {
+		return nil, err2
 	}
 
 	// @TODO send email
 
 	// send email
 	return invite, nil
+}
+
+// Generate a large random crypto string to work as the invitation token
+func generateInviteCode() (*string, error) {
+	b := make([]byte, 36)
+	_, err := rand.Read(b)
+	if err != nil {
+		return nil, err
+	}
+
+	code := base64.RawStdEncoding.EncodeToString(b)
+	return &code, nil
 }

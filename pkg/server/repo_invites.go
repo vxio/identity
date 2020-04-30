@@ -6,7 +6,7 @@ import (
 
 type InvitesRepository interface {
 	list(tenantID string) ([]Invite, error)
-	add(tenantID string, invite Invite) (Invite, error)
+	add(tenantID string, invite Invite, secretCode string) (Invite, error)
 	delete(tenantID string, inviteID string) error
 }
 
@@ -22,7 +22,7 @@ func (r *sqlInvitesRepo) list(tenantID string) ([]Invite, error) {
 	return nil, nil
 }
 
-func (r *sqlInvitesRepo) add(tenantID string, invite Invite) (Invite, error) {
+func (r *sqlInvitesRepo) add(tenantID string, invite Invite, secretCode string) (Invite, error) {
 	return invite, nil
 }
 
