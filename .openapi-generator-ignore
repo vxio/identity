@@ -24,4 +24,4 @@
 
 
 main.go
-pkg/server/api_*.go
+pkg/server/api*.go
