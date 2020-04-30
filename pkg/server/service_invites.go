@@ -36,7 +36,7 @@ func (s *InvitesService) DeleteInvite(inviteID string) (interface{}, error) {
 
 // ListInvites - List outstanding invites
 func (s *InvitesService) ListInvites(orgID string) (interface{}, error) {
-	invites, err := s.repository.list("1")
+	invites, err := s.repository.list("tenantID")
 	return invites, err
 }
 

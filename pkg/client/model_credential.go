@@ -21,8 +21,9 @@ type Credential struct {
 	SubjectID string `json:"subjectID,omitempty"`
 	// UUID v4
 	IdentityID string `json:"identityID,omitempty"`
-	// If disabled user will be unable to use this method of authentication without help from support removing the lock.
-	Enabled bool `json:"enabled,omitempty"`
 	CreatedOn time.Time `json:"createdOn,omitempty"`
 	LastUsedOn time.Time `json:"lastUsedOn,omitempty"`
+	DisabledOn *time.Time `json:"disabledOn,omitempty"`
+	// UUID v4
+	DisabledBy *string `json:"disabledBy,omitempty"`
 }

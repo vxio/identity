@@ -472,6 +472,13 @@ components:
       maxLength: 36
       pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
       type: string
+    OptionalUUID:
+      description: UUID v4
+      format: uuid
+      maxLength: 36
+      nullable: true
+      pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+      type: string
     Email:
       description: Email Address
       example: john.doe@gmail.com
@@ -482,6 +489,11 @@ components:
     DateTime:
       format: date-time
       maxLength: 24
+      type: string
+    OptionalDateTime:
+      format: date-time
+      maxLength: 24
+      nullable: true
       type: string
     SubjectID:
       description: ID of the remote OIDC server gives to this identity
@@ -637,8 +649,10 @@ components:
         birthDate: 2020-12-31T00:00:00.000+0000
         firstName: John
         emailVerified: true
+        disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         middleName: Jimmy
+        disabledOn: 2000-01-23T04:56:07.000+00:00
         registeredOn: 2000-01-23T04:56:07.000+00:00
         email: john.doe@gmail.com
         status: rejected
@@ -715,6 +729,18 @@ components:
           type: string
         lastLogin:
           $ref: '#/components/schemas/LastLogin'
+        disabledOn:
+          format: date-time
+          maxLength: 24
+          nullable: true
+          type: string
+        disabledBy:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          nullable: true
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
       required:
       - email
       - firstName
@@ -874,12 +900,13 @@ components:
         Description of a successful OpenID connect credential
       example:
         lastUsedOn: 2000-01-23T04:56:07.000+00:00
+        disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         provider: google
         identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        disabledOn: 2000-01-23T04:56:07.000+00:00
         createdOn: 2000-01-23T04:56:07.000+00:00
         subjectID: aSDDfasd23Dfasdf
-        enabled: true
       properties:
         credentialID:
           description: UUID v4
@@ -908,10 +935,6 @@ components:
           maxLength: 36
           pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
-        enabled:
-          description: If disabled user will be unable to use this method of authentication
-            without help from support removing the lock.
-          type: boolean
         createdOn:
           format: date-time
           maxLength: 24
@@ -919,6 +942,18 @@ components:
         lastUsedOn:
           format: date-time
           maxLength: 24
+          type: string
+        disabledOn:
+          format: date-time
+          maxLength: 24
+          nullable: true
+          type: string
+        disabledBy:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          nullable: true
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
       type: object
     OFACSearch:

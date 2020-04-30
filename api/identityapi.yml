@@ -364,6 +364,14 @@ components:
       maxLength: 36
       pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
 
+    OptionalUUID:
+      description: UUID v4
+      type: string
+      format: uuid
+      maxLength: 36
+      pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+      nullable: true
+
     Email:
       description: Email Address
       type: string
@@ -376,6 +384,12 @@ components:
       type: string
       format: date-time
       maxLength: 24
+
+    OptionalDateTime:
+      type: string
+      format: date-time
+      maxLength: 24
+      nullable: true
 
     SubjectID:
       description: ID of the remote OIDC server gives to this identity
@@ -502,6 +516,15 @@ components:
           $ref: '#/components/schemas/LastLogin'
           nullable: true
           readOnly: true
+        disabledOn:
+          description: Describes when the user was removed.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalDateTime'
+        disabledBy:
+          description: IdentityID of the user who disabled this user.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalUUID'
+
       required:
         - firstName
         - lastName
@@ -599,15 +622,20 @@ components:
         identityID:
           $ref: '#/components/schemas/UUID'
           readOnly: true
-        enabled:
-          type: boolean
-          description: If disabled user will be unable to use this method of authentication without help from support removing the lock.
         createdOn:
           $ref: '#/components/schemas/DateTime'
           readOnly: true
         lastUsedOn:
           $ref: '#/components/schemas/DateTime'
           readOnly: true
+        disabledOn:
+          description: Describes when the user was removed.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalDateTime'
+        disabledBy:
+          description: IdentityID of the user who disabled this user.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalUUID'
 
     OFACSearch:
       type: object

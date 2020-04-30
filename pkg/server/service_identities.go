@@ -33,32 +33,66 @@ func NewIdentitiesService(time TimeService, repository IdentityRepository) *Iden
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
 func (s *IdentitiesService) DisableIdentity(identityID string) (interface{}, error) {
-	// TODO - update DisableIdentity with the required logic for this service method.
-	// Add api_identities_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'DisableIdentity' not implemented")
+	identity, err := s.repository.get("tenantID", identityID)
+	if err != nil {
+		return nil, err
+	}
+
+	now := s.time.Now()
+	callerIdentityID := "callerIdentityID"
+	identity.DisabledOn = &now
+	identity.DisabledBy = &callerIdentityID
+
+	_, nil := s.repository.update("tenantID", identity)
+	if err != nil {
+		return nil, err
+	}
+
+	// supposed to be 204 no content...
+	return true, nil
 }
 
 // GetIdentity - List identities and associates userId
 func (s *IdentitiesService) GetIdentity(identityID string) (interface{}, error) {
-	i, e := s.repository.get("1", identityID)
+	i, e := s.repository.get("tenantID", identityID)
 	if e != nil {
 		return nil, errors.New("Identity not found")
 	}
+
 	return i, nil
 }
 
 // ListIdentities - List identities and associates userId
 func (s *IdentitiesService) ListIdentities(orgID string) (interface{}, error) {
-	// TODO - update ListIdentities with the required logic for this service method.
-	// Add api_identities_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'ListIdentities' not implemented")
+	identities, err := s.repository.list("tenantID")
+	return identities, err
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *IdentitiesService) UpdateIdentity(identityID string, identity UpdateIdentity) (interface{}, error) {
-	// TODO - update UpdateIdentity with the required logic for this service method.
-	// Add api_identities_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'UpdateIdentity' not implemented")
+func (s *IdentitiesService) UpdateIdentity(identityID string, update UpdateIdentity) (interface{}, error) {
+	identity, err := s.repository.get("tenantID", identityID)
+	if err != nil {
+		return nil, err
+	}
+
+	identity.FirstName = update.FirstName
+	identity.MiddleName = update.MiddleName
+	identity.LastName = update.LastName
+	identity.NickName = update.NickName
+	identity.Suffix = update.Suffix
+	identity.BirthDate = update.BirthDate
+	identity.Status = update.Status
+	identity.Phones = update.Phones
+	identity.Addresses = update.Addresses
+
+	updated, err := s.repository.update("tenantID", identity)
+	if err != nil {
+		return nil, err
+	}
+
+	// @TODO record update and email identity that changes were made.
+
+	return updated, err
 }
 
 func (s *IdentitiesService) Register(register Register) (*Identity, error) {

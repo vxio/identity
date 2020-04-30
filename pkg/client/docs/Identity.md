@@ -18,6 +18,8 @@ Name | Type | Description | Notes
 **Addresses** | [**[]Address**](Address.md) |  | [optional] 
 **RegisteredOn** | [**time.Time**](time.Time.md) |  | [optional] 
 **LastLogin** | [**LastLogin**](LastLogin.md) |  | [optional] 
+**DisabledOn** | Pointer to [**time.Time**](time.Time.md) |  | [optional] 
+**DisabledBy** | Pointer to **string** | UUID v4 | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

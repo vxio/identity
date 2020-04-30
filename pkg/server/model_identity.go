@@ -46,4 +46,9 @@ type Identity struct {
 	RegisteredOn time.Time `json:"registeredOn,omitempty"`
 
 	LastLogin LastLogin `json:"lastLogin,omitempty"`
+
+	DisabledOn *time.Time `json:"disabledOn,omitempty"`
+
+	// UUID v4
+	DisabledBy *string `json:"disabledBy,omitempty"`
 }

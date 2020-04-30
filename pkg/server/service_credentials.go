@@ -10,8 +10,6 @@
 package identityserver
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 )
 
@@ -33,28 +31,45 @@ func NewCredentialsService(time TimeService, repository CredentialRepository) *C
 
 // DisableCredentials - Disables a credential so it can&#39;t be used anymore to login
 func (s *CredentialsService) DisableCredentials(identityID string, credentialID string) (interface{}, error) {
-	// TODO - update DisableCredentials with the required logic for this service method.
-	// Add api_credentials_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'DisableCredentials' not implemented")
+	cred, err := s.repository.get(credentialID)
+	if err != nil {
+		return nil, err
+	}
+
+	now := s.time.Now()
+	callderIdentityID := "callerIdentityID" // @TODO
+	cred.DisabledOn = &now
+	cred.DisabledBy = &callderIdentityID
+
+	saved, err := s.repository.update(cred)
+	if err != nil {
+		return nil, err
+	}
+
+	return saved, err
 }
 
 // ListCredentials - List the credentials this user has used.
 func (s *CredentialsService) ListCredentials(identityID string) (interface{}, error) {
-	// TODO - update ListCredentials with the required logic for this service method.
-	// Add api_credentials_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'ListCredentials' not implemented")
+	return s.repository.list("tenantID", identityID)
 }
 
 func (s *CredentialsService) Login(login Login) (*Credential, error) {
 	// look into the repo for any matches
 	cred, err := s.repository.lookup(login.Provider, login.SubjectID)
 	if err != nil {
-		return nil, nil
+		return nil, err
+	}
+
+	cred.LastUsedOn = s.time.Now()
+	saved, err := s.repository.update(cred)
+	if err != nil {
+		return nil, err
 	}
 
 	// @TODO record login in a queue
 
-	return &cred, nil
+	return &saved, nil
 }
 
 func (s *CredentialsService) Register(identityID string, provider string, subjectID string) (*Credential, error) {
@@ -63,9 +78,10 @@ func (s *CredentialsService) Register(identityID string, provider string, subjec
 		Provider:     provider,
 		SubjectID:    subjectID,
 		IdentityID:   identityID,
-		Enabled:      true,
 		CreatedOn:    s.time.Now(),
 		LastUsedOn:   s.time.Now(),
+		DisabledBy:   nil,
+		DisabledOn:   nil,
 	}
 
 	saved, err := s.repository.add(cred)
