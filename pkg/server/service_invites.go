@@ -11,33 +11,55 @@ package identityserver
 
 import (
 	"errors"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type InvitesService struct {
+	time       TimeService
 	repository InvitesRepository
 }
 
-func NewInvitesService(repository InvitesRepository) InvitesApiServicer {
+func NewInvitesService(time TimeService, repository InvitesRepository) InvitesApiServicer {
 	return &InvitesService{
+		time:       time,
 		repository: repository,
 	}
 }
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
 func (s *InvitesService) DeleteInvite(inviteID string) (interface{}, error) {
+	s.repository.delete("1", inviteID)
 	return nil, errors.New("service method 'DeleteInvite' not implemented")
 }
 
 // ListInvites - List outstanding invites
 func (s *InvitesService) ListInvites(orgID string) (interface{}, error) {
-	return nil, errors.New("service method 'ListInvites' not implemented")
+	invites, err := s.repository.list("1")
+	return invites, err
 }
 
 // SendInvite - Send an email invite to a new user
-func (s *InvitesService) SendInvite(invite SendInvite) (interface{}, error) {
+func (s *InvitesService) SendInvite(send SendInvite) (interface{}, error) {
+	invite := Invite{
+		InviteID:  uuid.New().String(),
+		TenantID:  "1", // @TODO
+		Email:     send.Email,
+		InvitedBy: "1", // @TODO
+		InvitedOn: s.time.Now(),
+		ExpiresOn: s.time.Now().Add(time.Hour * 48),
+		Redeemed:  false,
+	}
 
 	// add to DB
+	invite, err := s.repository.add("1", invite) // @TODO tenantID
+	if err != nil {
+		return nil, err
+	}
+
+	// @TODO send email
 
 	// send email
-	return nil, errors.New("service method 'SendInvite' not implemented")
+	return invite, nil
 }

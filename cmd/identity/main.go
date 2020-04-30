@@ -48,7 +48,7 @@ func main() {
 	CredentialsService := identityserver.NewCredentialsService(TimeService, CredentialRepository)
 
 	InvitesRepository := identityserver.NewInvitesRepository(db)
-	InvitesService := identityserver.NewInvitesService(InvitesRepository)
+	InvitesService := identityserver.NewInvitesService(TimeService, InvitesRepository)
 
 	InternalService := identityserver.NewInternalService(*CredentialsService, *IdentitiesService)
 
