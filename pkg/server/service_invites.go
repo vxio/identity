@@ -18,15 +18,21 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	INVITE_TIMEOUT = time.Hour * 48
+)
+
 type InvitesService struct {
-	time       TimeService
-	repository InvitesRepository
+	time          TimeService
+	repository    InvitesRepository
+	notifications NotificationsService
 }
 
-func NewInvitesService(time TimeService, repository InvitesRepository) InvitesApiServicer {
+func NewInvitesService(time TimeService, repository InvitesRepository, notifications NotificationsService) InvitesApiServicer {
 	return &InvitesService{
-		time:       time,
-		repository: repository,
+		time:          time,
+		repository:    repository,
+		notifications: notifications,
 	}
 }
 
@@ -50,7 +56,7 @@ func (s *InvitesService) SendInvite(send SendInvite) (interface{}, error) {
 		Email:     send.Email,
 		InvitedBy: "1", // @TODO
 		InvitedOn: s.time.Now(),
-		ExpiresOn: s.time.Now().Add(time.Hour * 48),
+		ExpiresOn: s.time.Now().Add(INVITE_TIMEOUT),
 		Redeemed:  false,
 	}
 
@@ -65,9 +71,13 @@ func (s *InvitesService) SendInvite(send SendInvite) (interface{}, error) {
 		return nil, err2
 	}
 
-	// @TODO send email
-
 	// send email
+	if err := s.notifications.SendInvite(send.Email, *code); err != nil {
+		// clear out the one we added to the DB so it isn't just sitting around being unused.
+		s.repository.delete(invite.TenantID, invite.InviteID)
+		return nil, err
+	}
+
 	return invite, nil
 }
 

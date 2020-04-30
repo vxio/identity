@@ -46,6 +46,8 @@ func (s *CredentialsService) DisableCredentials(identityID string, credentialID 
 		return nil, err
 	}
 
+	// @TODO send notification to the email to notify them?
+
 	return saved, err
 }
 
@@ -90,6 +92,8 @@ func (s *CredentialsService) Register(identityID string, provider string, subjec
 	}
 
 	// @TODO record new registered credential
+
+	// @TODO email that a new credential was registered
 
 	return &saved, err
 }

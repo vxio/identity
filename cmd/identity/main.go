@@ -40,6 +40,7 @@ func main() {
 	defer close()
 
 	TimeService := identityserver.NewSystemTimeService()
+	NotificationsService := identityserver.NewNotificationsService("some.mail.server.com", 443, "username", "password", "noreply@moov.io")
 
 	IdentityRepository := identityserver.NewIdentityRepository(db)
 	IdentitiesService := identityserver.NewIdentitiesService(TimeService, IdentityRepository)
@@ -48,7 +49,7 @@ func main() {
 	CredentialsService := identityserver.NewCredentialsService(TimeService, CredentialRepository)
 
 	InvitesRepository := identityserver.NewInvitesRepository(db)
-	InvitesService := identityserver.NewInvitesService(TimeService, InvitesRepository)
+	InvitesService := identityserver.NewInvitesService(TimeService, InvitesRepository, NotificationsService)
 
 	InternalService := identityserver.NewInternalService(*CredentialsService, *IdentitiesService)
 
