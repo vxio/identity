@@ -49,10 +49,10 @@ func (s *InvitesService) ListInvites(orgID string) (interface{}, error) {
 }
 
 // SendInvite - Send an email invite to a new user
-func (s *InvitesService) SendInvite(send SendInvite) (interface{}, error) {
+func (s *InvitesService) SendInvite(tenant TenantID, send SendInvite) (interface{}, error) {
 	invite := Invite{
 		InviteID:  uuid.New().String(),
-		TenantID:  "1", // @TODO
+		TenantID:  string(tenant),
 		Email:     send.Email,
 		InvitedBy: "1", // @TODO
 		InvitedOn: s.time.Now(),
@@ -72,7 +72,7 @@ func (s *InvitesService) SendInvite(send SendInvite) (interface{}, error) {
 	}
 
 	// send email
-	if err := s.notifications.SendInvite(send.Email, *code); err != nil {
+	if err := s.notifications.SendInvite(send.Email, *code, "someurl"); err != nil {
 		// clear out the one we added to the DB so it isn't just sitting around being unused.
 		s.repository.delete(invite.TenantID, invite.InviteID)
 		return nil, err

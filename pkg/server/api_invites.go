@@ -79,13 +79,15 @@ func (c *InvitesController) ListInvites(w http.ResponseWriter, r *http.Request) 
 
 // SendInvite - Send an email invite to a new user
 func (c *InvitesController) SendInvite(w http.ResponseWriter, r *http.Request) {
+	tenantID := TenantID(r.Header.Get("x-tenant"))
+
 	invite := &SendInvite{}
 	if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
 		w.WriteHeader(500)
 		return
 	}
 
-	result, err := c.service.SendInvite(*invite)
+	result, err := c.service.SendInvite(tenantID, *invite)
 	if err != nil {
 		w.WriteHeader(500)
 		return

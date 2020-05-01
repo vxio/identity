@@ -84,5 +84,5 @@ type InternalApiServicer interface {
 type InvitesApiServicer interface {
 	DeleteInvite(string) (interface{}, error)
 	ListInvites(string) (interface{}, error)
-	SendInvite(SendInvite) (interface{}, error)
+	SendInvite(TenantID, SendInvite) (interface{}, error)
 }
