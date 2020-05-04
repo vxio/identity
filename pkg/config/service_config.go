@@ -40,7 +40,12 @@ func (s *ConfigService) Load(config interface{}) error {
 	}
 
 	overrides := viper.New()
-	overrides.SetConfigFile("./config.overrides.yml")
+
+	if v, s := os.LookupEnv("APP_CONFIG"); s {
+		overrides.SetConfigFile(v)
+	} else {
+		overrides.SetConfigFile("./config.overrides.yml")
+	}
 
 	if err := overrides.ReadInConfig(); err != nil {
 		if _, ok := err.(*os.PathError); ok {
