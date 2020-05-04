@@ -4,3 +4,6 @@ http:
 admin:
   bind:
     address: ":8302"
+database:
+  sqllite:
+    path: bin/identity.db

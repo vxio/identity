@@ -1,6 +1,3 @@
 admin:
   bind:
     address: ":8202"
-database:
-  sqllite:
-    path: bin/identity.db

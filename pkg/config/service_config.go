@@ -24,7 +24,7 @@ func NewConfigService(logger log.Logger) ConfigService {
 func (s *ConfigService) Load(config interface{}) error {
 	deflt := viper.New()
 
-	fmt.Println("Loading config")
+	s.logger.Log("config", "Loading config")
 	deflt.SetConfigFile("./config.default.yml")
 
 	if err := deflt.ReadInConfig(); err != nil {
