@@ -24,12 +24,12 @@ func NewJWTMiddleware(jwksLoader jwks.JwksService) (*jwtmiddleware.JWTMiddleware
 			kid := token.Header["kid"].(string)
 
 			// search the returned keys from the JWKS
-			found := findKey(kid, jwks.Keys)
-			if found == nil {
+			k := jwks.Key(kid)
+			if len(k) == 0 {
 				return nil, errors.New("Could not find the kid in the jwks web key set")
 			}
 
-			return found.Key, nil
+			return k[0], nil
 		},
 		SigningMethod: jwt.SigningMethodRS256,
 	})

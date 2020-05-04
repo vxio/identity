@@ -25,7 +25,7 @@ func (s *ConfigService) Load(config interface{}) error {
 	deflt := viper.New()
 
 	s.logger.Log("config", "Loading config")
-	deflt.SetConfigFile("./config.default.yml")
+	deflt.SetConfigFile("./configs/config.default.yml")
 
 	if err := deflt.ReadInConfig(); err != nil {
 		msg := "Unable to load the defaults"
@@ -44,7 +44,7 @@ func (s *ConfigService) Load(config interface{}) error {
 	if v, s := os.LookupEnv("APP_CONFIG"); s {
 		overrides.SetConfigFile(v)
 	} else {
-		overrides.SetConfigFile("./config.overrides.yml")
+		overrides.SetConfigFile("./configs/config.overrides.yml")
 	}
 
 	if err := overrides.ReadInConfig(); err != nil {
