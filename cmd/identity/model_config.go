@@ -5,21 +5,27 @@ import (
 	"github.com/moov-io/identity/pkg/jwks"
 )
 
+//Config defines all the configuration for the app
 type Config struct {
-	Http           HttpConfig
-	Admin          HttpConfig
+	HTTP           HTTPConfig
+	Admin          HTTPConfig
 	Database       database.DatabaseConfig
 	Authentication AuthenticationConfig
 }
 
-type HttpConfig struct {
+//HTTPConfig configuration for running an http server
+type HTTPConfig struct {
 	Bind BindAddress
 }
 
+//BindAddress specifies where the http server should bind to.
 type BindAddress struct {
 	Address string
 }
 
+//AuthenticationConfig on where to get keys from.
+//  Backchannel is for verifying what comes from the Gateway
+//  Frontchannel is for creating the tokens sent to the customer.
 type AuthenticationConfig struct {
 	Backchannel  jwks.JwksConfig
 	Frontchannel jwks.JwksConfig

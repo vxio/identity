@@ -78,7 +78,7 @@ func main() {
 	CredentialsController := identityserver.NewCredentialsApiController(CredentialsService)
 	InvitesController := identityserver.NewInvitesController(InvitesService)
 	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, InternalController, WhoAmIController)
-	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger, config.Http)
+	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger, config.HTTP)
 	defer shutdownServer()
 
 	awaitTermination(terminationListener)
@@ -101,7 +101,7 @@ func awaitTermination(terminationListener chan error) {
 	}
 }
 
-func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logger, config HttpConfig) *admin.Server {
+func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logger, config HTTPConfig) *admin.Server {
 	adminServer := admin.NewServer(config.Bind.Address)
 	adminServer.AddHandler("/", adminRouter.ServeHTTP)
 
@@ -117,7 +117,7 @@ func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logg
 	return adminServer
 }
 
-func bootPublicServer(routes *mux.Router, errs chan<- error, logger log.Logger, config HttpConfig) (*http.Server, func()) {
+func bootPublicServer(routes *mux.Router, errs chan<- error, logger log.Logger, config HTTPConfig) (*http.Server, func()) {
 
 	// Create main HTTP server
 	serve := &http.Server{
