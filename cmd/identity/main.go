@@ -60,10 +60,14 @@ func main() {
 	defer adminServer.Shutdown()
 
 	// public server
+
+	// debug api
+	WhoAmIController := identityserver.NewWhoAmIController()
+
 	IdentitiesController := identityserver.NewIdentitiesApiController(IdentitiesService)
 	CredentialsController := identityserver.NewCredentialsApiController(CredentialsService)
 	InvitesController := identityserver.NewInvitesController(InvitesService)
-	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, InternalController)
+	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, InternalController, WhoAmIController)
 	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger)
 	defer shutdownServer()
 
