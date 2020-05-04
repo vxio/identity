@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"strings"
 
 	//"github.com/moov-io/paygate/pkg/util"
 
@@ -24,15 +23,14 @@ func Type() string {
 
 // New establishes a database connection according to the type and environmental
 // variables for that specific database.
-func New(ctx context.Context, logger log.Logger, _type string) (*sql.DB, error) {
-	logger.Log("database", fmt.Sprintf("looking for %s database provider", _type))
-	switch strings.ToLower(_type) {
-	case "sqlite":
-		return sqliteConnection(logger, getSqlitePath()).Connect(ctx)
-	case "mysql":
-		return mysqlConnection(logger, os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_ADDRESS"), os.Getenv("MYSQL_DATABASE")).Connect(ctx)
+func New(ctx context.Context, logger log.Logger, config DatabaseConfig) (*sql.DB, error) {
+	if config.SqlLite != nil {
+		return sqliteConnection(logger, config.SqlLite.Path).Connect(ctx)
+	} else if config.MySql != nil {
+		return mysqlConnection(logger, config.MySql.User, config.MySql.Password, config.MySql.Address, config.MySql.Database).Connect(ctx)
 	}
-	return nil, fmt.Errorf("unknown database type %q", _type)
+
+	return nil, fmt.Errorf("Database config not defined")
 }
 
 func execsql(name, raw string) *migrator.MigrationNoTx {

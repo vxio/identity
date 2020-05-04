@@ -46,7 +46,7 @@ func main() {
 	fmt.Printf("%+v\n", config)
 
 	//db setup
-	db, close := initializeDatabase(logger)
+	db, close := initializeDatabase(logger, config.Database)
 	defer close()
 
 	TimeService := identityserver.NewSystemTimeService()
@@ -152,11 +152,11 @@ func bootPublicServer(routes *mux.Router, errs chan<- error, logger log.Logger, 
 	return serve, shutdownServer
 }
 
-func initializeDatabase(logger log.Logger) (*sql.DB, func()) {
+func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql.DB, func()) {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 
 	// migrate database
-	db, err := database.New(ctx, logger, database.Type())
+	db, err := database.New(ctx, logger, config)
 	if err != nil {
 		panic(fmt.Sprintf("error creating database: %v", err))
 	}
