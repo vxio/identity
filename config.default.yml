@@ -1,0 +1,6 @@
+http:
+  bind:
+    address: ":8301"
+admin:
+  bind:
+    address: ":8302"

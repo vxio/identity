@@ -23,6 +23,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base/admin"
+	config "github.com/moov-io/identity/pkg/config"
 	"github.com/moov-io/identity/pkg/database"
 	identityserver "github.com/moov-io/identity/pkg/server"
 )
@@ -34,6 +35,15 @@ func main() {
 
 	// Listen for application termination.
 	terminationListener := newTerminationListener()
+
+	ConfigService := config.NewConfigService(logger)
+
+	config := &Config{}
+	if err := ConfigService.Load(config); err != nil {
+		return
+	}
+
+	fmt.Printf("%+v\n", config)
 
 	//db setup
 	db, close := initializeDatabase(logger)
@@ -56,7 +66,7 @@ func main() {
 	// internal admin server
 	InternalController := identityserver.NewInternalAPIController(InternalService)
 	adminRouter := identityserver.NewRouter(InternalController)
-	adminServer := bootAdminServer(adminRouter, terminationListener, logger)
+	adminServer := bootAdminServer(adminRouter, terminationListener, logger, config.Admin)
 	defer adminServer.Shutdown()
 
 	// public server
@@ -68,7 +78,7 @@ func main() {
 	CredentialsController := identityserver.NewCredentialsApiController(CredentialsService)
 	InvitesController := identityserver.NewInvitesController(InvitesService)
 	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, InternalController, WhoAmIController)
-	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger)
+	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger, config.Http)
 	defer shutdownServer()
 
 	awaitTermination(terminationListener)
@@ -91,13 +101,8 @@ func awaitTermination(terminationListener chan error) {
 	}
 }
 
-func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logger) *admin.Server {
-	adminAddr := os.Getenv("HTTP_ADMIN_BIND_ADDRESS")
-	if adminAddr == "" {
-		adminAddr = ":8201"
-	}
-
-	adminServer := admin.NewServer(adminAddr)
+func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logger, config HttpConfig) *admin.Server {
+	adminServer := admin.NewServer(config.Bind.Address)
 	adminServer.AddHandler("/", adminRouter.ServeHTTP)
 
 	go func() {
@@ -112,15 +117,11 @@ func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logg
 	return adminServer
 }
 
-func bootPublicServer(routes *mux.Router, errs chan<- error, logger log.Logger) (*http.Server, func()) {
-	httpAddr := os.Getenv("HTTP_BIND_ADDRESS")
-	if httpAddr == "" {
-		httpAddr = ":8200"
-	}
+func bootPublicServer(routes *mux.Router, errs chan<- error, logger log.Logger, config HttpConfig) (*http.Server, func()) {
 
 	// Create main HTTP server
 	serve := &http.Server{
-		Addr:    httpAddr,
+		Addr:    config.Bind.Address,
 		Handler: routes,
 		TLSConfig: &tls.Config{
 			InsecureSkipVerify:       false,
@@ -134,7 +135,7 @@ func bootPublicServer(routes *mux.Router, errs chan<- error, logger log.Logger) 
 
 	// Start main HTTP server
 	go func() {
-		logger.Log("http", fmt.Sprintf("listening on %s", httpAddr))
+		logger.Log("http", fmt.Sprintf("listening on %s", config.Bind.Address))
 		if err := serve.ListenAndServe(); err != nil {
 			err = fmt.Errorf("problem starting http: %v", err)
 			logger.Log("http", err)

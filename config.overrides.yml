@@ -1,0 +1,3 @@
+admin:
+  bind:
+    address: ":8202"
