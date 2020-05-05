@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/moov-io/identity/pkg/database"
-	"github.com/moov-io/identity/pkg/jwks"
 	"github.com/moov-io/identity/pkg/notifications"
+	"github.com/moov-io/identity/pkg/webkeys"
 )
 
 //Config defines all the configuration for the app
@@ -29,6 +29,6 @@ type BindAddress struct {
 //  Backchannel is for verifying what comes from the Gateway
 //  Frontchannel is for creating the tokens sent to the customer.
 type AuthenticationConfig struct {
-	Backchannel  jwks.JwksConfig
-	Frontchannel jwks.JwksConfig
+	Backchannel  webkeys.WebKeysConfig
+	Frontchannel webkeys.WebKeysConfig
 }

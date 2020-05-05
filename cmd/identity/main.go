@@ -25,11 +25,11 @@ import (
 	"github.com/moov-io/base/admin"
 	config "github.com/moov-io/identity/pkg/config"
 	"github.com/moov-io/identity/pkg/database"
-	"github.com/moov-io/identity/pkg/jwks"
-	"github.com/moov-io/identity/pkg/jwtmw"
 	"github.com/moov-io/identity/pkg/notifications"
 	identityserver "github.com/moov-io/identity/pkg/server"
 	"github.com/moov-io/identity/pkg/utils"
+	"github.com/moov-io/identity/pkg/webkeys"
+	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 var logger log.Logger
@@ -55,13 +55,13 @@ func main() {
 
 	TimeService := utils.NewSystemTimeService()
 
-	FrontchannelJwks, err := jwks.NewJwksService(logger, config.Authentication.Frontchannel)
+	FrontchannelJwks, err := webkeys.NewWebKeysService(logger, config.Authentication.Frontchannel)
 	if err != nil {
 		logger.Log("main", "Unable to load up up the Frontchannel JSON Web Key Set")
 		return
 	}
 
-	BackchannelJwks, err := jwks.NewJwksService(logger, config.Authentication.Backchannel)
+	BackchannelJwks, err := webkeys.NewWebKeysService(logger, config.Authentication.Backchannel)
 	if err != nil {
 		logger.Log("main", "Unable to load up the Backchannel JSON Web Key Set")
 	}
@@ -90,7 +90,7 @@ func main() {
 	// public server
 
 	// auth middleware for the back channel
-	authMiddleware, err := jwtmw.NewJWTMiddleware(BackchannelJwks)
+	authMiddleware, err := zerotrust.NewJWTMiddleware(BackchannelJwks)
 	if err != nil {
 		logger.Log("main", "Can't startup the Middleware")
 		return

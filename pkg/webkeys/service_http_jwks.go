@@ -1,4 +1,4 @@
-package jwks
+package webkeys
 
 import (
 	"fmt"
@@ -8,19 +8,19 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
-type WebJwksService struct {
+type HTTPJwksService struct {
 	client  *http.Client
 	jwksURI string
 }
 
-func NewWebJwksService(jwksURI string) JwksService {
-	return &WebJwksService{
+func NewHTTPJwksService(jwksURI string) WebKeysService {
+	return &HTTPJwksService{
 		client:  &http.Client{},
 		jwksURI: jwksURI,
 	}
 }
 
-func (s *WebJwksService) FetchJwks() (*jose.JSONWebKeySet, error) {
+func (s *HTTPJwksService) FetchJwks() (*jose.JSONWebKeySet, error) {
 	resp, err := s.client.Get(s.jwksURI)
 	if err != nil {
 		return nil, err

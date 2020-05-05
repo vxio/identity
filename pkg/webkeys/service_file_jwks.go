@@ -1,4 +1,4 @@
-package jwks
+package webkeys
 
 import (
 	"io/ioutil"
@@ -11,7 +11,7 @@ type FileJwksService struct {
 	filePath string
 }
 
-func NewFileJwksService(filePath string) JwksService {
+func NewFileJwksService(filePath string) WebKeysService {
 	return &FileJwksService{
 		filePath: filePath,
 	}

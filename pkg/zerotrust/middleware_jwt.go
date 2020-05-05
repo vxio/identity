@@ -1,15 +1,15 @@
-package jwtmw
+package zerotrust
 
 import (
 	"errors"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/moov-io/identity/pkg/jwks"
+	"github.com/moov-io/identity/pkg/webkeys"
 	"gopkg.in/square/go-jose.v2"
 )
 
-func NewJWTMiddleware(jwksLoader jwks.JwksService) (*jwtmiddleware.JWTMiddleware, error) {
+func NewJWTMiddleware(jwksLoader webkeys.WebKeysService) (*jwtmiddleware.JWTMiddleware, error) {
 
 	// Fetch the JWKS from our source.
 	jwks, err := jwksLoader.FetchJwks()

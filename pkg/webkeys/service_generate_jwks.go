@@ -1,4 +1,4 @@
-package jwks
+package webkeys
 
 import (
 	"crypto"
@@ -17,7 +17,7 @@ type GenerateJwksService struct {
 	Public  jose.JSONWebKey
 }
 
-func NewGenerateJwksService() (JwksService, error) {
+func NewGenerateJwksService() (WebKeysService, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
 		return nil, err

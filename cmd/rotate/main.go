@@ -13,7 +13,7 @@ import (
 	"fmt"
 
 	"github.com/go-kit/kit/log"
-	"github.com/moov-io/identity/pkg/jwks"
+	"github.com/moov-io/identity/pkg/webkeys"
 )
 
 var logger log.Logger
@@ -22,13 +22,13 @@ var logger log.Logger
 This is used to rotate the jwks by our systems. It will generate a RSA256 public and private key for used.
 */
 func main() {
-	js, err := jwks.NewGenerateJwksService()
+	js, err := webkeys.NewGenerateJwksService()
 	if err != nil {
 		fmt.Printf("Unable to generate JWKS service - %s\n", err.Error())
 		return
 	}
 
-	s, _ := js.(*jwks.GenerateJwksService)
+	s, _ := js.(*webkeys.GenerateJwksService)
 
 	fmt.Printf("Writing out generated JWKS files into ./\n")
 	s.Save("./configs/")

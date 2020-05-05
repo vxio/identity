@@ -7,8 +7,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
-	"github.com/moov-io/identity/pkg/jwks"
 	"github.com/moov-io/identity/pkg/utils"
+	"github.com/moov-io/identity/pkg/webkeys"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -27,11 +27,11 @@ type TokenService interface {
 
 type tokenService struct {
 	time       utils.TimeService
-	jwks       jwks.JwksService
+	jwks       webkeys.WebKeysService
 	expiration time.Duration
 }
 
-func NewTokenService(time utils.TimeService, jwks jwks.JwksService, expiration time.Duration) TokenService {
+func NewTokenService(time utils.TimeService, jwks webkeys.WebKeysService, expiration time.Duration) TokenService {
 	return &tokenService{
 		time:       time,
 		jwks:       jwks,
