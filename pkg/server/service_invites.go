@@ -16,6 +16,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/moov-io/identity/pkg/notifications"
+	"github.com/moov-io/identity/pkg/utils"
 )
 
 var (
@@ -23,12 +25,12 @@ var (
 )
 
 type InvitesService struct {
-	time          TimeService
+	time          utils.TimeService
 	repository    InvitesRepository
-	notifications NotificationsService
+	notifications notifications.NotificationsService
 }
 
-func NewInvitesService(time TimeService, repository InvitesRepository, notifications NotificationsService) InvitesApiServicer {
+func NewInvitesService(time utils.TimeService, repository InvitesRepository, notifications notifications.NotificationsService) InvitesApiServicer {
 	return &InvitesService{
 		time:          time,
 		repository:    repository,

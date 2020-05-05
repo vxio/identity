@@ -13,18 +13,19 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/moov-io/identity/pkg/utils"
 )
 
 // IdentitiesApiService is a service that implents the logic for the IdentitiesApiServicer
 // This service should implement the business logic for every endpoint for the IdentitiesApi API.
 // Include any external packages or services that will be required by this service.
 type IdentitiesService struct {
-	time       TimeService
+	time       utils.TimeService
 	repository IdentityRepository
 }
 
 // NewIdentitiesApiService creates a default api service
-func NewIdentitiesService(time TimeService, repository IdentityRepository) *IdentitiesService {
+func NewIdentitiesService(time utils.TimeService, repository IdentityRepository) *IdentitiesService {
 	return &IdentitiesService{
 		time:       time,
 		repository: repository,

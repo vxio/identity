@@ -26,7 +26,10 @@ import (
 	config "github.com/moov-io/identity/pkg/config"
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/jwks"
+	"github.com/moov-io/identity/pkg/jwtmw"
+	"github.com/moov-io/identity/pkg/notifications"
 	identityserver "github.com/moov-io/identity/pkg/server"
+	"github.com/moov-io/identity/pkg/utils"
 )
 
 var logger log.Logger
@@ -50,17 +53,22 @@ func main() {
 	db, close := initializeDatabase(logger, config.Database)
 	defer close()
 
-	TimeService := identityserver.NewSystemTimeService()
+	TimeService := utils.NewSystemTimeService()
 
-	FrontChannelJwks, err := jwks.NewJwksService(logger, config.Authentication.Frontchannel)
+	FrontchannelJwks, err := jwks.NewJwksService(logger, config.Authentication.Frontchannel)
 	if err != nil {
 		logger.Log("main", "Unable to load up up the Frontchannel JSON Web Key Set")
 		return
 	}
 
-	TokenService := identityserver.NewTokenService(TimeService, FrontChannelJwks, config.Authentication.Frontchannel.Expiration)
+	BackchannelJwks, err := jwks.NewJwksService(logger, config.Authentication.Backchannel)
+	if err != nil {
+		logger.Log("main", "Unable to load up the Backchannel JSON Web Key Set")
+	}
 
-	NotificationsService := identityserver.NewNotificationsService("some.mail.server.com", 443, "username", "password", "noreply@moov.io")
+	TokenService := identityserver.NewTokenService(TimeService, FrontchannelJwks, config.Authentication.Frontchannel.Expiration)
+
+	NotificationsService := notifications.NewNotificationsService(config.Notifications)
 
 	IdentityRepository := identityserver.NewIdentityRepository(db)
 	IdentitiesService := identityserver.NewIdentitiesService(TimeService, IdentityRepository)
@@ -81,14 +89,23 @@ func main() {
 
 	// public server
 
+	// auth middleware for the back channel
+	authMiddleware, err := jwtmw.NewJWTMiddleware(BackchannelJwks)
+	if err != nil {
+		logger.Log("main", "Can't startup the Middleware")
+		return
+	}
+
 	// debug api
 	WhoAmIController := identityserver.NewWhoAmIController()
 
 	IdentitiesController := identityserver.NewIdentitiesApiController(IdentitiesService)
 	CredentialsController := identityserver.NewCredentialsApiController(CredentialsService)
 	InvitesController := identityserver.NewInvitesController(InvitesService)
-	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, InternalController, WhoAmIController)
-	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger, config.HTTP)
+	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
+	authedRouter := authMiddleware.Handler(publicRouter)
+
+	_, shutdownServer := bootPublicServer(authedRouter, terminationListener, logger, config.HTTP)
 	defer shutdownServer()
 
 	awaitTermination(terminationListener)
@@ -113,6 +130,7 @@ func awaitTermination(terminationListener chan error) {
 
 func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logger, config HTTPConfig) *admin.Server {
 	adminServer := admin.NewServer(config.Bind.Address)
+
 	adminServer.AddHandler("/", adminRouter.ServeHTTP)
 
 	go func() {
@@ -127,7 +145,7 @@ func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logg
 	return adminServer
 }
 
-func bootPublicServer(routes *mux.Router, errs chan<- error, logger log.Logger, config HTTPConfig) (*http.Server, func()) {
+func bootPublicServer(routes http.Handler, errs chan<- error, logger log.Logger, config HTTPConfig) (*http.Server, func()) {
 
 	// Create main HTTP server
 	serve := &http.Server{

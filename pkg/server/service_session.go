@@ -2,11 +2,13 @@ package identityserver
 
 import (
 	"errors"
+	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/jwks"
+	"github.com/moov-io/identity/pkg/utils"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -20,15 +22,16 @@ import (
 
 type TokenService interface {
 	Generate(identityID string) (string, error)
+	GenerateCookie(identityID string) (*http.Cookie, error)
 }
 
 type tokenService struct {
-	time       TimeService
+	time       utils.TimeService
 	jwks       jwks.JwksService
 	expiration time.Duration
 }
 
-func NewTokenService(time TimeService, jwks jwks.JwksService, expiration time.Duration) TokenService {
+func NewTokenService(time utils.TimeService, jwks jwks.JwksService, expiration time.Duration) TokenService {
 	return &tokenService{
 		time:       time,
 		jwks:       jwks,
@@ -52,7 +55,7 @@ func (s *tokenService) Generate(identityID string) (string, error) {
 
 	//jwt.SigningMethodRS256
 	token := jwt.NewWithClaims(signingMethod, jwt.StandardClaims{
-		ExpiresAt: s.time.Now().Add(s.expiration).Unix(),
+		ExpiresAt: s.calculateExpiration().Unix(),
 		NotBefore: s.time.Now().Add(time.Minute * -1).Unix(),
 		IssuedAt:  s.time.Now().Unix(),
 		Id:        uuid.New().String(),
@@ -68,6 +71,28 @@ func (s *tokenService) Generate(identityID string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func (s *tokenService) GenerateCookie(identityID string) (*http.Cookie, error) {
+	value, err := s.Generate(identityID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &http.Cookie{
+		Name:     "moov",
+		Value:    value,
+		Path:     "/",
+		Expires:  s.calculateExpiration(),
+		MaxAge:   int(s.expiration.Seconds()),
+		SameSite: http.SameSiteStrictMode,
+		Secure:   false,
+		HttpOnly: true,
+	}, nil
+}
+
+func (s *tokenService) calculateExpiration() time.Time {
+	return s.time.Now().Add(s.expiration)
 }
 
 func getPrivateKey(keys *jose.JSONWebKeySet) *jose.JSONWebKey {

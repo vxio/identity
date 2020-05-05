@@ -1,4 +1,4 @@
-package identityserver
+package utils
 
 import (
 	"time"

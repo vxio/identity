@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/jwks"
+	"github.com/moov-io/identity/pkg/notifications"
 )
 
 //Config defines all the configuration for the app
@@ -11,6 +12,7 @@ type Config struct {
 	Admin          HTTPConfig
 	Database       database.DatabaseConfig
 	Authentication AuthenticationConfig
+	Notifications  notifications.NotificationsConfig
 }
 
 //HTTPConfig configuration for running an http server

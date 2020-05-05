@@ -11,18 +11,19 @@ package identityserver
 
 import (
 	"github.com/google/uuid"
+	"github.com/moov-io/identity/pkg/utils"
 )
 
 // CredentialsService is a service that implents the logic for the CredentialsApiServicer
 // This service should implement the business logic for every endpoint for the CredentialsApi API.
 // Include any external packages or services that will be required by this service.
 type CredentialsService struct {
-	time       TimeService
+	time       utils.TimeService
 	repository CredentialRepository
 }
 
 // NewCredentialsService creates a default api service
-func NewCredentialsService(time TimeService, repository CredentialRepository) *CredentialsService {
+func NewCredentialsService(time utils.TimeService, repository CredentialRepository) *CredentialsService {
 	return &CredentialsService{
 		time:       time,
 		repository: repository,

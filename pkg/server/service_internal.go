@@ -57,12 +57,16 @@ func (s *InternalService) RegisterWithCredentials(register Register) (interface{
 // LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
 func (s *InternalService) LoginWithCredentials(login Login) (interface{}, error) {
 	// check if they exist in the credentials service and if its enabled.
-	_, err := s.credentials.Login(login)
+	loggedIn, err := s.credentials.Login(login)
 	if err != nil {
 		return nil, errors.New("Unauthorized")
 	}
 
 	// @TODO generate token with the ID's
+	cookie, err := s.token.GenerateCookie(loggedIn.IdentityID)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, errors.New("service method 'LoginWithCredentials' not implemented")
+	return cookie, errors.New("service method 'LoginWithCredentials' not implemented")
 }

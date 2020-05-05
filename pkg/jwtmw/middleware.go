@@ -1,4 +1,4 @@
-package identityserver
+package jwtmw
 
 import (
 	"errors"
