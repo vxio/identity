@@ -42,7 +42,7 @@ func (s *CredentialsService) DisableCredentials(identityID string, credentialID 
 	cred.DisabledOn = &now
 	cred.DisabledBy = &callderIdentityID
 
-	saved, err := s.repository.update(cred)
+	saved, err := s.repository.update(*cred)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (s *CredentialsService) DisableCredentials(identityID string, credentialID 
 
 // ListCredentials - List the credentials this user has used.
 func (s *CredentialsService) ListCredentials(identityID string) (interface{}, error) {
-	return s.repository.list("tenantID", identityID)
+	return s.repository.list(identityID)
 }
 
 func (s *CredentialsService) Login(login Login) (*Credential, error) {
@@ -65,14 +65,14 @@ func (s *CredentialsService) Login(login Login) (*Credential, error) {
 	}
 
 	cred.LastUsedOn = s.time.Now()
-	saved, err := s.repository.update(cred)
+	saved, err := s.repository.update(*cred)
 	if err != nil {
 		return nil, err
 	}
 
 	// @TODO record login in a queue
 
-	return &saved, nil
+	return saved, nil
 }
 
 func (s *CredentialsService) Register(identityID string, provider string, subjectID string) (*Credential, error) {
@@ -96,5 +96,5 @@ func (s *CredentialsService) Register(identityID string, provider string, subjec
 
 	// @TODO email that a new credential was registered
 
-	return &saved, err
+	return saved, err
 }
