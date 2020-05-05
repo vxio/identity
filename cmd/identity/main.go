@@ -25,6 +25,7 @@ import (
 	"github.com/moov-io/base/admin"
 	config "github.com/moov-io/identity/pkg/config"
 	"github.com/moov-io/identity/pkg/database"
+	"github.com/moov-io/identity/pkg/jwks"
 	identityserver "github.com/moov-io/identity/pkg/server"
 )
 
@@ -50,6 +51,15 @@ func main() {
 	defer close()
 
 	TimeService := identityserver.NewSystemTimeService()
+
+	FrontChannelJwks, err := jwks.NewJwksService(logger, config.Authentication.Frontchannel)
+	if err != nil {
+		logger.Log("main", "Unable to load up up the Frontchannel JSON Web Key Set")
+		return
+	}
+
+	TokenService := identityserver.NewTokenService(TimeService, FrontChannelJwks, config.Authentication.Frontchannel.Expiration)
+
 	NotificationsService := identityserver.NewNotificationsService("some.mail.server.com", 443, "username", "password", "noreply@moov.io")
 
 	IdentityRepository := identityserver.NewIdentityRepository(db)
@@ -61,7 +71,7 @@ func main() {
 	InvitesRepository := identityserver.NewInvitesRepository(db)
 	InvitesService := identityserver.NewInvitesService(TimeService, InvitesRepository, NotificationsService)
 
-	InternalService := identityserver.NewInternalService(*CredentialsService, *IdentitiesService)
+	InternalService := identityserver.NewInternalService(*CredentialsService, *IdentitiesService, TokenService)
 
 	// internal admin server
 	InternalController := identityserver.NewInternalAPIController(InternalService)

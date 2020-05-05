@@ -7,3 +7,8 @@ admin:
 database:
   sqllite:
     path: bin/identity.db
+authentication:
+  frontchannel:
+    expiration: 1h
+    file:
+      path: ./configs/jwk-sig-priv.json

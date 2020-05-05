@@ -19,13 +19,15 @@ import (
 type InternalService struct {
 	credentials CredentialsService
 	identities  IdentitiesService
+	token       TokenService
 }
 
 // NewInternalService creates a default api service
-func NewInternalService(credentials CredentialsService, identities IdentitiesService) InternalApiServicer {
+func NewInternalService(credentials CredentialsService, identities IdentitiesService, token TokenService) InternalApiServicer {
 	return &InternalService{
 		credentials: credentials,
 		identities:  identities,
+		token:       token,
 	}
 }
 
