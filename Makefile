@@ -22,7 +22,7 @@ openapitools:
 		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/.openapi-generator/client-generator-config.yml /local/.openapi-generator/server-generator-config.yml
 
 run: compile
-	rm ./bin/identity.db
+	-rm ./bin/identity.db
 	./bin/identity
 
 rotate:	compile

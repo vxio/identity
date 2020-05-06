@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"os"
 
 	migrate "github.com/golang-migrate/migrate/v4"
 	migratedb "github.com/golang-migrate/migrate/v4/database/sqlite3"
@@ -14,10 +13,7 @@ import (
 func RunMigrations(db *sql.DB) error {
 	fmt.Println("Running Migrations")
 
-	pkger.Walk("/migrations/", func(path string, info os.FileInfo, err error) error {
-		fmt.Println("Path: " + path)
-		return nil
-	})
+	pkger.Include("/migrations/")
 
 	driver, err := migratedb.WithInstance(db, &migratedb.Config{})
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 
+	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
 )
 
@@ -22,12 +23,16 @@ func NewConfigService(logger log.Logger) ConfigService {
 }
 
 func (s *ConfigService) Load(config interface{}) error {
-	deflt := viper.New()
-
 	s.logger.Log("config", "Loading config")
-	deflt.SetConfigFile("./configs/config.default.yml")
 
-	if err := deflt.ReadInConfig(); err != nil {
+	f, err := pkger.Open("/configs/config.default.yml")
+	if err != nil {
+		return err
+	}
+
+	deflt := viper.New()
+	deflt.SetConfigType("yaml")
+	if err := deflt.ReadConfig(f); err != nil {
 		msg := "Unable to load the defaults"
 		s.logger.Log("config", msg)
 		return errors.New(msg)
