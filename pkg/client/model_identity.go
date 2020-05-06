@@ -15,6 +15,8 @@ import (
 type Identity struct {
 	// UUID v4
 	IdentityID string `json:"identityID,omitempty"`
+	// UUID v4
+	TenantID string `json:"tenantID,omitempty"`
 	FirstName string `json:"firstName"`
 	MiddleName string `json:"middleName,omitempty"`
 	LastName string `json:"lastName"`
@@ -33,4 +35,5 @@ type Identity struct {
 	DisabledOn *time.Time `json:"disabledOn,omitempty"`
 	// UUID v4
 	DisabledBy *string `json:"disabledBy,omitempty"`
+	LastUpdatedOn time.Time `json:"lastUpdatedOn,omitempty"`
 }

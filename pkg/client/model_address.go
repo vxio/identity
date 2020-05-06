@@ -10,6 +10,10 @@
 package identityclient
 // Address Address of the Identity
 type Address struct {
+	// UUID v4
+	IdentityID string `json:"identityID,omitempty"`
+	// UUID v4
+	AddressID string `json:"addressID,omitempty"`
 	Type string `json:"type,omitempty"`
 	Address1 string `json:"address1,omitempty"`
 	Address2 *string `json:"address2,omitempty"`
@@ -18,5 +22,4 @@ type Address struct {
 	PostalCode string `json:"postalCode,omitempty"`
 	Country string `json:"country,omitempty"`
 	Validated bool `json:"validated,omitempty"`
-	Active bool `json:"active,omitempty"`
 }

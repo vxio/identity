@@ -4,6 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**IdentityID** | **string** | UUID v4 | [optional] 
+**AddressID** | **string** | UUID v4 | [optional] 
 **Type** | **string** |  | [optional] 
 **Address1** | **string** |  | [optional] 
 **Address2** | Pointer to **string** |  | [optional] 
@@ -12,7 +14,6 @@ Name | Type | Description | Notes
 **PostalCode** | **string** |  | [optional] 
 **Country** | **string** |  | [optional] 
 **Validated** | **bool** |  | [optional] 
-**Active** | **bool** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

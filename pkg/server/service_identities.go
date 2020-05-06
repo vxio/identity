@@ -43,8 +43,9 @@ func (s *IdentitiesService) DisableIdentity(identityID string) (interface{}, err
 	callerIdentityID := "callerIdentityID"
 	identity.DisabledOn = &now
 	identity.DisabledBy = &callerIdentityID
+	identity.LastUpdatedOn = s.time.Now()
 
-	_, nil := s.repository.update("tenantID", identity)
+	_, nil := s.repository.update(*identity)
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +86,9 @@ func (s *IdentitiesService) UpdateIdentity(identityID string, update UpdateIdent
 	identity.Status = update.Status
 	identity.Phones = update.Phones
 	identity.Addresses = update.Addresses
+	identity.LastUpdatedOn = s.time.Now()
 
-	updated, err := s.repository.update("tenantID", identity)
+	updated, err := s.repository.update(*identity)
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +101,7 @@ func (s *IdentitiesService) UpdateIdentity(identityID string, update UpdateIdent
 func (s *IdentitiesService) Register(register Register) (*Identity, error) {
 	identity := Identity{
 		IdentityID:    uuid.New().String(),
+		TenantID:      register.TenantID,
 		FirstName:     register.FirstName,
 		MiddleName:    register.MiddleName,
 		LastName:      register.LastName,
@@ -112,6 +115,7 @@ func (s *IdentitiesService) Register(register Register) (*Identity, error) {
 		Addresses:     register.Addresses,
 		RegisteredOn:  s.time.Now(),
 		LastLogin:     LastLogin{},
+		LastUpdatedOn: s.time.Now(),
 	}
 
 	saved, err := s.repository.add(identity)
@@ -123,5 +127,5 @@ func (s *IdentitiesService) Register(register Register) (*Identity, error) {
 
 	// @TODO send email notification to get registered email verified
 
-	return &saved, nil
+	return saved, nil
 }

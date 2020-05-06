@@ -14,7 +14,8 @@ CREATE TABLE credentials (
 
 CREATE TABLE invites (
     invite_id       UUID NOT NULL,
-    tenant_id       UUID NOT NULL, /* unsure here... */ 
+    tenant_id       UUID NOT NULL,
+
     email           VARCHAR(255) NOT NULL,
     invited_by      UUID NOT NULL,
     invited_on      TIMESTAMP NOT NULL,
@@ -26,6 +27,7 @@ CREATE TABLE invites (
 
 CREATE TABLE identity (
     identity_id     UUID NOT NULL,
+    tenant_id       UUID NOT NULL,
 
     first_name      VARCHAR(255) NOT NULL,
     middle_name     VARCHAR(255),
@@ -41,8 +43,11 @@ CREATE TABLE identity (
     
     disabled_on     TIMESTAMP,
     disabled_by     UUID,
+
+    last_updated_on TIMESTAMP NOT NULL,
     
-    CONSTRAINT identity_pk PRIMARY KEY (identity_id)
+    CONSTRAINT identity_pk PRIMARY KEY (identity_id),
+    CONSTRAINT email_tenant_uniq UNIQUE (tenant_id, email)
 );
 
 CREATE TABLE identity_address (
@@ -55,8 +60,9 @@ CREATE TABLE identity_address (
     city            VARCHAR(255) NOT NULL,
     state           VARCHAR(2) NOT NULL,
     country         VARCHAR(2) NOT NULL,
-    validated       BOOLEAN DEFAULT false,
-    active          BOOLEAN DEFAULT false,
+    validated       BOOLEAN NOT NULL,
+
+    last_updated_on TIMESTAMP NOT NULL,
 
     CONSTRAINT address_pk PRIMARY KEY (address_id)
 );
@@ -67,9 +73,11 @@ CREATE TABLE identity_phone (
     identity_id     UUID NOT NULL,
     phone_id        UUID NOT NULL,
 
-    number          VARCHAR(15),
-    valid           BOOLEAN NOT NULL,
     type            VARCHAR(20) NOT NULL,
+    number          VARCHAR(15),
+    validated       BOOLEAN NOT NULL,
+
+    last_updated_on TIMESTAMP NOT NULL,
 
     CONSTRAINT phone_pk PRIMARY KEY (phone_id)
 );

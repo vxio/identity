@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **IdentityID** | **string** | UUID v4 | [optional] 
+**TenantID** | **string** | UUID v4 | [optional] 
 **FirstName** | **string** |  | 
 **MiddleName** | **string** |  | [optional] 
 **LastName** | **string** |  | 
@@ -20,6 +21,7 @@ Name | Type | Description | Notes
 **LastLogin** | [**LastLogin**](LastLogin.md) |  | [optional] 
 **DisabledOn** | Pointer to [**time.Time**](time.Time.md) |  | [optional] 
 **DisabledBy** | Pointer to **string** | UUID v4 | [optional] 
+**LastUpdatedOn** | [**time.Time**](time.Time.md) |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -16,8 +16,6 @@ compile: pkger
 
 # Generate the go code from the public and internal api's
 openapitools:
-	rm -rf pkg/gen
-
 	docker run --rm \
 		-u $(USERID):$(GROUPID) \
 		-e OPENAPI_GENERATOR_VERSION='4.2.0' \

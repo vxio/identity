@@ -18,6 +18,9 @@ type Register struct {
 	// ID of the remote OIDC server gives to this identity
 	SubjectID string `json:"subjectID,omitempty"`
 
+	// UUID v4
+	TenantID string `json:"tenantID,omitempty"`
+
 	FirstName string `json:"firstName,omitempty"`
 
 	MiddleName string `json:"middleName,omitempty"`

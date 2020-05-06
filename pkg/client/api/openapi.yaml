@@ -587,63 +587,78 @@ components:
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         nickName: nickName
         phones:
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         suffix: suffix
         birthDate: 2020-12-31T00:00:00.000+0000
@@ -651,6 +666,8 @@ components:
         emailVerified: true
         disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        lastUpdatedOn: 2000-01-23T04:56:07.000+00:00
         middleName: Jimmy
         disabledOn: 2000-01-23T04:56:07.000+00:00
         registeredOn: 2000-01-23T04:56:07.000+00:00
@@ -658,6 +675,12 @@ components:
         status: rejected
       properties:
         identityID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        tenantID:
           description: UUID v4
           format: uuid
           maxLength: 36
@@ -741,6 +764,10 @@ components:
           nullable: true
           pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
+        lastUpdatedOn:
+          format: date-time
+          maxLength: 24
+          type: string
       required:
       - email
       - firstName
@@ -758,63 +785,78 @@ components:
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         nickName: nickName
         phones:
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         middleName: Jimmy
         suffix: suffix
@@ -984,16 +1026,30 @@ components:
       additionalProperties: false
       description: Phone number
       example:
-        valid: true
         number: number
+        validated: true
+        identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         type: home
       properties:
+        identityID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        phoneID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
         number:
           format: phone
           maxLength: 15
           pattern: ^[0-9]+$
           type: string
-        valid:
+        validated:
           type: boolean
         type:
           enum:
@@ -1010,12 +1066,25 @@ components:
         validated: true
         address2: address2
         city: Cedar Falls
+        identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         address1: 111 Main St.
         postalCode: "50613"
-        active: true
         state: IA
         type: primary
+        addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
+        identityID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        addressID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
         type:
           enum:
           - primary
@@ -1055,8 +1124,6 @@ components:
           pattern: ^\w+$
           type: string
         validated:
-          type: boolean
-        active:
           type: boolean
       type: object
     Login:
@@ -1106,64 +1173,80 @@ components:
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
           validated: true
           address2: address2
           city: Cedar Falls
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
-          active: true
           state: IA
           type: primary
+          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         provider: google
         nickName: nickName
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         phones:
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
-        - valid: true
-          number: number
+        - number: number
+          validated: true
+          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         middleName: Jimmy
         suffix: suffix
@@ -1185,6 +1268,12 @@ components:
           maxLength: 255
           pattern: ^[0-9a-zA-Z_-]+$
           readOnly: true
+          type: string
+        tenantID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
         firstName:
           example: John

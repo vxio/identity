@@ -10,7 +10,11 @@
 package identityclient
 // Phone Phone number
 type Phone struct {
+	// UUID v4
+	IdentityID string `json:"identityID,omitempty"`
+	// UUID v4
+	PhoneID string `json:"phoneID,omitempty"`
 	Number string `json:"number,omitempty"`
-	Valid bool `json:"valid,omitempty"`
+	Validated bool `json:"validated,omitempty"`
 	Type string `json:"type,omitempty"`
 }

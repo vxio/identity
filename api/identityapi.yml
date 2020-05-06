@@ -452,6 +452,8 @@ components:
         identityID:
           $ref: '#/components/schemas/UUID'
           readOnly: true
+        tenantID:
+          $ref: '#/components/schemas/UUID'
         firstName:
           type: string
           example: John
@@ -524,6 +526,11 @@ components:
           description: IdentityID of the user who disabled this user.
           readOnly: true
           $ref: '#/components/schemas/OptionalUUID'
+        lastUpdatedOn:
+          description: Last time this user was updated
+          readOnly: true
+          nullable: true
+          $ref: '#/components/schemas/DateTime'
 
       required:
         - firstName
@@ -666,12 +673,18 @@ components:
       type: object
       additionalProperties: false
       properties:
+        identityID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        phoneID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
         number:
           type: string
           format: phone
           pattern: ^[0-9]+$
           maxLength: 15
-        valid:
+        validated: 
           type: boolean
         type:
           type: string
@@ -685,6 +698,12 @@ components:
       type: object
       additionalProperties: false
       properties:
+        identityID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        addressID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
         type:
           type: string
           enum:
@@ -725,8 +744,6 @@ components:
           example: US
         validated: 
           type: boolean
-        active: 
-          type: boolean
           
     Login:
       description: |
@@ -763,6 +780,8 @@ components:
         subjectID:
           $ref: '#/components/schemas/SubjectID'
           writeOnly: true
+        tenantID:
+          $ref: '#/components/schemas/UUID'
         firstName:
           type: string
           example: John
