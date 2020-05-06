@@ -1,10 +1,10 @@
 admin:
   bind:
     address: ":8202"
-authentication:
-  backchannel:
-    http:
-      url: http://oathkeeper:4456/.well-known/jwks.json
-  frontchannel:
-    file:
-      path: ./configs/jwk-sig-priv.json
+# authentication:
+#   backchannel:
+#     http:
+#       url: http://oathkeeper:4456/.well-known/jwks.json
+#   frontchannel:
+#     file:
+#       path: ./configs/jwk-sig-priv.json

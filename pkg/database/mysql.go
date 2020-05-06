@@ -15,7 +15,6 @@ import (
 	"github.com/go-kit/kit/log"
 	kitprom "github.com/go-kit/kit/metrics/prometheus"
 	gomysql "github.com/go-sql-driver/mysql"
-	"github.com/lopezator/migrator"
 	"github.com/ory/dockertest/v3"
 	stdprom "github.com/prometheus/client_golang/prometheus"
 )
@@ -38,34 +37,6 @@ var (
 		}
 		return 16
 	}()
-
-	mysqlMigrations = migrator.Migrations(
-		execsql(
-			"create_tenants",
-			`create table tenants(tenant_id varchar(40) primary key, user_id varchar(40), name varchar(64), primary_customer varchar(40), created_at datetime, deleted_at datetime)`,
-		),
-		execsql(
-			"create_organizations",
-			`create table organizations(organization_id varchar(40) primary key, user_id varchar(40), name varchar(64), primary_customer varchar(40), created_at datetime, deleted_at datetime)`,
-		),
-		execsql(
-			"create_tenants_organizations",
-			`create table tenants_organizations(tenant_id varchar(40), organization_id varchar(40), created_at datetime, deleted_at datetime);`,
-		),
-		execsql(
-			"create_tenants_organizations_idx",
-			`create unique index tenants_organizations_idx on tenants_organizations (tenant_id, organization_id);`,
-		),
-		execsql(
-			"create_transfers",
-			`create table transfers(transfer_id varchar(40) primary key, user_id varchar(40), type varchar(10), amount varchar(30), originator_id varchar(40), originator_depository varchar(40), receiver varchar(40), receiver_depository varchar(40), description varchar(200), standard_entry_class_code varchar(5), status varchar(10), same_day boolean, file_id varchar(40), transaction_id varchar(40), merged_filename varchar(100), return_code varchar(10), trace_number varchar(20), created_at datetime, last_updated_at datetime, deleted_at datetime);`,
-		),
-		execsql(
-			"add_remote_addr_to_transfers",
-			// Max length for IPv6 addresses -- https://stackoverflow.com/a/7477384
-			"alter table transfers add column remote_address varchar(45) default '';",
-		),
-	)
 )
 
 type discardLogger struct{}
@@ -96,13 +67,6 @@ func (my *mysql) Connect(ctx context.Context) (*sql.DB, error) {
 	}
 
 	// Migrate our database
-	if m, err := migrator.New(mysqlMigrations); err != nil {
-		return nil, err
-	} else {
-		if err := m.Migrate(db); err != nil {
-			return nil, err
-		}
-	}
 
 	// Setup metrics after the database is setup
 	go func() {

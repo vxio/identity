@@ -12,3 +12,6 @@ authentication:
     expiration: 1h
     file:
       path: ./configs/jwk-sig-priv.json
+  backchannel:
+    file:
+      path: ./configs/jwk-sig-pub.json

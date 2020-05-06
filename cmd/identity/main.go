@@ -47,8 +47,6 @@ func main() {
 		return
 	}
 
-	fmt.Printf("%+v\n", config)
-
 	//db setup
 	db, close := initializeDatabase(logger, config.Database)
 	defer close()
@@ -92,7 +90,7 @@ func main() {
 	// auth middleware for the back channel
 	authMiddleware, err := zerotrust.NewJWTMiddleware(BackchannelJwks)
 	if err != nil {
-		logger.Log("main", "Can't startup the Middleware")
+		logger.Log("main", fmt.Sprintf("Can't startup the front channel middleware - %s", err))
 		return
 	}
 
@@ -194,6 +192,10 @@ func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql
 		if err := db.Close(); err != nil {
 			logger.Log("exit", err)
 		}
+	}
+
+	if err := database.RunMigrations(db); err != nil {
+		panic(fmt.Sprintf("Error running migrations: %s", err))
 	}
 
 	return db, shutdown
