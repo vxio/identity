@@ -21,6 +21,7 @@ CREATE TABLE invites (
     invited_on      TIMESTAMP NOT NULL,
     expires_on      TIMESTAMP NOT NULL,
     redeemed        BOOLEAN,
+    secret_code     VARCHAR(255) NOT NULL,
 
     CONSTRAINT invite_id_pk PRIMARY KEY (invite_id)
 );

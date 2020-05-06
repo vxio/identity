@@ -68,19 +68,19 @@ func (s *InvitesService) SendInvite(tenant TenantID, send SendInvite) (interface
 	}
 
 	// add to DB
-	invite, err2 := s.repository.add("1", invite, *code) // @TODO tenantID
+	created, err2 := s.repository.add(invite, *code) // @TODO tenantID
 	if err2 != nil {
 		return nil, err2
 	}
 
 	// send email
-	if err := s.notifications.SendInvite(send.Email, *code, "someurl"); err != nil {
+	if err := s.notifications.SendInvite(created.Email, *code, "someurl"); err != nil {
 		// clear out the one we added to the DB so it isn't just sitting around being unused.
-		s.repository.delete(invite.TenantID, invite.InviteID)
+		s.repository.delete(created.TenantID, created.InviteID)
 		return nil, err
 	}
 
-	return invite, nil
+	return created, nil
 }
 
 // Generate a large random crypto string to work as the invitation token
