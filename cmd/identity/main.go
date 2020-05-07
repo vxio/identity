@@ -27,6 +27,7 @@ import (
 	config "github.com/moov-io/identity/pkg/config"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
+	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
 	identityserver "github.com/moov-io/identity/pkg/server"
@@ -71,8 +72,8 @@ func main() {
 
 	NotificationsService := notifications.NewNotificationsService(config.Notifications)
 
-	IdentityRepository := identityserver.NewIdentityRepository(db)
-	IdentitiesService := identityserver.NewIdentitiesService(TimeService, IdentityRepository)
+	IdentityRepository := identities.NewIdentityRepository(db)
+	IdentitiesService := identities.NewIdentitiesService(TimeService, IdentityRepository)
 
 	CredentialRepository := credentials.NewCredentialRepository(db)
 	CredentialsService := credentials.NewCredentialsService(TimeService, CredentialRepository)
@@ -100,7 +101,7 @@ func main() {
 	// debug api
 	WhoAmIController := identityserver.NewWhoAmIController()
 
-	IdentitiesController := identityserver.NewIdentitiesApiController(IdentitiesService)
+	IdentitiesController := identities.NewIdentitiesApiController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
 	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, WhoAmIController)

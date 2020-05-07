@@ -1,16 +1,18 @@
-package identityserver
+package identities
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
+
+	api "github.com/moov-io/identity/pkg/server"
 )
 
 type IdentityRepository interface {
-	list(tenantID TenantID) ([]Identity, error)
-	get(tenantID TenantID, identityID string) (*Identity, error)
-	update(updated Identity) (*Identity, error)
-	add(identity Identity) (*Identity, error)
+	list(tenantID api.TenantID) ([]api.Identity, error)
+	get(tenantID api.TenantID, identityID string) (*api.Identity, error)
+	update(updated api.Identity) (*api.Identity, error)
+	add(identity api.Identity) (*api.Identity, error)
 }
 
 func NewIdentityRepository(db *sql.DB) IdentityRepository {
@@ -21,7 +23,7 @@ type sqlIdentityRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlIdentityRepo) list(tenantID TenantID) ([]Identity, error) {
+func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]api.Identity, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM identity
@@ -74,7 +76,7 @@ func (r *sqlIdentityRepo) list(tenantID TenantID) ([]Identity, error) {
 	return identities, nil
 }
 
-func (r *sqlIdentityRepo) get(tenantID TenantID, identityID string) (*Identity, error) {
+func (r *sqlIdentityRepo) get(tenantID api.TenantID, identityID string) (*api.Identity, error) {
 
 	qry := fmt.Sprintf(`
 		SELECT %s
@@ -122,7 +124,7 @@ func (r *sqlIdentityRepo) get(tenantID TenantID, identityID string) (*Identity, 
 	return &identities[0], nil
 }
 
-func (r *sqlIdentityRepo) update(updated Identity) (*Identity, error) {
+func (r *sqlIdentityRepo) update(updated api.Identity) (*api.Identity, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return nil, err
@@ -187,7 +189,7 @@ func (r *sqlIdentityRepo) update(updated Identity) (*Identity, error) {
 	return &updated, nil
 }
 
-func (r *sqlIdentityRepo) add(identity Identity) (*Identity, error) {
+func (r *sqlIdentityRepo) add(identity api.Identity) (*api.Identity, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return nil, err
@@ -272,16 +274,16 @@ var identitySelect = `
 	identity.disabled_by
 `
 
-func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) ([]Identity, error) {
+func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) ([]api.Identity, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	items := []Identity{}
+	items := []api.Identity{}
 	for rows.Next() {
-		item := Identity{}
+		item := api.Identity{}
 		if err := rows.Scan(
 			&item.IdentityID,
 			&item.FirstName,
@@ -324,16 +326,16 @@ var addressSelect = `
 	identity_address.active
 `
 
-func (r *sqlIdentityRepo) queryScanAddresses(query string, args ...interface{}) ([]Address, error) {
+func (r *sqlIdentityRepo) queryScanAddresses(query string, args ...interface{}) ([]api.Address, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	items := []Address{}
+	items := []api.Address{}
 	for rows.Next() {
-		item := Address{}
+		item := api.Address{}
 		if err := rows.Scan(
 			&item.IdentityID,
 			&item.AddressID,
@@ -367,16 +369,16 @@ var phoneSelect = `
 	identity_phone.type
 `
 
-func (r *sqlIdentityRepo) queryScanPhone(query string, args ...interface{}) ([]Phone, error) {
+func (r *sqlIdentityRepo) queryScanPhone(query string, args ...interface{}) ([]api.Phone, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	items := []Phone{}
+	items := []api.Phone{}
 	for rows.Next() {
-		item := Phone{}
+		item := api.Phone{}
 		if err := rows.Scan(
 			&item.IdentityID,
 			&item.PhoneID,
@@ -397,7 +399,7 @@ func (r *sqlIdentityRepo) queryScanPhone(query string, args ...interface{}) ([]P
 	return items, nil
 }
 
-func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *Identity) error {
+func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) error {
 
 	updateQry := `
 		UPDATE identity_address
@@ -467,7 +469,7 @@ func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *Identity) error {
 	return nil
 }
 
-func (r *sqlIdentityRepo) upsertPhones(tx *sql.Tx, updated *Identity) error {
+func (r *sqlIdentityRepo) upsertPhones(tx *sql.Tx, updated *api.Identity) error {
 
 	updateQry := `
 		UPDATE identity_phone

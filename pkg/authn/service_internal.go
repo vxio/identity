@@ -14,6 +14,7 @@ import (
 	"net/http"
 
 	"github.com/moov-io/identity/pkg/credentials"
+	"github.com/moov-io/identity/pkg/identities"
 	api "github.com/moov-io/identity/pkg/server"
 )
 
@@ -22,12 +23,12 @@ import (
 // Include any external packages or services that will be required by this service.
 type InternalService struct {
 	credentials credentials.CredentialsService
-	identities  api.IdentitiesService
+	identities  identities.IdentitiesService
 	token       api.TokenService
 }
 
 // NewInternalService creates a default api service
-func NewInternalService(credentials credentials.CredentialsService, identities api.IdentitiesService, token api.TokenService) api.InternalApiServicer {
+func NewInternalService(credentials credentials.CredentialsService, identities identities.IdentitiesService, token api.TokenService) api.InternalApiServicer {
 	return &InternalService{
 		credentials: credentials,
 		identities:  identities,
