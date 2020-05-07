@@ -6,11 +6,12 @@ import (
 	"fmt"
 
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 type IdentityRepository interface {
-	list(tenantID api.TenantID) ([]api.Identity, error)
-	get(tenantID api.TenantID, identityID string) (*api.Identity, error)
+	list(tenantID zerotrust.TenantID) ([]api.Identity, error)
+	get(tenantID zerotrust.TenantID, identityID string) (*api.Identity, error)
 	update(updated api.Identity) (*api.Identity, error)
 	add(identity api.Identity) (*api.Identity, error)
 }
@@ -23,7 +24,7 @@ type sqlIdentityRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]api.Identity, error) {
+func (r *sqlIdentityRepo) list(tenantID zerotrust.TenantID) ([]api.Identity, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM identity
@@ -76,7 +77,7 @@ func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]api.Identity, error) {
 	return identities, nil
 }
 
-func (r *sqlIdentityRepo) get(tenantID api.TenantID, identityID string) (*api.Identity, error) {
+func (r *sqlIdentityRepo) get(tenantID zerotrust.TenantID, identityID string) (*api.Identity, error) {
 
 	qry := fmt.Sprintf(`
 		SELECT %s

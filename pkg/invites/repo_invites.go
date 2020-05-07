@@ -6,12 +6,13 @@ import (
 	"fmt"
 
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 type InvitesRepository interface {
-	list(tenantID api.TenantID) ([]api.Invite, error)
+	list(tenantID zerotrust.TenantID) ([]api.Invite, error)
 	add(invite api.Invite, secretCode string) (*api.Invite, error)
-	delete(tenantID api.TenantID, inviteID string) error
+	delete(tenantID zerotrust.TenantID, inviteID string) error
 }
 
 func NewInvitesRepository(db *sql.DB) InvitesRepository {
@@ -22,7 +23,7 @@ type sqlInvitesRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlInvitesRepo) list(tenantID api.TenantID) ([]api.Invite, error) {
+func (r *sqlInvitesRepo) list(tenantID zerotrust.TenantID) ([]api.Invite, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s FROM invites WHERE tenant_id = ?
 	`, inviteSelect)
@@ -60,7 +61,7 @@ func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite,
 	return &invite, nil
 }
 
-func (r *sqlInvitesRepo) delete(tenantID api.TenantID, inviteID string) error {
+func (r *sqlInvitesRepo) delete(tenantID zerotrust.TenantID, inviteID string) error {
 	qry := `DELETE FROM invites WHERE tenant_id = ? AND invite_id = ?`
 
 	res, err := r.db.Exec(qry, tenantID.String(), inviteID)

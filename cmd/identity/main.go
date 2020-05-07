@@ -68,7 +68,7 @@ func main() {
 		logger.Log("main", "Unable to load up the Backchannel JSON Web Key Set")
 	}
 
-	TokenService := api.NewTokenService(TimeService, FrontchannelJwks, config.Authentication.Frontchannel.Expiration)
+	TokenService := authn.NewTokenService(TimeService, FrontchannelJwks, config.Authentication.Frontchannel.Expiration)
 
 	NotificationsService := notifications.NewNotificationsService(config.Notifications)
 

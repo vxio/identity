@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/utils"
+	"github.com/moov-io/identity/pkg/zerotrust"
 
 	api "github.com/moov-io/identity/pkg/api"
 )
@@ -38,19 +39,19 @@ func NewInvitesService(config InvitesConfig, time utils.TimeService, repository 
 }
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
-func (s *InvitesService) DeleteInvite(session api.Session, inviteID string) error {
+func (s *InvitesService) DeleteInvite(session zerotrust.Session, inviteID string) error {
 	s.repository.delete(session.TenantID, inviteID)
 	return errors.New("service method 'DeleteInvite' not implemented")
 }
 
 // ListInvites - List outstanding invites
-func (s *InvitesService) ListInvites(session api.Session) ([]api.Invite, error) {
+func (s *InvitesService) ListInvites(session zerotrust.Session) ([]api.Invite, error) {
 	invites, err := s.repository.list(session.TenantID)
 	return invites, err
 }
 
 // SendInvite - Send an email invite to a new user
-func (s *InvitesService) SendInvite(session api.Session, send api.SendInvite) (*api.Invite, error) {
+func (s *InvitesService) SendInvite(session zerotrust.Session, send api.SendInvite) (*api.Invite, error) {
 	invite := api.Invite{
 		InviteID:  uuid.New().String(),
 		TenantID:  session.TenantID.String(),

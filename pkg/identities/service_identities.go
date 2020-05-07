@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/utils"
+	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 // IdentitiesApiService is a service that implents the logic for the IdentitiesApiServicer
@@ -34,7 +35,7 @@ func NewIdentitiesService(time utils.TimeService, repository IdentityRepository)
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
-func (s *IdentitiesService) DisableIdentity(session api.Session, identityID string) error {
+func (s *IdentitiesService) DisableIdentity(session zerotrust.Session, identityID string) error {
 	identity, err := s.repository.get(session.TenantID, identityID)
 	if err != nil {
 		return err
@@ -57,7 +58,7 @@ func (s *IdentitiesService) DisableIdentity(session api.Session, identityID stri
 }
 
 // GetIdentity - List identities and associates userId
-func (s *IdentitiesService) GetIdentity(session api.Session, identityID string) (*api.Identity, error) {
+func (s *IdentitiesService) GetIdentity(session zerotrust.Session, identityID string) (*api.Identity, error) {
 	i, e := s.repository.get(session.TenantID, identityID)
 	if e != nil {
 		return nil, errors.New("Identity not found")
@@ -67,13 +68,13 @@ func (s *IdentitiesService) GetIdentity(session api.Session, identityID string) 
 }
 
 // ListIdentities - List identities and associates userId
-func (s *IdentitiesService) ListIdentities(session api.Session, orgID string) ([]api.Identity, error) {
+func (s *IdentitiesService) ListIdentities(session zerotrust.Session, orgID string) ([]api.Identity, error) {
 	identities, err := s.repository.list(session.TenantID)
 	return identities, err
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *IdentitiesService) UpdateIdentity(session api.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
+func (s *IdentitiesService) UpdateIdentity(session zerotrust.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
 	identity, err := s.repository.get(session.TenantID, identityID)
 	if err != nil {
 		return nil, err

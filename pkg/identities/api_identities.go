@@ -16,6 +16,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 // A IdentitiesApiController binds http requests to an api service and writes the service results to the http response
@@ -60,7 +61,7 @@ func (c *IdentitiesApiController) Routes() api.Routes {
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
 func (c *IdentitiesApiController) DisableIdentity(w http.ResponseWriter, r *http.Request) {
-	api.WithSession(w, r, func(session api.Session) {
+	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		err := c.service.DisableIdentity(session, identityID)
@@ -75,7 +76,7 @@ func (c *IdentitiesApiController) DisableIdentity(w http.ResponseWriter, r *http
 
 // GetIdentity - List identities and associates userId
 func (c *IdentitiesApiController) GetIdentity(w http.ResponseWriter, r *http.Request) {
-	api.WithSession(w, r, func(session api.Session) {
+	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		result, err := c.service.GetIdentity(session, identityID)
@@ -90,7 +91,7 @@ func (c *IdentitiesApiController) GetIdentity(w http.ResponseWriter, r *http.Req
 
 // ListIdentities - List identities and associates userId
 func (c *IdentitiesApiController) ListIdentities(w http.ResponseWriter, r *http.Request) {
-	api.WithSession(w, r, func(session api.Session) {
+	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		query := r.URL.Query()
 		orgID := query.Get("orgID")
 		result, err := c.service.ListIdentities(session, orgID)
@@ -105,7 +106,7 @@ func (c *IdentitiesApiController) ListIdentities(w http.ResponseWriter, r *http.
 
 // UpdateIdentity - Update a specific Identity
 func (c *IdentitiesApiController) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
-	api.WithSession(w, r, func(session api.Session) {
+	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		identity := &api.UpdateIdentity{}

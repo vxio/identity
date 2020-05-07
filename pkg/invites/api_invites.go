@@ -16,6 +16,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 // A InvitesController binds http requests to an api service and writes the service results to the http response
@@ -54,7 +55,7 @@ func (c *InvitesController) Routes() api.Routes {
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
 func (c *InvitesController) DeleteInvite(w http.ResponseWriter, r *http.Request) {
-	api.WithSession(w, r, func(session api.Session) {
+	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		inviteID := params["inviteID"]
 		err := c.service.DeleteInvite(session, inviteID)
@@ -69,7 +70,7 @@ func (c *InvitesController) DeleteInvite(w http.ResponseWriter, r *http.Request)
 
 // ListInvites - List outstanding invites
 func (c *InvitesController) ListInvites(w http.ResponseWriter, r *http.Request) {
-	api.WithSession(w, r, func(session api.Session) {
+	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		//query := r.URL.Query()
 		//orgID := query.Get("orgID")
 		result, err := c.service.ListInvites(session)
@@ -84,7 +85,7 @@ func (c *InvitesController) ListInvites(w http.ResponseWriter, r *http.Request) 
 
 // SendInvite - Send an email invite to a new user
 func (c *InvitesController) SendInvite(w http.ResponseWriter, r *http.Request) {
-	api.WithSession(w, r, func(session api.Session) {
+	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		invite := &api.SendInvite{}
 		if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
 			w.WriteHeader(500)

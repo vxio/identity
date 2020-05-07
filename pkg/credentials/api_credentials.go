@@ -15,6 +15,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 // A CredentialsApiController binds http requests to an api service and writes the service results to the http response
@@ -47,7 +48,7 @@ func (c *CredentialsApiController) Routes() api.Routes {
 
 // DisableCredentials - Disables a credential so it can't be used anymore to login
 func (c *CredentialsApiController) DisableCredentials(w http.ResponseWriter, r *http.Request) {
-	api.WithSession(w, r, func(session api.Session) {
+	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		credentialID := params["credentialID"]
@@ -63,7 +64,7 @@ func (c *CredentialsApiController) DisableCredentials(w http.ResponseWriter, r *
 
 // ListCredentials - List the credentials this user has used.
 func (c *CredentialsApiController) ListCredentials(w http.ResponseWriter, r *http.Request) {
-	api.WithSession(w, r, func(session api.Session) {
+	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		result, err := c.service.ListCredentials(identityID)

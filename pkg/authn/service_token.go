@@ -1,4 +1,4 @@
-package identityserver
+package authn
 
 import (
 	"errors"
@@ -11,14 +11,6 @@ import (
 	"github.com/moov-io/identity/pkg/webkeys"
 	"gopkg.in/square/go-jose.v2"
 )
-
-/*
-
-
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-
-	})
-*/
 
 type TokenService interface {
 	Generate(identityID string) (string, error)
