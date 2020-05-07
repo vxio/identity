@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	api "github.com/moov-io/identity/pkg/server"
+	api "github.com/moov-io/identity/pkg/api"
 )
 
 type CredentialRepository interface {

@@ -7,4 +7,4 @@ gitRepoId: identity
 additionalProperties:
   isGoSubmodule: true
   packageName: identityserver
-  sourceFolder: pkg/server
+  sourceFolder: pkg/api

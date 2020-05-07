@@ -15,7 +15,7 @@ import (
 
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/identities"
-	api "github.com/moov-io/identity/pkg/server"
+	api "github.com/moov-io/identity/pkg/api"
 )
 
 // InternalService is a service that implents the logic for the InternalApiServicer

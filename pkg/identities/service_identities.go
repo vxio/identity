@@ -13,7 +13,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	api "github.com/moov-io/identity/pkg/server"
+	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/utils"
 )
 

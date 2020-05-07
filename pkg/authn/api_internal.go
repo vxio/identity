@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"strings"
 
-	api "github.com/moov-io/identity/pkg/server"
+	api "github.com/moov-io/identity/pkg/api"
 )
 
 // A InternalAPIController binds http requests to an api service and writes the service results to the http response

@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	api "github.com/moov-io/identity/pkg/server"
+	api "github.com/moov-io/identity/pkg/api"
 )
 
 // A CredentialsApiController binds http requests to an api service and writes the service results to the http response

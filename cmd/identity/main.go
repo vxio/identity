@@ -23,6 +23,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base/admin"
+	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/authn"
 	config "github.com/moov-io/identity/pkg/config"
 	"github.com/moov-io/identity/pkg/credentials"
@@ -30,7 +31,6 @@ import (
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
-	identityserver "github.com/moov-io/identity/pkg/server"
 	"github.com/moov-io/identity/pkg/utils"
 	"github.com/moov-io/identity/pkg/webkeys"
 	"github.com/moov-io/identity/pkg/zerotrust"
@@ -68,7 +68,7 @@ func main() {
 		logger.Log("main", "Unable to load up the Backchannel JSON Web Key Set")
 	}
 
-	TokenService := identityserver.NewTokenService(TimeService, FrontchannelJwks, config.Authentication.Frontchannel.Expiration)
+	TokenService := api.NewTokenService(TimeService, FrontchannelJwks, config.Authentication.Frontchannel.Expiration)
 
 	NotificationsService := notifications.NewNotificationsService(config.Notifications)
 
@@ -85,7 +85,7 @@ func main() {
 
 	// internal admin server
 	InternalController := authn.NewInternalAPIController(InternalService)
-	adminRouter := identityserver.NewRouter(InternalController)
+	adminRouter := api.NewRouter(InternalController)
 	adminServer := bootAdminServer(adminRouter, terminationListener, logger, config.Admin)
 	defer adminServer.Shutdown()
 
@@ -99,12 +99,12 @@ func main() {
 	}
 
 	// debug api
-	WhoAmIController := identityserver.NewWhoAmIController()
+	WhoAmIController := api.NewWhoAmIController()
 
 	IdentitiesController := identities.NewIdentitiesApiController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
-	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
+	publicRouter := api.NewRouter(IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
 	authedRouter := authMiddleware.Handler(publicRouter)
 
 	_, shutdownServer := bootPublicServer(authedRouter, terminationListener, logger, config.HTTP)

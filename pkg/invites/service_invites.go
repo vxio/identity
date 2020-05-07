@@ -18,7 +18,7 @@ import (
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/utils"
 
-	api "github.com/moov-io/identity/pkg/server"
+	api "github.com/moov-io/identity/pkg/api"
 )
 
 type InvitesService struct {
