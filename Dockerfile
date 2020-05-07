@@ -1,4 +1,4 @@
-FROM golang:1.10 AS build
+FROM golang:1.14 AS build
 WORKDIR /go/src
 COPY pkg/api ./pkg/api
 COPY main.go .
