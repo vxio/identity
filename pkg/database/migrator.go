@@ -5,37 +5,57 @@ import (
 	"fmt"
 
 	migrate "github.com/golang-migrate/migrate/v4"
-	migratedb "github.com/golang-migrate/migrate/v4/database/sqlite3"
+	"github.com/golang-migrate/migrate/v4/database"
+	migmysql "github.com/golang-migrate/migrate/v4/database/mysql"
+	migsqlite3 "github.com/golang-migrate/migrate/v4/database/sqlite3"
 	_ "github.com/golang-migrate/migrate/v4/source/pkger"
 	"github.com/markbates/pkger"
 )
 
-func RunMigrations(db *sql.DB) error {
+func RunMigrations(db *sql.DB, config DatabaseConfig) error {
 	fmt.Println("Running Migrations")
 
 	pkger.Include("/migrations/")
 
-	driver, err := migratedb.WithInstance(db, &migratedb.Config{})
+	driver, err := GetDriver(db, config)
 	if err != nil {
-		fmt.Printf("Error setting up migration - %s", err.Error())
 		return err
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
 		"pkger:///migrations/",
-		"identity",
+		config.DatabaseName,
 		driver,
 	)
 	if err != nil {
 		fmt.Printf("Error running migration - %s", err.Error())
-		return nil
+		return err
 	}
 
 	if err := m.Up(); err != nil {
 		fmt.Printf("Error running migrations - %s\n", err.Error())
+		return err
 	}
 
 	fmt.Println("Migrations complete")
 
 	return nil
+}
+
+func GetDriver(db *sql.DB, config DatabaseConfig) (database.Driver, error) {
+	if config.MySql != nil {
+		return MySqlDriver(db)
+	} else if config.SqlLite != nil {
+		return Sqlite3Driver(db)
+	}
+
+	return nil, fmt.Errorf("Database config not defined")
+}
+
+func MySqlDriver(db *sql.DB) (database.Driver, error) {
+	return migmysql.WithInstance(db, &migmysql.Config{})
+}
+
+func Sqlite3Driver(db *sql.DB) (database.Driver, error) {
+	return migsqlite3.WithInstance(db, &migsqlite3.Config{})
 }

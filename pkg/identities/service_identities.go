@@ -14,7 +14,7 @@ import (
 
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/utils"
+	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
@@ -22,12 +22,12 @@ import (
 // This service should implement the business logic for every endpoint for the IdentitiesApi API.
 // Include any external packages or services that will be required by this service.
 type IdentitiesService struct {
-	time       utils.TimeService
+	time       stime.TimeService
 	repository IdentityRepository
 }
 
 // NewIdentitiesApiService creates a default api service
-func NewIdentitiesService(time utils.TimeService, repository IdentityRepository) *IdentitiesService {
+func NewIdentitiesService(time stime.TimeService, repository IdentityRepository) *IdentitiesService {
 	return &IdentitiesService{
 		time:       time,
 		repository: repository,

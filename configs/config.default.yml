@@ -5,8 +5,10 @@ admin:
   bind:
     address: ":8302"
 database:
+  databaseName: "identity"
   sqllite:
     path: bin/identity.db
+
 authentication:
   frontchannel:
     expiration: 1h

@@ -12,7 +12,7 @@ package credentials
 import (
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/utils"
+	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
@@ -20,12 +20,12 @@ import (
 // This service should implement the business logic for every endpoint for the CredentialsApi API.
 // Include any external packages or services that will be required by this service.
 type CredentialsService struct {
-	time       utils.TimeService
+	time       stime.TimeService
 	repository CredentialRepository
 }
 
 // NewCredentialsService creates a default api service
-func NewCredentialsService(time utils.TimeService, repository CredentialRepository) *CredentialsService {
+func NewCredentialsService(time stime.TimeService, repository CredentialRepository) *CredentialsService {
 	return &CredentialsService{
 		time:       time,
 		repository: repository,

@@ -10,7 +10,6 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.11.0
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.4
-	github.com/lopezator/migrator v0.3.0
 	github.com/markbates/pkger v0.15.1
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/moov-io/base v0.11.0

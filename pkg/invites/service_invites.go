@@ -16,7 +16,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/notifications"
-	"github.com/moov-io/identity/pkg/utils"
+	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/zerotrust"
 
 	api "github.com/moov-io/identity/pkg/api"
@@ -24,12 +24,12 @@ import (
 
 type InvitesService struct {
 	config        InvitesConfig
-	time          utils.TimeService
+	time          stime.TimeService
 	repository    InvitesRepository
 	notifications notifications.NotificationsService
 }
 
-func NewInvitesService(config InvitesConfig, time utils.TimeService, repository InvitesRepository, notifications notifications.NotificationsService) api.InvitesApiServicer {
+func NewInvitesService(config InvitesConfig, time stime.TimeService, repository InvitesRepository, notifications notifications.NotificationsService) api.InvitesApiServicer {
 	return &InvitesService{
 		config:        config,
 		time:          time,

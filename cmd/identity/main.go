@@ -31,7 +31,7 @@ import (
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
-	"github.com/moov-io/identity/pkg/utils"
+	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
 	"github.com/moov-io/identity/pkg/zerotrust"
 )
@@ -55,7 +55,7 @@ func main() {
 	db, close := initializeDatabase(logger, config.Database)
 	defer close()
 
-	TimeService := utils.NewSystemTimeService()
+	TimeService := stime.NewSystemTimeService()
 
 	FrontchannelJwks, err := webkeys.NewWebKeysService(logger, config.Authentication.Frontchannel)
 	if err != nil {
@@ -99,7 +99,7 @@ func main() {
 	}
 
 	// debug api
-	WhoAmIController := api.NewWhoAmIController()
+	WhoAmIController := authn.NewWhoAmIController()
 
 	IdentitiesController := identities.NewIdentitiesApiController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
@@ -198,7 +198,7 @@ func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql
 		}
 	}
 
-	if err := database.RunMigrations(db); err != nil {
+	if err := database.RunMigrations(db, config); err != nil {
 		panic(fmt.Sprintf("Error running migrations: %s", err))
 	}
 
