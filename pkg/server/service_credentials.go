@@ -31,16 +31,16 @@ func NewCredentialsService(time utils.TimeService, repository CredentialReposito
 }
 
 // DisableCredentials - Disables a credential so it can&#39;t be used anymore to login
-func (s *CredentialsService) DisableCredentials(identityID string, credentialID string) (interface{}, error) {
+func (s *CredentialsService) DisableCredentials(auth Session, identityID string, credentialID string) (*Credential, error) {
 	cred, err := s.repository.get(credentialID)
 	if err != nil {
 		return nil, err
 	}
 
+	caller := auth.CallerID.String()
 	now := s.time.Now()
-	callderIdentityID := "callerIdentityID" // @TODO
 	cred.DisabledOn = &now
-	cred.DisabledBy = &callderIdentityID
+	cred.DisabledBy = &caller
 
 	saved, err := s.repository.update(*cred)
 	if err != nil {
@@ -53,7 +53,7 @@ func (s *CredentialsService) DisableCredentials(identityID string, credentialID 
 }
 
 // ListCredentials - List the credentials this user has used.
-func (s *CredentialsService) ListCredentials(identityID string) (interface{}, error) {
+func (s *CredentialsService) ListCredentials(identityID string) ([]Credential, error) {
 	return s.repository.list(identityID)
 }
 

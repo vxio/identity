@@ -33,30 +33,31 @@ func NewIdentitiesService(time utils.TimeService, repository IdentityRepository)
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
-func (s *IdentitiesService) DisableIdentity(identityID string) (interface{}, error) {
-	identity, err := s.repository.get("tenantID", identityID)
+func (s *IdentitiesService) DisableIdentity(session Session, identityID string) error {
+	identity, err := s.repository.get(session.TenantID, identityID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	now := s.time.Now()
-	callerIdentityID := "callerIdentityID"
+	callerIdentityID := session.CallerID.String()
+
 	identity.DisabledOn = &now
 	identity.DisabledBy = &callerIdentityID
 	identity.LastUpdatedOn = s.time.Now()
 
 	_, nil := s.repository.update(*identity)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// supposed to be 204 no content...
-	return true, nil
+	return nil
 }
 
 // GetIdentity - List identities and associates userId
-func (s *IdentitiesService) GetIdentity(identityID string) (interface{}, error) {
-	i, e := s.repository.get("tenantID", identityID)
+func (s *IdentitiesService) GetIdentity(session Session, identityID string) (*Identity, error) {
+	i, e := s.repository.get(session.TenantID, identityID)
 	if e != nil {
 		return nil, errors.New("Identity not found")
 	}
@@ -65,14 +66,14 @@ func (s *IdentitiesService) GetIdentity(identityID string) (interface{}, error) 
 }
 
 // ListIdentities - List identities and associates userId
-func (s *IdentitiesService) ListIdentities(orgID string) (interface{}, error) {
-	identities, err := s.repository.list("tenantID")
+func (s *IdentitiesService) ListIdentities(session Session, orgID string) ([]Identity, error) {
+	identities, err := s.repository.list(session.TenantID)
 	return identities, err
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *IdentitiesService) UpdateIdentity(identityID string, update UpdateIdentity) (interface{}, error) {
-	identity, err := s.repository.get("tenantID", identityID)
+func (s *IdentitiesService) UpdateIdentity(session Session, identityID string, update UpdateIdentity) (*Identity, error) {
+	identity, err := s.repository.get(session.TenantID, identityID)
 	if err != nil {
 		return nil, err
 	}

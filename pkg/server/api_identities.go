@@ -59,58 +59,66 @@ func (c *IdentitiesApiController) Routes() Routes {
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
 func (c *IdentitiesApiController) DisableIdentity(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	identityID := params["identityID"]
-	result, err := c.service.DisableIdentity(identityID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
+	WithSession(w, r, func(session Session) {
+		params := mux.Vars(r)
+		identityID := params["identityID"]
+		err := c.service.DisableIdentity(session, identityID)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	EncodeJSONResponse(result, nil, w)
+		w.WriteHeader(204)
+	})
 }
 
 // GetIdentity - List identities and associates userId
 func (c *IdentitiesApiController) GetIdentity(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	identityID := params["identityID"]
-	result, err := c.service.GetIdentity(identityID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
+	WithSession(w, r, func(session Session) {
+		params := mux.Vars(r)
+		identityID := params["identityID"]
+		result, err := c.service.GetIdentity(session, identityID)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	EncodeJSONResponse(result, nil, w)
+		EncodeJSONResponse(result, nil, w)
+	})
 }
 
 // ListIdentities - List identities and associates userId
 func (c *IdentitiesApiController) ListIdentities(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	orgID := query.Get("orgID")
-	result, err := c.service.ListIdentities(orgID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
+	WithSession(w, r, func(session Session) {
+		query := r.URL.Query()
+		orgID := query.Get("orgID")
+		result, err := c.service.ListIdentities(session, orgID)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	EncodeJSONResponse(result, nil, w)
+		EncodeJSONResponse(result, nil, w)
+	})
 }
 
 // UpdateIdentity - Update a specific Identity
 func (c *IdentitiesApiController) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	identityID := params["identityID"]
-	identity := &UpdateIdentity{}
-	if err := json.NewDecoder(r.Body).Decode(&identity); err != nil {
-		w.WriteHeader(500)
-		return
-	}
+	WithSession(w, r, func(session Session) {
+		params := mux.Vars(r)
+		identityID := params["identityID"]
+		identity := &UpdateIdentity{}
+		if err := json.NewDecoder(r.Body).Decode(&identity); err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	result, err := c.service.UpdateIdentity(identityID, *identity)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
+		result, err := c.service.UpdateIdentity(session, identityID, *identity)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	EncodeJSONResponse(result, nil, w)
+		EncodeJSONResponse(result, nil, w)
+	})
 }

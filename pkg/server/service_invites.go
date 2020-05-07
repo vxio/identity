@@ -39,24 +39,24 @@ func NewInvitesService(time utils.TimeService, repository InvitesRepository, not
 }
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
-func (s *InvitesService) DeleteInvite(inviteID string) (interface{}, error) {
-	s.repository.delete("1", inviteID)
-	return nil, errors.New("service method 'DeleteInvite' not implemented")
+func (s *InvitesService) DeleteInvite(session Session, inviteID string) error {
+	s.repository.delete(session.TenantID, inviteID)
+	return errors.New("service method 'DeleteInvite' not implemented")
 }
 
 // ListInvites - List outstanding invites
-func (s *InvitesService) ListInvites(orgID string) (interface{}, error) {
-	invites, err := s.repository.list("tenantID")
+func (s *InvitesService) ListInvites(session Session) ([]Invite, error) {
+	invites, err := s.repository.list(session.TenantID)
 	return invites, err
 }
 
 // SendInvite - Send an email invite to a new user
-func (s *InvitesService) SendInvite(tenant TenantID, send SendInvite) (interface{}, error) {
+func (s *InvitesService) SendInvite(session Session, send SendInvite) (*Invite, error) {
 	invite := Invite{
 		InviteID:  uuid.New().String(),
-		TenantID:  string(tenant),
+		TenantID:  session.TenantID.String(),
 		Email:     send.Email,
-		InvitedBy: "1", // @TODO
+		InvitedBy: session.CallerID.String(),
 		InvitedOn: s.time.Now(),
 		ExpiresOn: s.time.Now().Add(INVITE_TIMEOUT),
 		Redeemed:  false,
@@ -68,15 +68,15 @@ func (s *InvitesService) SendInvite(tenant TenantID, send SendInvite) (interface
 	}
 
 	// add to DB
-	created, err2 := s.repository.add(invite, *code) // @TODO tenantID
+	created, err2 := s.repository.add(invite, *code)
 	if err2 != nil {
 		return nil, err2
 	}
 
-	// send email
+	// send email @TODO get url fixed up
 	if err := s.notifications.SendInvite(created.Email, *code, "someurl"); err != nil {
 		// clear out the one we added to the DB so it isn't just sitting around being unused.
-		s.repository.delete(created.TenantID, created.InviteID)
+		s.repository.delete(session.TenantID, created.InviteID)
 		return nil, err
 	}
 

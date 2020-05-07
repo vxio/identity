@@ -47,27 +47,31 @@ func (c *CredentialsApiController) Routes() Routes {
 
 // DisableCredentials - Disables a credential so it can't be used anymore to login
 func (c *CredentialsApiController) DisableCredentials(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	identityID := params["identityID"]
-	credentialID := params["credentialID"]
-	result, err := c.service.DisableCredentials(identityID, credentialID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
+	WithSession(w, r, func(session Session) {
+		params := mux.Vars(r)
+		identityID := params["identityID"]
+		credentialID := params["credentialID"]
+		result, err := c.service.DisableCredentials(session, identityID, credentialID)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	EncodeJSONResponse(result, nil, w)
+		EncodeJSONResponse(result, nil, w)
+	})
 }
 
 // ListCredentials - List the credentials this user has used.
 func (c *CredentialsApiController) ListCredentials(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	identityID := params["identityID"]
-	result, err := c.service.ListCredentials(identityID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
+	WithSession(w, r, func(session Session) {
+		params := mux.Vars(r)
+		identityID := params["identityID"]
+		result, err := c.service.ListCredentials(identityID)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	EncodeJSONResponse(result, nil, w)
+		EncodeJSONResponse(result, nil, w)
+	})
 }

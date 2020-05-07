@@ -53,8 +53,8 @@ type InvitesApiRouter interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type CredentialsApiServicer interface {
-	DisableCredentials(string, string) (interface{}, error)
-	ListCredentials(string) (interface{}, error)
+	DisableCredentials(Session, string, string) (*Credential, error)
+	ListCredentials(string) ([]Credential, error)
 }
 
 // IdentitiesApiServicer defines the api actions for the IdentitiesApi service
@@ -62,10 +62,10 @@ type CredentialsApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type IdentitiesApiServicer interface {
-	DisableIdentity(string) (interface{}, error)
-	GetIdentity(string) (interface{}, error)
-	ListIdentities(string) (interface{}, error)
-	UpdateIdentity(string, UpdateIdentity) (interface{}, error)
+	DisableIdentity(Session, string) error
+	GetIdentity(Session, string) (*Identity, error)
+	ListIdentities(Session, string) ([]Identity, error)
+	UpdateIdentity(Session, string, UpdateIdentity) (*Identity, error)
 }
 
 // InternalApiServicer defines the api actions for the InternalApi service
@@ -73,8 +73,8 @@ type IdentitiesApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type InternalApiServicer interface {
-	LoginWithCredentials(Login) (interface{}, error)
-	RegisterWithCredentials(Register) (interface{}, error)
+	LoginWithCredentials(Login) (*http.Cookie, error)
+	RegisterWithCredentials(Register) (*http.Cookie, error)
 }
 
 // InvitesApiServicer defines the api actions for the InvitesApi service
@@ -82,7 +82,7 @@ type InternalApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type InvitesApiServicer interface {
-	DeleteInvite(string) (interface{}, error)
-	ListInvites(string) (interface{}, error)
-	SendInvite(TenantID, SendInvite) (interface{}, error)
+	DeleteInvite(Session, string) error
+	ListInvites(Session) ([]Invite, error)
+	SendInvite(Session, SendInvite) (*Invite, error)
 }

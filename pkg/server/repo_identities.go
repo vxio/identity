@@ -7,8 +7,8 @@ import (
 )
 
 type IdentityRepository interface {
-	list(tenantID string) ([]Identity, error)
-	get(tenantID string, identityID string) (*Identity, error)
+	list(tenantID TenantID) ([]Identity, error)
+	get(tenantID TenantID, identityID string) (*Identity, error)
 	update(updated Identity) (*Identity, error)
 	add(identity Identity) (*Identity, error)
 }
@@ -21,14 +21,14 @@ type sqlIdentityRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlIdentityRepo) list(tenantID string) ([]Identity, error) {
+func (r *sqlIdentityRepo) list(tenantID TenantID) ([]Identity, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM identity
 		WHERE identity.tenant_id = ?
 	`, identitySelect)
 
-	identities, err := r.queryScanIdentity(qry, tenantID)
+	identities, err := r.queryScanIdentity(qry, tenantID.String())
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (r *sqlIdentityRepo) list(tenantID string) ([]Identity, error) {
 		WHERE identity.tenant_id = ?
 	`, addressSelect)
 
-	addresses, err := r.queryScanAddresses(qry, tenantID)
+	addresses, err := r.queryScanAddresses(qry, tenantID.String())
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (r *sqlIdentityRepo) list(tenantID string) ([]Identity, error) {
 		WHERE identity.tenant_id = ?
 	`, phoneSelect)
 
-	phones, err := r.queryScanPhone(qry, tenantID)
+	phones, err := r.queryScanPhone(qry, tenantID.String())
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (r *sqlIdentityRepo) list(tenantID string) ([]Identity, error) {
 	return identities, nil
 }
 
-func (r *sqlIdentityRepo) get(tenantID string, identityID string) (*Identity, error) {
+func (r *sqlIdentityRepo) get(tenantID TenantID, identityID string) (*Identity, error) {
 
 	qry := fmt.Sprintf(`
 		SELECT %s

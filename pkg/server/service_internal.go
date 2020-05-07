@@ -11,6 +11,7 @@ package identityserver
 
 import (
 	"errors"
+	"net/http"
 )
 
 // InternalService is a service that implents the logic for the InternalApiServicer
@@ -32,7 +33,7 @@ func NewInternalService(credentials CredentialsService, identities IdentitiesSer
 }
 
 // RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
-func (s *InternalService) RegisterWithCredentials(register Register) (interface{}, error) {
+func (s *InternalService) RegisterWithCredentials(register Register) (*http.Cookie, error) {
 	// Create the identity so we can login with it and give the user access.
 	identity, err := s.identities.Register(register)
 	if err != nil {
@@ -55,7 +56,7 @@ func (s *InternalService) RegisterWithCredentials(register Register) (interface{
 }
 
 // LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
-func (s *InternalService) LoginWithCredentials(login Login) (interface{}, error) {
+func (s *InternalService) LoginWithCredentials(login Login) (*http.Cookie, error) {
 	// check if they exist in the credentials service and if its enabled.
 	loggedIn, err := s.credentials.Login(login)
 	if err != nil {
@@ -68,5 +69,5 @@ func (s *InternalService) LoginWithCredentials(login Login) (interface{}, error)
 		return nil, err
 	}
 
-	return cookie, errors.New("service method 'LoginWithCredentials' not implemented")
+	return cookie, nil
 }

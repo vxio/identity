@@ -53,45 +53,50 @@ func (c *InvitesController) Routes() Routes {
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
 func (c *InvitesController) DeleteInvite(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	inviteID := params["inviteID"]
-	result, err := c.service.DeleteInvite(inviteID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
+	WithSession(w, r, func(session Session) {
+		params := mux.Vars(r)
+		inviteID := params["inviteID"]
+		err := c.service.DeleteInvite(session, inviteID)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	EncodeJSONResponse(result, nil, w)
+		w.WriteHeader(204)
+		return
+	})
 }
 
 // ListInvites - List outstanding invites
 func (c *InvitesController) ListInvites(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	orgID := query.Get("orgID")
-	result, err := c.service.ListInvites(orgID)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
+	WithSession(w, r, func(session Session) {
+		//query := r.URL.Query()
+		//orgID := query.Get("orgID")
+		result, err := c.service.ListInvites(session)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	EncodeJSONResponse(result, nil, w)
+		EncodeJSONResponse(result, nil, w)
+	})
 }
 
 // SendInvite - Send an email invite to a new user
 func (c *InvitesController) SendInvite(w http.ResponseWriter, r *http.Request) {
-	tenantID := TenantID(r.Header.Get("x-tenant"))
+	WithSession(w, r, func(session Session) {
+		invite := &SendInvite{}
+		if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	invite := &SendInvite{}
-	if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
-		w.WriteHeader(500)
-		return
-	}
+		result, err := c.service.SendInvite(session, *invite)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-	result, err := c.service.SendInvite(tenantID, *invite)
-	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
-
-	EncodeJSONResponse(result, nil, w)
+		EncodeJSONResponse(result, nil, w)
+	})
 }

@@ -7,9 +7,9 @@ import (
 
 type CredentialRepository interface {
 	list(identityID string) ([]Credential, error)
-	add(credentials Credential) (*Credential, error)
 	lookup(providerID string, subjectID string) (*Credential, error)
 	get(credentialID string) (*Credential, error)
+	add(credentials Credential) (*Credential, error)
 	update(updated Credential) (*Credential, error)
 }
 

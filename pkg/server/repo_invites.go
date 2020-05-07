@@ -7,9 +7,9 @@ import (
 )
 
 type InvitesRepository interface {
-	list(tenantID string) ([]Invite, error)
+	list(tenantID TenantID) ([]Invite, error)
 	add(invite Invite, secretCode string) (*Invite, error)
-	delete(tenantID string, inviteID string) error
+	delete(tenantID TenantID, inviteID string) error
 }
 
 func NewInvitesRepository(db *sql.DB) InvitesRepository {
@@ -20,12 +20,12 @@ type sqlInvitesRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlInvitesRepo) list(tenantID string) ([]Invite, error) {
+func (r *sqlInvitesRepo) list(tenantID TenantID) ([]Invite, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s FROM invites WHERE tenant_id = ?
 	`, inviteSelect)
 
-	return r.queryScan(qry, tenantID)
+	return r.queryScan(qry, tenantID.String())
 }
 
 func (r *sqlInvitesRepo) add(invite Invite, secretCode string) (*Invite, error) {
@@ -58,10 +58,10 @@ func (r *sqlInvitesRepo) add(invite Invite, secretCode string) (*Invite, error) 
 	return &invite, nil
 }
 
-func (r *sqlInvitesRepo) delete(tenantID string, inviteID string) error {
+func (r *sqlInvitesRepo) delete(tenantID TenantID, inviteID string) error {
 	qry := `DELETE FROM invites WHERE tenant_id = ? AND invite_id = ?`
 
-	res, err := r.db.Exec(qry, tenantID, inviteID)
+	res, err := r.db.Exec(qry, tenantID.String(), inviteID)
 	if err != nil {
 		return err
 	}
