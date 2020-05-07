@@ -24,4 +24,5 @@
 
 
 main.go
-pkg/server/api*.go
+pkg/api/api*.go
+Dockerfile

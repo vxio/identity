@@ -1,4 +1,4 @@
-module github.com/moov-io/identity/identityclient
+module github.com/moov-io/identity/client
 
 go 1.14
 

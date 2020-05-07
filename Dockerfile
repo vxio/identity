@@ -1,14 +1,14 @@
-FROM golang:1.14 AS build
+FROM golang:1.10 AS build
 WORKDIR /go/src
-COPY pkg/server ./pkg/server
+COPY pkg/api ./pkg/api
 COPY main.go .
 
 ENV CGO_ENABLED=0
 RUN go get -d -v ./...
 
-RUN go build -a -installsuffix cgo -o identityserver .
+RUN go build -a -installsuffix cgo -o api .
 
 FROM scratch AS runtime
-COPY --from=build /go/src/identityserver ./
+COPY --from=build /go/src/api ./
 EXPOSE 8080/tcp
-ENTRYPOINT ["./identityserver"]
+ENTRYPOINT ["./api"]
