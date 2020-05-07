@@ -36,4 +36,6 @@ type Identity struct {
 	// UUID v4
 	DisabledBy *string `json:"disabledBy,omitempty"`
 	LastUpdatedOn time.Time `json:"lastUpdatedOn,omitempty"`
+	// UUID v4
+	InviteID string `json:"inviteID,omitempty"`
 }

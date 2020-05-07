@@ -209,7 +209,8 @@ func (r *sqlIdentityRepo) add(identity api.Identity) (*api.Identity, error) {
 			status, 
 			email, 
 			email_verified,
-			registered_on, 
+			registered_on,
+			invite_id,
 			disabled_on,
 			disabled_by,
 			last_updated_on
@@ -229,6 +230,7 @@ func (r *sqlIdentityRepo) add(identity api.Identity) (*api.Identity, error) {
 		identity.Email,
 		identity.EmailVerified,
 		identity.RegisteredOn,
+		identity.InviteID,
 		identity.DisabledOn,
 		identity.DisabledBy,
 		identity.LastUpdatedOn)
@@ -270,6 +272,7 @@ var identitySelect = `
 	identity.email, 
 	identity.email_verified, 
 	identity.registered_on, 
+	identity.invite_id,
 	identity.disabled_on, 
 	identity.disabled_by
 `

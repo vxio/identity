@@ -2,7 +2,7 @@
 USERID := $(shell id -u $$USER)
 GROUPID:= $(shell id -g $$USER)
 
-build: compile
+build: identity
 #openapitools
 
 identity:

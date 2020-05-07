@@ -27,11 +27,11 @@ var (
 type InvitesApiService service
 
 /*
-DeleteInvite Delete an invite that was sent and invalidate the token.
+DisableInvite Delete an invite that was sent and invalidate the token.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param inviteID ID of the invite to delete
 */
-func (a *InvitesApiService) DeleteInvite(ctx _context.Context, inviteID string) (*_nethttp.Response, error) {
+func (a *InvitesApiService) DisableInvite(ctx _context.Context, inviteID string) (*_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}

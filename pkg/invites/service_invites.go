@@ -12,7 +12,6 @@ package invites
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"errors"
 
 	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/notifications"
@@ -38,12 +37,6 @@ func NewInvitesService(config InvitesConfig, time stime.TimeService, repository 
 	}
 }
 
-// DeleteInvite - Delete an invite that was sent and invalidate the token.
-func (s *InvitesService) DeleteInvite(session zerotrust.Session, inviteID string) error {
-	s.repository.delete(session.TenantID, inviteID)
-	return errors.New("service method 'DeleteInvite' not implemented")
-}
-
 // ListInvites - List outstanding invites
 func (s *InvitesService) ListInvites(session zerotrust.Session) ([]api.Invite, error) {
 	invites, err := s.repository.list(session.TenantID)
@@ -53,18 +46,25 @@ func (s *InvitesService) ListInvites(session zerotrust.Session) ([]api.Invite, e
 // SendInvite - Send an email invite to a new user
 func (s *InvitesService) SendInvite(session zerotrust.Session, send api.SendInvite) (*api.Invite, error) {
 	invite := api.Invite{
-		InviteID:  uuid.New().String(),
-		TenantID:  session.TenantID.String(),
-		Email:     send.Email,
-		InvitedBy: session.CallerID.String(),
-		InvitedOn: s.time.Now(),
-		ExpiresOn: s.time.Now().Add(s.config.Expiration),
-		Redeemed:  false,
+		InviteID:   uuid.New().String(),
+		TenantID:   session.TenantID.String(),
+		Email:      send.Email,
+		InvitedBy:  session.CallerID.String(),
+		InvitedOn:  s.time.Now(),
+		RedeemedOn: nil,
+		ExpiresOn:  s.time.Now().Add(s.config.Expiration),
+		DisabledBy: nil,
+		DisabledOn: nil,
 	}
 
 	code, err1 := generateInviteCode()
 	if err1 != nil {
 		return nil, err1
+	}
+
+	// send email @TODO get url fixed up
+	if err := s.notifications.SendInvite(invite.Email, *code, s.config.SendToURL); err != nil {
+		return nil, err
 	}
 
 	// add to DB
@@ -73,14 +73,38 @@ func (s *InvitesService) SendInvite(session zerotrust.Session, send api.SendInvi
 		return nil, err2
 	}
 
-	// send email @TODO get url fixed up
-	if err := s.notifications.SendInvite(created.Email, *code, "someurl"); err != nil {
-		// clear out the one we added to the DB so it isn't just sitting around being unused.
-		s.repository.delete(session.TenantID, created.InviteID)
+	return created, nil
+}
+
+// DeleteInvite - Delete an invite that was sent and invalidate the token.
+func (s *InvitesService) DisableInvite(session zerotrust.Session, inviteID string) error {
+	invite, err := s.repository.get(session.TenantID, inviteID)
+	if err != nil {
+		return err
+	}
+
+	disabledBy := session.CallerID.String()
+	disabledOn := s.time.Now()
+	invite.DisabledBy = &disabledBy
+	invite.DisabledOn = &disabledOn
+
+	return s.repository.update(*invite)
+}
+
+func (s *InvitesService) Redeem(code string) (*api.Invite, error) {
+	invite, err := s.repository.getByCode(code)
+	if err != nil {
 		return nil, err
 	}
 
-	return created, nil
+	redeemedOn := s.time.Now()
+	invite.RedeemedOn = &redeemedOn
+
+	if err := s.repository.update(*invite); err != nil {
+		return nil, err
+	}
+
+	return invite, nil
 }
 
 // Generate a large random crypto string to work as the invitation token

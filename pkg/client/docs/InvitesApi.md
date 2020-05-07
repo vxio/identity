@@ -4,15 +4,15 @@ All URIs are relative to *https://local.moov.io*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**DeleteInvite**](InvitesApi.md#DeleteInvite) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
+[**DisableInvite**](InvitesApi.md#DisableInvite) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
 [**ListInvites**](InvitesApi.md#ListInvites) | **Get** /invites | List outstanding invites
 [**SendInvite**](InvitesApi.md#SendInvite) | **Post** /invites | Send an email invite to a new user
 
 
 
-## DeleteInvite
+## DisableInvite
 
-> DeleteInvite(ctx, inviteID)
+> DisableInvite(ctx, inviteID)
 
 Delete an invite that was sent and invalidate the token.
 

@@ -58,7 +58,7 @@ func (c *InvitesController) DeleteInvite(w http.ResponseWriter, r *http.Request)
 	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		inviteID := params["inviteID"]
-		err := c.service.DeleteInvite(session, inviteID)
+		err := c.service.DisableInvite(session, inviteID)
 		if err != nil {
 			w.WriteHeader(500)
 			return

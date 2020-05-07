@@ -18,3 +18,4 @@ authentication:
       path: ./configs/jwk-sig-pub.json
 invites:
   expiration: 48h
+  sendToURL: https://api.moov.io

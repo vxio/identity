@@ -68,7 +68,7 @@ paths:
 
   /invites/{inviteID}:
     delete:
-      operationId: DeleteInvite
+      operationId: DisableInvite
       summary: Delete an invite that was sent and invalidate the token.
       tags:
       - invites
@@ -435,13 +435,21 @@ components:
           description: date time the user was invited.
           $ref: '#/components/schemas/DateTime'
           readOnly: true
+        redeemedOn:
+          description: If this invite has been redeemed for a registration
+          readOnly: true
+          $ref: '#/components/schemas/OptionalDateTime'
         expiresOn:
           description: Point at which this invite is no longer valid.
           $ref: '#/components/schemas/DateTime'
-        redeemed:
-          description: If this invite has been redeemed for a registration
-          type: boolean
+        disabledOn:
+          description: Describes when the user was removed.
           readOnly: true
+          $ref: '#/components/schemas/OptionalDateTime'
+        disabledBy:
+          description: IdentityID of the user who disabled this user.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalUUID'
 
     Identity:
       description: |
@@ -531,6 +539,11 @@ components:
           readOnly: true
           nullable: true
           $ref: '#/components/schemas/DateTime'
+        inviteID: 
+          description: Invite ID that was used to register.
+          readOnly: true
+          nullable: false
+          $ref: '#/components/schemas/UUID'
 
       required:
         - firstName
@@ -780,8 +793,10 @@ components:
         subjectID:
           $ref: '#/components/schemas/SubjectID'
           writeOnly: true
-        tenantID:
-          $ref: '#/components/schemas/UUID'
+        inviteCode:
+          type: string
+          maxLength: 60
+          pattern: ^w+$
         firstName:
           type: string
           example: John

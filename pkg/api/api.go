@@ -84,7 +84,7 @@ type InternalApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type InvitesApiServicer interface {
-	DeleteInvite(zerotrust.Session, string) error
+	DisableInvite(zerotrust.Session, string) error
 	ListInvites(zerotrust.Session) ([]Invite, error)
 	SendInvite(zerotrust.Session, SendInvite) (*Invite, error)
 }

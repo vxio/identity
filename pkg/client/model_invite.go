@@ -22,7 +22,9 @@ type Invite struct {
 	// UUID v4
 	InvitedBy string `json:"invitedBy,omitempty"`
 	InvitedOn time.Time `json:"invitedOn,omitempty"`
+	RedeemedOn *time.Time `json:"redeemedOn,omitempty"`
 	ExpiresOn time.Time `json:"expiresOn,omitempty"`
-	// If this invite has been redeemed for a registration
-	Redeemed bool `json:"redeemed,omitempty"`
+	DisabledOn *time.Time `json:"disabledOn,omitempty"`
+	// UUID v4
+	DisabledBy *string `json:"disabledBy,omitempty"`
 }

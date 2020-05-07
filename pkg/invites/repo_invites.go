@@ -10,8 +10,10 @@ import (
 
 type InvitesRepository interface {
 	list(tenantID zerotrust.TenantID) ([]api.Invite, error)
+	get(tenantID zerotrust.TenantID, inviteID string) (*api.Invite, error)
+	getByCode(code string) (*api.Invite, error)
 	add(invite api.Invite, secretCode string) (*api.Invite, error)
-	delete(tenantID zerotrust.TenantID, inviteID string) error
+	update(updated api.Invite) error
 }
 
 func NewInvitesRepository(db *sql.DB) InvitesRepository {
@@ -24,10 +26,54 @@ type sqlInvitesRepo struct {
 
 func (r *sqlInvitesRepo) list(tenantID zerotrust.TenantID) ([]api.Invite, error) {
 	qry := fmt.Sprintf(`
-		SELECT %s FROM invites WHERE tenant_id = ?
+		SELECT %s 
+		FROM invites 
+		WHERE 
+			tenant_id = ?
+		ORDER BY invites.invited_on DESC
 	`, inviteSelect)
 
 	return r.queryScan(qry, tenantID.String())
+}
+
+func (r *sqlInvitesRepo) get(tenantID zerotrust.TenantID, inviteID string) (*api.Invite, error) {
+	qry := fmt.Sprintf(`
+		SELECT %s
+		FROM invites
+		WHERE tenant_id = ? AND invite_id = ?
+		LIMIT 1
+	`, inviteSelect)
+
+	res, err := r.queryScan(qry, tenantID.String(), inviteID)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) != 1 {
+		return nil, sql.ErrNoRows
+	}
+
+	return &res[0], nil
+}
+
+func (r *sqlInvitesRepo) getByCode(code string) (*api.Invite, error) {
+	qry := fmt.Sprintf(`
+		SELECT %s
+		FROM invites
+		WHERE secret_code = ?
+		LIMIT 1
+	`, inviteSelect)
+
+	res, err := r.queryScan(qry, code)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) != 1 {
+		return nil, sql.ErrNoRows
+	}
+
+	return &res[0], nil
 }
 
 func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite, error) {
@@ -38,8 +84,8 @@ func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite,
 			email,
 			invited_by,
 			invited_on,
+			redeemed_on,
 			expires_on,
-			redeemed,
 			secret_code
 		) VALUES (?,?,?,?,?,?,?)`
 
@@ -49,8 +95,8 @@ func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite,
 		invite.Email,
 		invite.InvitedBy,
 		invite.InvitedOn,
+		invite.RedeemedOn,
 		invite.ExpiresOn,
-		invite.Redeemed,
 		secretCode)
 
 	if err != nil {
@@ -60,10 +106,24 @@ func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite,
 	return &invite, nil
 }
 
-func (r *sqlInvitesRepo) delete(tenantID zerotrust.TenantID, inviteID string) error {
-	qry := `DELETE FROM invites WHERE tenant_id = ? AND invite_id = ?`
+func (r *sqlInvitesRepo) update(updated api.Invite) error {
+	qry := `
+		UPDATE invites 
+		SET 
+			redeemed = ?,
+			disabled_by = ?,
+			disabled_on = ?
+		WHERE
+			tenant_id = ? AND 
+			invite_id = ?
+	`
 
-	res, err := r.db.Exec(qry, tenantID.String(), inviteID)
+	res, err := r.db.Exec(qry,
+		updated.RedeemedOn,
+		updated.DisabledBy,
+		updated.DisabledOn,
+		updated.TenantID,
+		updated.InviteID)
 	if err != nil {
 		return err
 	}
@@ -81,13 +141,15 @@ func (r *sqlInvitesRepo) delete(tenantID zerotrust.TenantID, inviteID string) er
 
 // Matches the order pulled in by the rows.Scan below in queryScanIdentity
 var inviteSelect = `
-	invites.identity_id,
+	invites.invite_id,
 	invites.tenant_id,
 	invites.email,
 	invites.invited_by,
 	invites.invited_on,
+	invites.redeemed,
 	invites.expires_on,
-	invites.redeemed
+	invites.disabled_on,
+	invites.disabled_by
 `
 
 func (r *sqlInvitesRepo) queryScan(query string, args ...interface{}) ([]api.Invite, error) {
@@ -100,7 +162,17 @@ func (r *sqlInvitesRepo) queryScan(query string, args ...interface{}) ([]api.Inv
 	items := []api.Invite{}
 	for rows.Next() {
 		item := api.Invite{}
-		if err := rows.Scan(&item.InviteID, &item.TenantID, &item.Email, &item.InvitedBy, &item.InvitedOn, &item.ExpiresOn, &item.Redeemed); err != nil {
+		if err := rows.Scan(
+			&item.InviteID,
+			&item.TenantID,
+			&item.Email,
+			&item.InvitedBy,
+			&item.InvitedOn,
+			&item.RedeemedOn,
+			&item.ExpiresOn,
+			&item.DisabledOn,
+			&item.DisabledBy,
+		); err != nil {
 			return nil, err
 		}
 

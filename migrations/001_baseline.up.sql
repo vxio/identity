@@ -19,8 +19,11 @@ CREATE TABLE invites (
     email           VARCHAR(255) NOT NULL,
     invited_by      UUID NOT NULL,
     invited_on      TIMESTAMP NOT NULL,
+    redeemed_on     TIMESTAMP,
     expires_on      TIMESTAMP NOT NULL,
-    redeemed        BOOLEAN,
+    disabled_on     TIMESTAMP DEFAULT NULL,
+    disabled_by     UUID DEFAULT NULL,
+
     secret_code     VARCHAR(255) NOT NULL,
 
     CONSTRAINT invite_id_pk PRIMARY KEY (invite_id)
@@ -41,6 +44,7 @@ CREATE TABLE identity (
     email_verified  BOOLEAN DEFAULT false,
 
     registered_on   TIMESTAMP NOT NULL,
+    invite_id       UUID NOT NULL,
     
     disabled_on     TIMESTAMP,
     disabled_by     UUID,

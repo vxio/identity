@@ -79,7 +79,7 @@ paths:
       - invites
   /invites/{inviteID}:
     delete:
-      operationId: DeleteInvite
+      operationId: DisableInvite
       parameters:
       - description: ID of the invite to delete
         explode: false
@@ -527,12 +527,14 @@ components:
       additionalProperties: false
       description: Describes an invite that was sent to a user to join.
       example:
+        disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         invitedBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        redeemed: true
         inviteID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         expiresOn: 2000-01-23T04:56:07.000+00:00
+        disabledOn: 2000-01-23T04:56:07.000+00:00
         invitedOn: 2000-01-23T04:56:07.000+00:00
+        redeemedOn: 2000-01-23T04:56:07.000+00:00
         email: john.doe@gmail.com
       properties:
         inviteID:
@@ -564,14 +566,27 @@ components:
           format: date-time
           maxLength: 24
           type: string
+        redeemedOn:
+          format: date-time
+          maxLength: 24
+          nullable: true
+          type: string
         expiresOn:
           format: date-time
           maxLength: 24
           type: string
-        redeemed:
-          description: If this invite has been redeemed for a registration
-          readOnly: true
-          type: boolean
+        disabledOn:
+          format: date-time
+          maxLength: 24
+          nullable: true
+          type: string
+        disabledBy:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          nullable: true
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
       type: object
     Identity:
       additionalProperties: false
@@ -634,6 +649,7 @@ components:
           type: primary
           addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         nickName: nickName
+        inviteID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         phones:
         - number: number
           validated: true
@@ -767,6 +783,12 @@ components:
         lastUpdatedOn:
           format: date-time
           maxLength: 24
+          type: string
+        inviteID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
       required:
       - email
@@ -1221,7 +1243,7 @@ components:
           addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         provider: google
         nickName: nickName
-        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        inviteCode: inviteCode
         phones:
         - number: number
           validated: true
@@ -1269,11 +1291,9 @@ components:
           pattern: ^[0-9a-zA-Z_-]+$
           readOnly: true
           type: string
-        tenantID:
-          description: UUID v4
-          format: uuid
-          maxLength: 36
-          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+        inviteCode:
+          maxLength: 60
+          pattern: ^w+$
           type: string
         firstName:
           example: John

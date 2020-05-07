@@ -16,6 +16,7 @@ import (
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/identities"
+	"github.com/moov-io/identity/pkg/invites"
 )
 
 // InternalService is a service that implents the logic for the InternalApiServicer
@@ -25,10 +26,15 @@ type InternalService struct {
 	credentials credentials.CredentialsService
 	identities  identities.IdentitiesService
 	token       TokenService
+	invites     invites.InvitesService
 }
 
 // NewInternalService creates a default api service
-func NewInternalService(credentials credentials.CredentialsService, identities identities.IdentitiesService, token TokenService) api.InternalApiServicer {
+func NewInternalService(
+	credentials credentials.CredentialsService,
+	identities identities.IdentitiesService,
+	token TokenService,
+) api.InternalApiServicer {
 	return &InternalService{
 		credentials: credentials,
 		identities:  identities,
@@ -38,8 +44,13 @@ func NewInternalService(credentials credentials.CredentialsService, identities i
 
 // RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
 func (s *InternalService) RegisterWithCredentials(register api.Register) (*http.Cookie, error) {
+	invite, err := s.invites.Redeem(register.InviteCode)
+	if err != nil {
+		return nil, err
+	}
+
 	// Create the identity so we can login with it and give the user access.
-	identity, err := s.identities.Register(register)
+	identity, err := s.identities.Register(*invite, register)
 	if err != nil {
 		return nil, err
 	}

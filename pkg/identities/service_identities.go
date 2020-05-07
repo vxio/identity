@@ -101,10 +101,9 @@ func (s *IdentitiesService) UpdateIdentity(session zerotrust.Session, identityID
 	return updated, err
 }
 
-func (s *IdentitiesService) Register(register api.Register) (*api.Identity, error) {
+func (s *IdentitiesService) Register(invite api.Invite, register api.Register) (*api.Identity, error) {
 	identity := api.Identity{
 		IdentityID:    uuid.New().String(),
-		TenantID:      register.TenantID,
 		FirstName:     register.FirstName,
 		MiddleName:    register.MiddleName,
 		LastName:      register.LastName,
@@ -118,6 +117,7 @@ func (s *IdentitiesService) Register(register api.Register) (*api.Identity, erro
 		Addresses:     register.Addresses,
 		RegisteredOn:  s.time.Now(),
 		LastLogin:     api.LastLogin{},
+		InviteID:      invite.InviteID,
 		LastUpdatedOn: s.time.Now(),
 	}
 
