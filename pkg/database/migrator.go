@@ -32,7 +32,11 @@ func RunMigrations(db *sql.DB, config DatabaseConfig) error {
 		return err
 	}
 
-	if err := m.Up(); err != nil {
+	switch m.Up() {
+	case nil:
+	case migrate.ErrNoChange:
+		fmt.Println("Database already at version")
+	default:
 		fmt.Printf("Error running migrations - %s\n", err.Error())
 		return err
 	}

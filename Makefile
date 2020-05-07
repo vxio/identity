@@ -7,12 +7,10 @@ build: compile
 
 identity:
 	pkger
-	cd ./cmd/identity && go build -o $(PWD)/bin/identity
-	#go build -o ${PWD}/bin/identity cmd/identity/*
+	go build -o ${PWD}/bin/identity cmd/identity/*
 
 rotate:
-	cd ./cmd/rotate && go build -o ${PWD}/bin/rotate
-	#go build -o ${PWD}/bin/rotate cmd/rotate/*
+	go build -o ${PWD}/bin/rotate cmd/rotate/*
 	./bin/rotate
 
 # Generate the go code from the public and internal api's
@@ -23,7 +21,6 @@ openapitools:
 		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/.openapi-generator/client-generator-config.yml /local/.openapi-generator/server-generator-config.yml
 
 run: identity
-	-rm ./bin/identity.db
 	./bin/identity
 
 migrate:
@@ -37,3 +34,6 @@ install:
 docker:
 	docker build -f Dockerfile -t moov/identity .
 	docker run -it --rm moov/identity
+
+clean:
+	rm ./data/*

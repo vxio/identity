@@ -1,6 +1,6 @@
-admin:
-  bind:
-    address: ":8202"
+# admin:
+#   bind:
+#     address: ":8202"
 # authentication:
 #   backchannel:
 #     http:

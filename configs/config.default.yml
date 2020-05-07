@@ -7,7 +7,7 @@ admin:
 database:
   databaseName: "identity"
   sqllite:
-    path: /data/identity.db
+    path: ./data/identity.db
 authentication:
   frontchannel:
     expiration: 1h
