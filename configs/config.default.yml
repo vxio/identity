@@ -16,4 +16,4 @@ authentication:
     file:
       path: ./configs/jwk-sig-pub.json
 invites:
-  expiration: 2d
+  expiration: 48h
