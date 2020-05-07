@@ -15,3 +15,5 @@ authentication:
   backchannel:
     file:
       path: ./configs/jwk-sig-pub.json
+invites:
+  expiration: 2d

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/moov-io/identity/pkg/database"
+	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/webkeys"
 )
@@ -13,6 +14,7 @@ type Config struct {
 	Database       database.DatabaseConfig
 	Authentication AuthenticationConfig
 	Notifications  notifications.NotificationsConfig
+	Invites        invites.InvitesConfig
 }
 
 //HTTPConfig configuration for running an http server

@@ -1,15 +1,17 @@
-package identityserver
+package invites
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
+
+	api "github.com/moov-io/identity/pkg/server"
 )
 
 type InvitesRepository interface {
-	list(tenantID TenantID) ([]Invite, error)
-	add(invite Invite, secretCode string) (*Invite, error)
-	delete(tenantID TenantID, inviteID string) error
+	list(tenantID api.TenantID) ([]api.Invite, error)
+	add(invite api.Invite, secretCode string) (*api.Invite, error)
+	delete(tenantID api.TenantID, inviteID string) error
 }
 
 func NewInvitesRepository(db *sql.DB) InvitesRepository {
@@ -20,7 +22,7 @@ type sqlInvitesRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlInvitesRepo) list(tenantID TenantID) ([]Invite, error) {
+func (r *sqlInvitesRepo) list(tenantID api.TenantID) ([]api.Invite, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s FROM invites WHERE tenant_id = ?
 	`, inviteSelect)
@@ -28,7 +30,7 @@ func (r *sqlInvitesRepo) list(tenantID TenantID) ([]Invite, error) {
 	return r.queryScan(qry, tenantID.String())
 }
 
-func (r *sqlInvitesRepo) add(invite Invite, secretCode string) (*Invite, error) {
+func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite, error) {
 	qry := `
 		INSERT INTO invites(
 			invite_id,
@@ -58,7 +60,7 @@ func (r *sqlInvitesRepo) add(invite Invite, secretCode string) (*Invite, error) 
 	return &invite, nil
 }
 
-func (r *sqlInvitesRepo) delete(tenantID TenantID, inviteID string) error {
+func (r *sqlInvitesRepo) delete(tenantID api.TenantID, inviteID string) error {
 	qry := `DELETE FROM invites WHERE tenant_id = ? AND invite_id = ?`
 
 	res, err := r.db.Exec(qry, tenantID.String(), inviteID)
@@ -88,16 +90,16 @@ var inviteSelect = `
 	invites.redeemed
 `
 
-func (r *sqlInvitesRepo) queryScan(query string, args ...interface{}) ([]Invite, error) {
+func (r *sqlInvitesRepo) queryScan(query string, args ...interface{}) ([]api.Invite, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	items := []Invite{}
+	items := []api.Invite{}
 	for rows.Next() {
-		item := Invite{}
+		item := api.Invite{}
 		if err := rows.Scan(&item.InviteID, &item.TenantID, &item.Email, &item.InvitedBy, &item.InvitedOn, &item.ExpiresOn, &item.Redeemed); err != nil {
 			return nil, err
 		}
