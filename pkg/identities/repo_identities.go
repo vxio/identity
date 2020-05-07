@@ -2,7 +2,6 @@ package identities
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 
 	api "github.com/moov-io/identity/pkg/api"
@@ -116,7 +115,7 @@ func (r *sqlIdentityRepo) get(tenantID zerotrust.TenantID, identityID string) (*
 	}
 
 	if len(identities) != 1 {
-		return nil, errors.New("Identity not found")
+		return nil, sql.ErrNoRows
 	}
 
 	identities[0].Phones = phones
@@ -174,7 +173,7 @@ func (r *sqlIdentityRepo) update(updated api.Identity) (*api.Identity, error) {
 		return nil, err
 	}
 	if cnt != 1 {
-		return nil, errors.New("Identity not found to be updated")
+		return nil, sql.ErrNoRows
 	}
 
 	if err := r.upsertAddresses(tx, &updated); err != nil {
@@ -242,7 +241,7 @@ func (r *sqlIdentityRepo) add(identity api.Identity) (*api.Identity, error) {
 		return nil, err
 	}
 	if cnt != 1 {
-		return nil, errors.New("Identity not found to be updated")
+		return nil, sql.ErrNoRows
 	}
 
 	if err := r.upsertAddresses(tx, &identity); err != nil {

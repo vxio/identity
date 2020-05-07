@@ -2,7 +2,6 @@ package invites
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 
 	api "github.com/moov-io/identity/pkg/api"
@@ -74,7 +73,7 @@ func (r *sqlInvitesRepo) delete(tenantID zerotrust.TenantID, inviteID string) er
 		return err
 	}
 	if cnt == 0 {
-		return errors.New("Invite not found to be deleted")
+		return sql.ErrNoRows
 	}
 
 	return nil

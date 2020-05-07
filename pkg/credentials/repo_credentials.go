@@ -2,7 +2,6 @@ package credentials
 
 import (
 	"database/sql"
-	"errors"
 
 	api "github.com/moov-io/identity/pkg/api"
 )
@@ -48,7 +47,7 @@ func (r *sqlCredsRepo) lookup(providerID string, subjectID string) (*api.Credent
 	}
 
 	if len(results) != 1 {
-		return nil, errors.New("Not found")
+		return nil, sql.ErrNoRows
 	}
 
 	return &results[0], nil
@@ -68,7 +67,7 @@ func (r *sqlCredsRepo) get(credentialID string) (*api.Credential, error) {
 	}
 
 	if len(results) != 1 {
-		return nil, errors.New("Not found")
+		return nil, sql.ErrNoRows
 	}
 
 	return &results[0], nil
@@ -102,7 +101,7 @@ func (r *sqlCredsRepo) add(credentials api.Credential) (*api.Credential, error) 
 	}
 
 	if cnt, err := res.RowsAffected(); cnt != 1 || err != nil {
-		return nil, errors.New("No rows affected")
+		return nil, sql.ErrNoRows
 	}
 
 	return &credentials, nil
@@ -136,7 +135,7 @@ func (r *sqlCredsRepo) update(updated api.Credential) (*api.Credential, error) {
 	}
 
 	if cnt, err := res.RowsAffected(); cnt != 1 || err != nil {
-		return nil, errors.New("No rows affected")
+		return nil, sql.ErrNoRows
 	}
 
 	return &updated, nil
