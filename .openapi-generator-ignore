@@ -23,6 +23,7 @@
 #!docs/README.md
 
 
-main.go
-pkg/api/api*.go
-Dockerfile
+/main.go
+/pkg/api/api*.go
+/Dockerfile
+/go.mod
