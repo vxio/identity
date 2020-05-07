@@ -22,5 +22,7 @@
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
 
-.travis.yml
-git_push.sh
+/.travis.yml
+/git_push.sh
+/go.mod
+/.gitignore

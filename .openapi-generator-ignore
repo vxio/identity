@@ -27,5 +27,3 @@
 /pkg/api/api*.go
 /Dockerfile
 /go.mod
-/pkg/client/go.mod
-/pkg/client/.gitignore
