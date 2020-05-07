@@ -23,7 +23,9 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base/admin"
+	"github.com/moov-io/identity/pkg/authn"
 	config "github.com/moov-io/identity/pkg/config"
+	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
@@ -72,16 +74,16 @@ func main() {
 	IdentityRepository := identityserver.NewIdentityRepository(db)
 	IdentitiesService := identityserver.NewIdentitiesService(TimeService, IdentityRepository)
 
-	CredentialRepository := identityserver.NewCredentialRepository(db)
-	CredentialsService := identityserver.NewCredentialsService(TimeService, CredentialRepository)
+	CredentialRepository := credentials.NewCredentialRepository(db)
+	CredentialsService := credentials.NewCredentialsService(TimeService, CredentialRepository)
 
 	InvitesRepository := invites.NewInvitesRepository(db)
 	InvitesService := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService)
 
-	InternalService := identityserver.NewInternalService(*CredentialsService, *IdentitiesService, TokenService)
+	InternalService := authn.NewInternalService(*CredentialsService, *IdentitiesService, TokenService)
 
 	// internal admin server
-	InternalController := identityserver.NewInternalAPIController(InternalService)
+	InternalController := authn.NewInternalAPIController(InternalService)
 	adminRouter := identityserver.NewRouter(InternalController)
 	adminServer := bootAdminServer(adminRouter, terminationListener, logger, config.Admin)
 	defer adminServer.Shutdown()
@@ -99,7 +101,7 @@ func main() {
 	WhoAmIController := identityserver.NewWhoAmIController()
 
 	IdentitiesController := identityserver.NewIdentitiesApiController(IdentitiesService)
-	CredentialsController := identityserver.NewCredentialsApiController(CredentialsService)
+	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
 	publicRouter := identityserver.NewRouter(IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
 	authedRouter := authMiddleware.Handler(publicRouter)

@@ -1,16 +1,18 @@
-package identityserver
+package credentials
 
 import (
 	"database/sql"
 	"errors"
+
+	api "github.com/moov-io/identity/pkg/server"
 )
 
 type CredentialRepository interface {
-	list(identityID string) ([]Credential, error)
-	lookup(providerID string, subjectID string) (*Credential, error)
-	get(credentialID string) (*Credential, error)
-	add(credentials Credential) (*Credential, error)
-	update(updated Credential) (*Credential, error)
+	list(identityID string) ([]api.Credential, error)
+	lookup(providerID string, subjectID string) (*api.Credential, error)
+	get(credentialID string) (*api.Credential, error)
+	add(credentials api.Credential) (*api.Credential, error)
+	update(updated api.Credential) (*api.Credential, error)
 }
 
 func NewCredentialRepository(db *sql.DB) CredentialRepository {
@@ -21,7 +23,7 @@ type sqlCredsRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlCredsRepo) list(identityID string) ([]Credential, error) {
+func (r *sqlCredsRepo) list(identityID string) ([]api.Credential, error) {
 	qry := `
 		SELECT credential_id, provider, subject_id, identity_id, creaton_on, last_used_on, disabled_on, disabled_by
 		FROM credentials
@@ -32,7 +34,7 @@ func (r *sqlCredsRepo) list(identityID string) ([]Credential, error) {
 	return r.queryScan(qry, identityID)
 }
 
-func (r *sqlCredsRepo) lookup(providerID string, subjectID string) (*Credential, error) {
+func (r *sqlCredsRepo) lookup(providerID string, subjectID string) (*api.Credential, error) {
 	qry := `
 		SELECT credential_id, provider, subject_id, identity_id, created_on, last_used_on, disabled_on, disabled_by
 		FROM credentials
@@ -52,7 +54,7 @@ func (r *sqlCredsRepo) lookup(providerID string, subjectID string) (*Credential,
 	return &results[0], nil
 }
 
-func (r *sqlCredsRepo) get(credentialID string) (*Credential, error) {
+func (r *sqlCredsRepo) get(credentialID string) (*api.Credential, error) {
 	qry := `
 		SELECT credential_id, provider, subject_id, identity_id, created_on, last_used_on, disabled_on, disabled_by
 		FROM 
@@ -72,7 +74,7 @@ func (r *sqlCredsRepo) get(credentialID string) (*Credential, error) {
 	return &results[0], nil
 }
 
-func (r *sqlCredsRepo) add(credentials Credential) (*Credential, error) {
+func (r *sqlCredsRepo) add(credentials api.Credential) (*api.Credential, error) {
 	qry := `
 		INSERT INTO credentials(
 			credential_id, 
@@ -106,7 +108,7 @@ func (r *sqlCredsRepo) add(credentials Credential) (*Credential, error) {
 	return &credentials, nil
 }
 
-func (r *sqlCredsRepo) update(updated Credential) (*Credential, error) {
+func (r *sqlCredsRepo) update(updated api.Credential) (*api.Credential, error) {
 
 	qry := `
 		UPDATE credentials
@@ -140,16 +142,16 @@ func (r *sqlCredsRepo) update(updated Credential) (*Credential, error) {
 	return &updated, nil
 }
 
-func (r *sqlCredsRepo) queryScan(query string, args ...interface{}) ([]Credential, error) {
+func (r *sqlCredsRepo) queryScan(query string, args ...interface{}) ([]api.Credential, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	credentials := []Credential{}
+	credentials := []api.Credential{}
 	for rows.Next() {
-		cred := Credential{}
+		cred := api.Credential{}
 		if err := rows.Scan(&cred.CredentialID, &cred.Provider, &cred.SubjectID, &cred.IdentityID, &cred.CreatedOn, &cred.LastUsedOn, &cred.DisabledOn, &cred.DisabledBy); err != nil {
 			return nil, err
 		}
