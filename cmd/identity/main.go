@@ -20,6 +20,8 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/moov-io/identity" // need to import the embedded files
+
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base/admin"

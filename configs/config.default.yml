@@ -1,14 +1,13 @@
 http:
   bind:
-    address: ":8301"
+    address: ":8200"
 admin:
   bind:
-    address: ":8302"
+    address: ":8201"
 database:
   databaseName: "identity"
   sqllite:
-    path: bin/identity.db
-
+    path: /data/identity.db
 authentication:
   frontchannel:
     expiration: 1h

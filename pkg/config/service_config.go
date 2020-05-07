@@ -27,6 +27,7 @@ func (s *ConfigService) Load(config interface{}) error {
 
 	f, err := pkger.Open("/configs/config.default.yml")
 	if err != nil {
+		s.logger.Log("config", fmt.Sprintf("Pkger unable to load config.default.yml - cause: %s", err.Error()))
 		return err
 	}
 

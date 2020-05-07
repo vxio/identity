@@ -1,14 +1,18 @@
-FROM golang:1.14 AS build
-WORKDIR /go/src
-COPY pkg/api ./pkg/api
-COPY main.go .
+FROM golang:1.14-buster AS build
+WORKDIR /build
+RUN apt-get update && apt-get install make gcc g++
+COPY . .
+RUN make install
+RUN make identity
 
-ENV CGO_ENABLED=0
-RUN go get -d -v ./...
+FROM debian:10 AS runtime
+WORKDIR /
+COPY --from=build /build/bin/identity /app/identity
 
-RUN go build -a -installsuffix cgo -o api .
+VOLUME [ "/data", "/configs" ]
 
-FROM scratch AS runtime
-COPY --from=build /go/src/api ./
-EXPOSE 8080/tcp
-ENTRYPOINT ["./api"]
+COPY configs/jwk* /configs/
+
+EXPOSE 8200/tcp
+EXPOSE 8201/tcp
+ENTRYPOINT ["/app/identity"]

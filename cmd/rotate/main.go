@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	_ "github.com/moov-io/identity" // need to import the embedded files
+
 	"github.com/moov-io/identity/pkg/webkeys"
 )
 
