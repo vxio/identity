@@ -6,4 +6,4 @@ gitUserId: moov-io
 gitRepoId: identity
 additionalProperties:
   isGoSubmodule: true
-  packageName: identityclient
+  packageName: client

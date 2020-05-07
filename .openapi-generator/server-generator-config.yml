@@ -6,5 +6,5 @@ gitUserId: moov-io
 gitRepoId: identity
 additionalProperties:
   isGoSubmodule: true
-  packageName: identityserver
+  packageName: api
   sourceFolder: pkg/api
