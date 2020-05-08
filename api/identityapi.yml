@@ -10,12 +10,17 @@ servers:
     description: Local Testing
   - url: https://api.moov.io/
     description: Production
+  - url: https://identity.srvs.moov.local/
+    description: Internal address of service
 
 paths:
 
   /invites:
     get:
+      operationId: ListInvites
       summary: List outstanding invites
+      tags:
+      - invites
       security:
       - GatewayAuth: []
       parameters:
@@ -38,7 +43,10 @@ paths:
           $ref: '#/components/responses/Empty'
                     
     post:
+      operationId: SendInvite
       summary: Send an email invite to a new user
+      tags:
+      - invites
       security:
       - GatewayAuth: []
       requestBody:
@@ -46,7 +54,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Invite'
+              $ref: '#/components/schemas/SendInvite'
       responses:
         '200':
           description: Invite sent
@@ -60,7 +68,10 @@ paths:
 
   /invites/{inviteID}:
     delete:
+      operationId: DisableInvite
       summary: Delete an invite that was sent and invalidate the token.
+      tags:
+      - invites
       parameters:
       - in: path
         name: inviteID
@@ -81,7 +92,10 @@ paths:
 
   /identities:
     get:
+      operationId: ListIdentities
       summary: List identities and associates userId
+      tags:
+      - identities
       security:
       - GatewayAuth: []
       parameters:
@@ -105,7 +119,10 @@ paths:
 
   /identities/{identityID}:
     get:
+      operationId: GetIdentity
       summary: List identities and associates userId
+      tags:
+      - identities
       security:
       - GatewayAuth: []
       parameters:
@@ -128,7 +145,10 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
     put:
+      operationId: UpdateIdentity
       summary: Update a specific Identity
+      tags:
+      - identities
       security:
       - GatewayAuth: []
       parameters:
@@ -143,7 +163,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Identity'
+              $ref: '#/components/schemas/UpdateIdentity'
       responses:
         '200':
           description: Identity was updated.
@@ -156,10 +176,36 @@ paths:
           $ref: '#/components/responses/Empty'
         default:
           $ref: '#/components/responses/Empty'
+    delete:
+      operationId: DisableIdentity
+      summary: Disable an identity. Its left around for historical reporting
+      tags:
+        - identities
+      security:
+      - GatewayAuth: []
+      parameters:
+      - in: path
+        name: identityID
+        description: ID of the Identity to lookup
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '204':
+          description: Invite was removed
+        '404':
+          description: Invite was not found.
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+        
 
   /identities/{identityID}/credentials:
     get:
+      operationId: ListCredentials
       summary: List the credentials this user has used.
+      tags:
+      - credentials
       security:
       - GatewayAuth: []
       parameters:
@@ -185,6 +231,106 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
+
+  /identities/{identityID}/credentials/{credentialID}:
+    get:
+      operationId: DisableCredentials
+      summary: Disables a credential so it can't be used anymore to login
+      tags:
+      - credentials
+      security:
+      - GatewayAuth: []
+      parameters:
+      - in: path
+        name: identityID
+        description: ID of the Identity for the credential
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - in: path
+        name: credentialID
+        description: ID of the credential to disable
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of credentials tied to this identity
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 300
+                items:
+                  $ref: '#/components/schemas/Credential'
+        '404':
+          description: IdentityID doesn't exist
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+
+# Internal only
+  /login:
+    post:
+      operationId: LoginWithCredentials
+      summary: |
+        Complete a login via a OIDC.
+        Once the OIDC client service has authenticated their identity the client service will call 
+        this endpoint to record and finish the login to get their token to use the API.
+
+        If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.      
+      security:
+      - ServiceAuth: []
+      tags:
+      - internal
+      requestBody:
+        description: Arguments needed to match up the OIDC user data with a user in the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: User successfully logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggedIn'
+        '404':
+          description: User was not located.
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+
+  /register:
+    post:
+      operationId: RegisterWithCredentials
+      summary: |
+        Register user based on OIDC credentials. 
+        This is called by the OIDC client services we create to register the user with what 
+        available information they have and obtain from the user.
+      security:
+      - ServiceAuth: []
+      tags:
+      - internal
+      requestBody:
+        description: Arguments needed register a user with OIDC credentials.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+      responses:
+        '200':
+          description: User successfully registered, they can now log in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggedIn'
+        default:
+          $ref: '#/components/responses/Empty'
+
 components:
   responses:
     Empty:
@@ -203,6 +349,12 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: JWT that comes from the gateway that validates against the gateways public RSA key
+      
+    ServiceAuth:
+      type: apiKey
+      in: header
+      name: X-Request-Hash
+      description: Hash of HMAC(X-Timestamp +'|' + X-Nonce, Secret)
 
   schemas:
     UUID:
@@ -211,6 +363,14 @@ components:
       format: uuid
       maxLength: 36
       pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+
+    OptionalUUID:
+      description: UUID v4
+      type: string
+      format: uuid
+      maxLength: 36
+      pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+      nullable: true
 
     Email:
       description: Email Address
@@ -224,6 +384,12 @@ components:
       type: string
       format: date-time
       maxLength: 24
+
+    OptionalDateTime:
+      type: string
+      format: date-time
+      maxLength: 24
+      nullable: true
 
     SubjectID:
       description: ID of the remote OIDC server gives to this identity
@@ -240,6 +406,14 @@ components:
       pattern: ^\w+$
       maxLength: 255
       readOnly: true
+
+    SendInvite:
+      description: Describes an invite that was sent to a user to join.
+      type: object
+      additionalProperties: false
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
 
     Invite:
       description: Describes an invite that was sent to a user to join.
@@ -261,13 +435,21 @@ components:
           description: date time the user was invited.
           $ref: '#/components/schemas/DateTime'
           readOnly: true
+        redeemedOn:
+          description: If this invite has been redeemed for a registration
+          readOnly: true
+          $ref: '#/components/schemas/OptionalDateTime'
         expiresOn:
           description: Point at which this invite is no longer valid.
           $ref: '#/components/schemas/DateTime'
-        redeemed:
-          description: If this invite has been redeemed for a registration
-          type: boolean
+        disabledOn:
+          description: Describes when the user was removed.
           readOnly: true
+          $ref: '#/components/schemas/OptionalDateTime'
+        disabledBy:
+          description: IdentityID of the user who disabled this user.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalUUID'
 
     Identity:
       description: |
@@ -278,6 +460,8 @@ components:
         identityID:
           $ref: '#/components/schemas/UUID'
           readOnly: true
+        tenantID:
+          $ref: '#/components/schemas/UUID'
         firstName:
           type: string
           example: John
@@ -342,11 +526,90 @@ components:
           $ref: '#/components/schemas/LastLogin'
           nullable: true
           readOnly: true
+        disabledOn:
+          description: Describes when the user was removed.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalDateTime'
+        disabledBy:
+          description: IdentityID of the user who disabled this user.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalUUID'
+        lastUpdatedOn:
+          description: Last time this user was updated
+          readOnly: true
+          nullable: true
+          $ref: '#/components/schemas/DateTime'
+        inviteID: 
+          description: Invite ID that was used to register.
+          readOnly: true
+          nullable: false
+          $ref: '#/components/schemas/UUID'
+
       required:
         - firstName
         - lastName
         - email
     
+    UpdateIdentity:
+      description: |
+        Properties of an Identity. These users will under-go KYC checks thus all the information
+      type: object
+      additionalProperties: false
+      properties:
+        firstName:
+          type: string
+          example: John
+          maxLength: 255
+          pattern: ^\w+$
+        middleName:
+          type: string
+          example: Jimmy
+          maxLength: 255
+          pattern: ^\w+$
+        lastName:
+          type: string
+          example: Doe
+          maxLength: 255
+          pattern: ^\w+$
+        nickName:
+          type: string
+          nullable: true
+          maxLength: 255
+          pattern: ^\w+$
+        suffix:
+          type: string
+          nullable: true
+          pattern: ^\w+$
+          maxLength: 255
+        birthDate:
+          type: string
+          format: date
+          example: 2020-12-31
+          maxLength: 10
+        status: 
+          type: string
+          enum:
+          - rejected
+          - none
+          - review-required
+          - kyc
+          - ofac
+          - cip
+        phones:
+          type: array
+          maxItems: 300
+          items:
+            $ref: '#/components/schemas/Phone'
+        addresses:
+          type: array
+          maxItems: 300
+          items:
+            $ref: '#/components/schemas/Address'
+      required:
+        - firstName
+        - lastName
+        - email
+
     LastLogin:
       description: |
         Defines when and what credential was used for the last login
@@ -379,15 +642,20 @@ components:
         identityID:
           $ref: '#/components/schemas/UUID'
           readOnly: true
-        enabled:
-          type: boolean
-          description: If disabled user will be unable to use this method of authentication without help from support removing the lock.
         createdOn:
           $ref: '#/components/schemas/DateTime'
           readOnly: true
         lastUsedOn:
           $ref: '#/components/schemas/DateTime'
           readOnly: true
+        disabledOn:
+          description: Describes when the user was removed.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalDateTime'
+        disabledBy:
+          description: IdentityID of the user who disabled this user.
+          readOnly: true
+          $ref: '#/components/schemas/OptionalUUID'
 
     OFACSearch:
       type: object
@@ -418,12 +686,18 @@ components:
       type: object
       additionalProperties: false
       properties:
+        identityID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        phoneID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
         number:
           type: string
           format: phone
           pattern: ^[0-9]+$
           maxLength: 15
-        valid:
+        validated: 
           type: boolean
         type:
           type: string
@@ -437,6 +711,12 @@ components:
       type: object
       additionalProperties: false
       properties:
+        identityID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        addressID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
         type:
           type: string
           enum:
@@ -477,5 +757,87 @@ components:
           example: US
         validated: 
           type: boolean
-        active: 
-          type: boolean
+          
+    Login:
+      description: |
+        User has authenticated with an OIDC now to verify the system can find them. This verifies theirs stored credentials for a user that match the arguments
+      type: object
+      additionalProperties: false
+      properties:
+        provider:
+          $ref: '#/components/schemas/Provider'
+          writeOnly: true
+        subjectID:
+          $ref: '#/components/schemas/SubjectID'
+          writeOnly: true
+
+    LoggedIn:
+      description: User has logged in and is being given a token to proof identity
+      type: object
+      additionalProperties: false
+      properties:
+        jwt:
+          type: string
+          description: JWT token that provides authentication of identity
+          pattern: ^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$
+          maxLength: 4000
+
+    Register:
+      description: Request to register a user in the system
+      type: object
+      additionalProperties: false
+      properties:
+        provider:
+          $ref: '#/components/schemas/Provider'
+          writeOnly: true
+        subjectID:
+          $ref: '#/components/schemas/SubjectID'
+          writeOnly: true
+        inviteCode:
+          type: string
+          maxLength: 60
+          pattern: ^w+$
+        firstName:
+          type: string
+          example: John
+          maxLength: 255
+          pattern: ^\w+$
+        middleName:
+          type: string
+          example: Jimmy
+          maxLength: 255
+          pattern: ^\w+$
+        lastName:
+          type: string
+          example: Doe
+          maxLength: 255
+          pattern: ^\w+$
+        nickName:
+          type: string
+          nullable: true
+          maxLength: 255
+          pattern: ^\w+$
+        suffix:
+          type: string
+          nullable: true
+          pattern: ^\w+$
+          maxLength: 255
+        birthDate:
+          type: string
+          format: date
+          example: 2020-12-31
+          maxLength: 10
+        email:
+          $ref: '#/components/schemas/Email'
+          writeOnly: true
+        phones:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/Phone'
+        addresses:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/Address'
+    

@@ -1,0 +1,9 @@
+inputSpec: /local/api/identityapi.yml
+outputDir: /local/pkg/client
+generatorName: go
+artifactId: identities-client
+gitUserId: moov-io
+gitRepoId: identity
+additionalProperties:
+  isGoSubmodule: true
+  packageName: client

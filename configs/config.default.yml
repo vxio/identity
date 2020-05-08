@@ -1,0 +1,21 @@
+http:
+  bind:
+    address: ":8200"
+admin:
+  bind:
+    address: ":8201"
+database:
+  databaseName: "identity"
+  sqllite:
+    path: ./data/identity.db
+authentication:
+  frontchannel:
+    expiration: 1h
+    file:
+      path: ./configs/jwk-sig-priv.json
+  backchannel:
+    file:
+      path: ./configs/jwk-sig-pub.json
+invites:
+  expiration: 48h
+  sendToURL: https://api.moov.io
