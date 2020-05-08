@@ -23,7 +23,6 @@ import (
 	_ "github.com/moov-io/identity" // need to import the embedded files
 
 	"github.com/go-kit/kit/log"
-	"github.com/gorilla/mux"
 	"github.com/moov-io/base/admin"
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/authn"
@@ -87,14 +86,14 @@ func main() {
 
 	// internal admin server
 	InternalController := authn.NewInternalAPIController(InternalService)
-	adminRouter := api.NewRouter(InternalController)
-	adminServer := bootAdminServer(adminRouter, terminationListener, logger, config.Admin)
+	adminRoutes := InternalController.Routes()
+	adminServer := bootAdminServer(adminRoutes, terminationListener, logger, config.Admin)
 	defer adminServer.Shutdown()
 
 	// public server
 
 	// auth middleware for the back channel
-	authMiddleware, err := zerotrust.NewJWTMiddleware(BackchannelJwks)
+	AuthMiddleware, err := zerotrust.NewJWTMiddleware(BackchannelJwks)
 	if err != nil {
 		logger.Log("main", fmt.Sprintf("Can't startup the front channel middleware - %s", err))
 		return
@@ -107,9 +106,11 @@ func main() {
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
 	publicRouter := api.NewRouter(IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
-	authedRouter := authMiddleware.Handler(publicRouter)
 
-	_, shutdownServer := bootPublicServer(authedRouter, terminationListener, logger, config.HTTP)
+	// Add the auth middle ware.
+	publicRouter.Use(AuthMiddleware.Handler)
+
+	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger, config.HTTP)
 	defer shutdownServer()
 
 	awaitTermination(terminationListener)
@@ -132,10 +133,13 @@ func awaitTermination(terminationListener chan error) {
 	}
 }
 
-func bootAdminServer(adminRouter *mux.Router, errs chan<- error, logger log.Logger, config HTTPConfig) *admin.Server {
+func bootAdminServer(adminRoutes api.Routes, errs chan<- error, logger log.Logger, config HTTPConfig) *admin.Server {
 	adminServer := admin.NewServer(config.Bind.Address)
 
-	adminServer.AddHandler("/", adminRouter.ServeHTTP)
+	// This is funky because we can't get to the mux.Router to work with it.
+	for _, r := range adminRoutes {
+		adminServer.AddHandler(r.Pattern, r.HandlerFunc)
+	}
 
 	go func() {
 		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
