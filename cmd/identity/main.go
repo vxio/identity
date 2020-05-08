@@ -20,10 +20,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/mux"
+	"github.com/moov-io/base/admin"
 	_ "github.com/moov-io/identity" // need to import the embedded files
 
 	"github.com/go-kit/kit/log"
-	"github.com/moov-io/base/admin"
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/authn"
 	config "github.com/moov-io/identity/pkg/config"
@@ -56,6 +57,9 @@ func main() {
 	db, close := initializeDatabase(logger, config.Database)
 	defer close()
 
+	adminServer := bootAdminServer(terminationListener, logger, config.Servers.Admin)
+	defer adminServer.Shutdown()
+
 	TimeService := stime.NewSystemTimeService()
 
 	FrontchannelJwks, err := webkeys.NewWebKeysService(logger, config.Authentication.Frontchannel)
@@ -84,11 +88,11 @@ func main() {
 
 	InternalService := authn.NewInternalService(*CredentialsService, *IdentitiesService, TokenService)
 
-	// internal admin server
+	// internal server
 	InternalController := authn.NewInternalAPIController(InternalService)
-	adminRoutes := InternalController.Routes()
-	adminServer := bootAdminServer(adminRoutes, terminationListener, logger, config.Admin)
-	defer adminServer.Shutdown()
+	privateRouter := api.NewRouter(InternalController)
+	_, shutdownPrivateServer := bootHTTPServer("private", privateRouter, terminationListener, logger, config.Servers.Private)
+	defer shutdownPrivateServer()
 
 	// public server
 
@@ -107,11 +111,11 @@ func main() {
 	InvitesController := invites.NewInvitesController(InvitesService)
 	publicRouter := api.NewRouter(IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
 
-	// Add the auth middle ware.
+	// Add the auth middleware.
 	publicRouter.Use(AuthMiddleware.Handler)
 
-	_, shutdownServer := bootPublicServer(publicRouter, terminationListener, logger, config.HTTP)
-	defer shutdownServer()
+	_, shutdownPublicServer := bootHTTPServer("public", publicRouter, terminationListener, logger, config.Servers.Public)
+	defer shutdownPublicServer()
 
 	awaitTermination(terminationListener)
 }
@@ -133,27 +137,7 @@ func awaitTermination(terminationListener chan error) {
 	}
 }
 
-func bootAdminServer(adminRoutes api.Routes, errs chan<- error, logger log.Logger, config HTTPConfig) *admin.Server {
-	adminServer := admin.NewServer(config.Bind.Address)
-
-	// This is funky because we can't get to the mux.Router to work with it.
-	for _, r := range adminRoutes {
-		adminServer.AddHandler(r.Pattern, r.HandlerFunc)
-	}
-
-	go func() {
-		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
-		if err := adminServer.Listen(); err != nil {
-			err = fmt.Errorf("problem starting admin http: %v", err)
-			logger.Log("admin", err)
-			errs <- err // send err to shutdown channel
-		}
-	}()
-
-	return adminServer
-}
-
-func bootPublicServer(routes http.Handler, errs chan<- error, logger log.Logger, config HTTPConfig) (*http.Server, func()) {
+func bootHTTPServer(name string, routes *mux.Router, errs chan<- error, logger log.Logger, config HTTPConfig) (*http.Server, func()) {
 
 	// Create main HTTP server
 	serve := &http.Server{
@@ -171,21 +155,36 @@ func bootPublicServer(routes http.Handler, errs chan<- error, logger log.Logger,
 
 	// Start main HTTP server
 	go func() {
-		logger.Log("http", fmt.Sprintf("listening on %s", config.Bind.Address))
+		logger.Log(name, fmt.Sprintf("listening on %s", config.Bind.Address))
 		if err := serve.ListenAndServe(); err != nil {
 			err = fmt.Errorf("problem starting http: %v", err)
-			logger.Log("http", err)
+			logger.Log(name, err)
 			errs <- err // send err to shutdown channel
 		}
 	}()
 
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
-			logger.Log("exit", err)
+			logger.Log(name, err)
 		}
 	}
 
 	return serve, shutdownServer
+}
+
+func bootAdminServer(errs chan<- error, logger log.Logger, config HTTPConfig) *admin.Server {
+	adminServer := admin.NewServer(config.Bind.Address)
+
+	go func() {
+		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
+		if err := adminServer.Listen(); err != nil {
+			err = fmt.Errorf("problem starting admin http: %v", err)
+			logger.Log("admin", err)
+			errs <- err // send err to shutdown channel
+		}
+	}()
+
+	return adminServer
 }
 
 func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql.DB, func()) {

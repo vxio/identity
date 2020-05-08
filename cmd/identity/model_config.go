@@ -9,12 +9,17 @@ import (
 
 //Config defines all the configuration for the app
 type Config struct {
-	HTTP           HTTPConfig
-	Admin          HTTPConfig
+	Servers        ServerConfig
 	Database       database.DatabaseConfig
 	Authentication AuthenticationConfig
 	Notifications  notifications.NotificationsConfig
 	Invites        invites.InvitesConfig
+}
+
+type ServerConfig struct {
+	Public  HTTPConfig
+	Private HTTPConfig
+	Admin   HTTPConfig
 }
 
 //HTTPConfig configuration for running an http server

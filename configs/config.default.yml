@@ -1,9 +1,13 @@
-http:
-  bind:
-    address: ":8200"
-admin:
-  bind:
-    address: ":8201"
+servers:
+  public:
+    bind:
+      address: ":8200"
+  private:
+    bind:
+      address: ":8201"
+  admin:
+    bind:
+      address: ":8202"
 database:
   databaseName: "identity"
   sqllite:
