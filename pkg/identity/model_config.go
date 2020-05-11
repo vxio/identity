@@ -1,4 +1,4 @@
-package main
+package identity
 
 import (
 	"github.com/moov-io/identity/pkg/database"
@@ -7,8 +7,8 @@ import (
 	"github.com/moov-io/identity/pkg/webkeys"
 )
 
-//Config defines all the configuration for the app
-type Config struct {
+//IdentityConfig defines all the configuration for the app
+type IdentityConfig struct {
 	Servers        ServerConfig
 	Database       database.DatabaseConfig
 	Authentication AuthenticationConfig
