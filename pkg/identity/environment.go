@@ -38,8 +38,7 @@ type Environment struct {
 
 	InviteService invites.InvitesService
 
-	PublicRouter  mux.Router
-	PrivateRouter mux.Router
+	PublicRouter mux.Router
 }
 
 func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
@@ -64,19 +63,25 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 
 	TimeService := stime.NewSystemTimeService()
 
-	FrontchannelJwks, err := webkeys.NewWebKeysService(logger, config.Authentication.Frontchannel)
+	AuthnPublicKeys, err := webkeys.NewWebKeysService(logger, config.Keys.AuthnPublic)
 	if err != nil {
-		logger.Log("main", "Unable to load up up the Frontchannel JSON Web Key Set")
+		logger.Log("main", "Unable to load up the Authentication JSON Web Key Set")
 		return nil, err
 	}
 
-	BackchannelJwks, err := webkeys.NewWebKeysService(logger, config.Authentication.Backchannel)
+	GatewayPublicKeys, err := webkeys.NewWebKeysService(logger, config.Keys.GatewayPublic)
 	if err != nil {
-		logger.Log("main", "Unable to load up the Backchannel JSON Web Key Set")
+		logger.Log("main", "Unable to load up the Gateway JSON Web Key Set")
 		return nil, err
 	}
 
-	TokenService := authn.NewTokenService(TimeService, FrontchannelJwks, config.Authentication.Frontchannel.Expiration)
+	SessionPrivateKeys, err := webkeys.NewWebKeysService(logger, config.Keys.SessionPrivate)
+	if err != nil {
+		logger.Log("main", "Unable to load up up the Session JSON Web Key Set")
+		return nil, err
+	}
+
+	SessionService := authn.NewSessionService(TimeService, SessionPrivateKeys, config.Session)
 
 	NotificationsService := notifications.NewNotificationsService(config.Notifications)
 
@@ -89,38 +94,48 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 	InvitesRepository := invites.NewInvitesRepository(db)
 	InvitesService := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService)
 
-	InternalService := authn.NewInternalService(*CredentialsService, *IdentitiesService, TokenService)
+	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService)
 
-	// internal server
-	InternalController := authn.NewInternalAPIController(InternalService)
-	privateRouter := api.NewRouter(InternalController)
+	// router
+	router := mux.NewRouter()
 
-	// public server
+	// authn endpoints
 
-	// auth middleware for the back channel
-	AuthMiddleware, err := zerotrust.NewJWTMiddleware(BackchannelJwks)
+	AuthnMiddleware, err := zerotrust.NewJWTMiddleware(AuthnPublicKeys)
 	if err != nil {
-		logger.Log("main", fmt.Sprintf("Can't startup the front channel middleware - %s", err))
+		logger.Log("main", fmt.Sprintf("Can't startup the Authn middleware - %s", err))
 		return nil, err
 	}
 
-	// debug api
-	WhoAmIController := authn.NewWhoAmIController()
+	AuthnController := authn.NewAuthnAPIController(AuthnService)
 
+	authnRouter := router.NewRoute().Subrouter()
+	authnRouter = api.AppendRouters(authnRouter, AuthnController)
+	authnRouter.Use(AuthnMiddleware.Handler)
+
+	// public server
+
+	// auth middleware for the tokens coming from the gateway
+	GatewayMiddleware, err := zerotrust.NewJWTMiddleware(GatewayPublicKeys)
+	if err != nil {
+		logger.Log("main", fmt.Sprintf("Can't startup the Gateway middleware - %s", err))
+		return nil, err
+	}
+
+	WhoAmIController := authn.NewWhoAmIController()
 	IdentitiesController := identities.NewIdentitiesApiController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
-	publicRouter := api.NewRouter(IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
 
-	// Add the auth middleware.
-	publicRouter.Use(AuthMiddleware.Handler)
+	publicRouter := router.NewRoute().Subrouter()
+	publicRouter = api.AppendRouters(publicRouter, IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
+	publicRouter.Use(GatewayMiddleware.Handler)
 
 	env := Environment{
 		Logger: logger,
 		Config: *config,
 
-		PublicRouter:  *publicRouter,
-		PrivateRouter: *privateRouter,
+		PublicRouter: *router,
 	}
 
 	return &env, nil

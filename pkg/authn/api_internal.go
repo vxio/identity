@@ -17,18 +17,18 @@ import (
 	api "github.com/moov-io/identity/pkg/api"
 )
 
-// A InternalAPIController binds http requests to an api service and writes the service results to the http response
-type InternalAPIController struct {
+// A AuthnAPIController binds http requests to an api service and writes the service results to the http response
+type AuthnAPIController struct {
 	service api.InternalApiServicer
 }
 
-// NewInternalAPIController creates a default api controller
-func NewInternalAPIController(s api.InternalApiServicer) api.Router {
-	return &InternalAPIController{service: s}
+// NewAuthnAPIController creates a default api controller
+func NewAuthnAPIController(s api.InternalApiServicer) api.Router {
+	return &AuthnAPIController{service: s}
 }
 
 // Routes returns all of the api route for the InternalApiController
-func (c *InternalAPIController) Routes() api.Routes {
+func (c *AuthnAPIController) Routes() api.Routes {
 	return api.Routes{
 		{
 			"LoginWithCredentials",
@@ -46,7 +46,7 @@ func (c *InternalAPIController) Routes() api.Routes {
 }
 
 // LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
-func (c *InternalAPIController) LoginWithCredentials(w http.ResponseWriter, r *http.Request) {
+func (c *AuthnAPIController) LoginWithCredentials(w http.ResponseWriter, r *http.Request) {
 	login := &api.Login{}
 	if err := json.NewDecoder(r.Body).Decode(&login); err != nil {
 		w.WriteHeader(500)
@@ -63,7 +63,7 @@ func (c *InternalAPIController) LoginWithCredentials(w http.ResponseWriter, r *h
 }
 
 // RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
-func (c *InternalAPIController) RegisterWithCredentials(w http.ResponseWriter, r *http.Request) {
+func (c *AuthnAPIController) RegisterWithCredentials(w http.ResponseWriter, r *http.Request) {
 	register := &api.Register{}
 	if err := json.NewDecoder(r.Body).Decode(&register); err != nil {
 		w.WriteHeader(500)

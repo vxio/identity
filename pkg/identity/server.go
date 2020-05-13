@@ -25,9 +25,6 @@ func (env *Environment) RunServers() {
 	adminServer := bootAdminServer(terminationListener, env.Logger, env.Config.Servers.Admin)
 	defer adminServer.Shutdown()
 
-	_, shutdownPrivateServer := bootHTTPServer("private", &env.PrivateRouter, terminationListener, env.Logger, env.Config.Servers.Private)
-	defer shutdownPrivateServer()
-
 	_, shutdownPublicServer := bootHTTPServer("public", &env.PublicRouter, terminationListener, env.Logger, env.Config.Servers.Public)
 	defer shutdownPublicServer()
 

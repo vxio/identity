@@ -1,6 +1,7 @@
 package identity
 
 import (
+	"github.com/moov-io/identity/pkg/authn"
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
@@ -9,17 +10,17 @@ import (
 
 //IdentityConfig defines all the configuration for the app
 type IdentityConfig struct {
-	Servers        ServerConfig
-	Database       database.DatabaseConfig
-	Authentication AuthenticationConfig
-	Notifications  notifications.NotificationsConfig
-	Invites        invites.InvitesConfig
+	Servers       ServerConfig
+	Database      database.DatabaseConfig
+	Keys          KeysConfig
+	Session       authn.SessionConfig
+	Notifications notifications.NotificationsConfig
+	Invites       invites.InvitesConfig
 }
 
 type ServerConfig struct {
-	Public  HTTPConfig
-	Private HTTPConfig
-	Admin   HTTPConfig
+	Public HTTPConfig
+	Admin  HTTPConfig
 }
 
 //HTTPConfig configuration for running an http server
@@ -35,7 +36,8 @@ type BindAddress struct {
 //AuthenticationConfig on where to get keys from.
 //  Backchannel is for verifying what comes from the Gateway
 //  Frontchannel is for creating the tokens sent to the customer.
-type AuthenticationConfig struct {
-	Backchannel  webkeys.WebKeysConfig
-	Frontchannel webkeys.WebKeysConfig
+type KeysConfig struct {
+	AuthnPublic    webkeys.WebKeysConfig
+	GatewayPublic  webkeys.WebKeysConfig
+	SessionPrivate webkeys.WebKeysConfig
 }

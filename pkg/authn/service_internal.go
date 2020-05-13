@@ -25,15 +25,15 @@ import (
 type InternalService struct {
 	credentials credentials.CredentialsService
 	identities  identities.IdentitiesService
-	token       TokenService
+	token       SessionService
 	invites     invites.InvitesService
 }
 
 // NewInternalService creates a default api service
-func NewInternalService(
+func NewAuthnService(
 	credentials credentials.CredentialsService,
 	identities identities.IdentitiesService,
-	token TokenService,
+	token SessionService,
 ) api.InternalApiServicer {
 	return &InternalService{
 		credentials: credentials,

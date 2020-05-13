@@ -12,14 +12,18 @@ database:
   databaseName: "identity"
   sqllite:
     path: ./data/identity.db
-authentication:
-  frontchannel:
-    expiration: 1h
-    file:
-      path: ./configs/jwk-sig-priv.json
-  backchannel:
-    file:
-      path: ./configs/jwk-sig-pub.json
 invites:
   expiration: 48h
   sendToURL: https://api.moov.io
+session:
+  expiration: 1h
+keys:
+  authn-public:
+    file:
+      path: ./configs/jwk-sig-pub.json
+  gateway-public:
+    file:
+      path: ./configs/jwk-sig-pub.json
+  session-private:
+    file:
+      path: ./configs/jwk-sig-priv.json
