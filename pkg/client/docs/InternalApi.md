@@ -4,16 +4,16 @@ All URIs are relative to *https://local.moov.io*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**LoginWithCredentials**](InternalApi.md#LoginWithCredentials) | **Post** /login | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
-[**RegisterWithCredentials**](InternalApi.md#RegisterWithCredentials) | **Post** /register | Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
+[**Authenticated**](InternalApi.md#Authenticated) | **Post** /authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
+[**RegisterWithCredentials**](InternalApi.md#RegisterWithCredentials) | **Post** /register | If the OIDC client specified it got an invite code that token will be exchanged here to login 
 
 
 
-## LoginWithCredentials
+## Authenticated
 
-> LoggedIn LoginWithCredentials(ctx, login)
+> LoggedIn Authenticated(ctx, moovLogin, login)
 
-Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
+Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
 
 ### Required Parameters
 
@@ -21,6 +21,7 @@ Complete a login via a OIDC. Once the OIDC client service has authenticated thei
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**moovLogin** | **string**| Encrypted and signed token that they authenticated via one of the approved services | 
 **login** | [**Login**](Login.md)| Arguments needed to match up the OIDC user data with a user in the system | 
 
 ### Return type
@@ -29,7 +30,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[ServiceAuth](../README.md#ServiceAuth)
+[LoginAuth](../README.md#LoginAuth)
 
 ### HTTP request headers
 
@@ -43,9 +44,9 @@ Name | Type | Description  | Notes
 
 ## RegisterWithCredentials
 
-> LoggedIn RegisterWithCredentials(ctx, register)
+> LoggedIn RegisterWithCredentials(ctx, moovLogin, register)
 
-Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
+If the OIDC client specified it got an invite code that token will be exchanged here to login 
 
 ### Required Parameters
 
@@ -53,6 +54,7 @@ Register user based on OIDC credentials.  This is called by the OIDC client serv
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**moovLogin** | **string**| Encrypted and signed token that they authenticated via one of the approved services | 
 **register** | [**Register**](Register.md)| Arguments needed register a user with OIDC credentials. | 
 
 ### Return type
@@ -61,7 +63,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[ServiceAuth](../README.md#ServiceAuth)
+[LoginAuth](../README.md#LoginAuth)
 
 ### HTTP request headers
 

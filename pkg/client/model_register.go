@@ -23,6 +23,6 @@ type Register struct {
 	BirthDate string `json:"birthDate,omitempty"`
 	// Email Address
 	Email string `json:"email,omitempty"`
-	Phones []Phone `json:"phones,omitempty"`
-	Addresses []Address `json:"addresses,omitempty"`
+	Phones []RegisterPhone `json:"phones,omitempty"`
+	Addresses []RegisterAddress `json:"addresses,omitempty"`
 }

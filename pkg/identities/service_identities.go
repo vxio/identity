@@ -102,6 +102,35 @@ func (s *IdentitiesService) UpdateIdentity(session zerotrust.Session, identityID
 }
 
 func (s *IdentitiesService) Register(invite api.Invite, register api.Register) (*api.Identity, error) {
+	identityID := uuid.New().String()
+
+	phones := []api.Phone{}
+	for _, rp := range register.Phones {
+		phones = append(phones, api.Phone{
+			IdentityID: identityID,
+			PhoneID:    uuid.New().String(),
+			Number:     rp.Number,
+			Validated:  false,
+			Type:       rp.Type,
+		})
+	}
+
+	addresses := []api.Address{}
+	for _, ra := range register.Addresses {
+		addresses = append(addresses, api.Address{
+			IdentityID: identityID,
+			AddressID:  uuid.New().String(),
+			Type:       ra.Type,
+			Address1:   ra.Address1,
+			Address2:   ra.Address2,
+			City:       ra.City,
+			State:      ra.State,
+			PostalCode: ra.PostalCode,
+			Country:    ra.Country,
+			Validated:  false,
+		})
+	}
+
 	identity := api.Identity{
 		IdentityID:    uuid.New().String(),
 		FirstName:     register.FirstName,
@@ -113,8 +142,8 @@ func (s *IdentitiesService) Register(invite api.Invite, register api.Register) (
 		Status:        "none",
 		Email:         register.Email,
 		EmailVerified: false,
-		Phones:        register.Phones,
-		Addresses:     register.Addresses,
+		Phones:        phones,
+		Addresses:     addresses,
 		RegisteredOn:  s.time.Now(),
 		LastLogin:     api.LastLogin{},
 		InviteID:      invite.InviteID,

@@ -39,8 +39,8 @@ Class | Method | HTTP request | Description
 *IdentitiesApi* | [**GetIdentity**](docs/IdentitiesApi.md#getidentity) | **Get** /identities/{identityID} | List identities and associates userId
 *IdentitiesApi* | [**ListIdentities**](docs/IdentitiesApi.md#listidentities) | **Get** /identities | List identities and associates userId
 *IdentitiesApi* | [**UpdateIdentity**](docs/IdentitiesApi.md#updateidentity) | **Put** /identities/{identityID} | Update a specific Identity
-*InternalApi* | [**LoginWithCredentials**](docs/InternalApi.md#loginwithcredentials) | **Post** /login | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
-*InternalApi* | [**RegisterWithCredentials**](docs/InternalApi.md#registerwithcredentials) | **Post** /register | Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
+*InternalApi* | [**Authenticated**](docs/InternalApi.md#authenticated) | **Post** /authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
+*InternalApi* | [**RegisterWithCredentials**](docs/InternalApi.md#registerwithcredentials) | **Post** /register | If the OIDC client specified it got an invite code that token will be exchanged here to login 
 *InvitesApi* | [**DisableInvite**](docs/InvitesApi.md#disableinvite) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
 *InvitesApi* | [**ListInvites**](docs/InvitesApi.md#listinvites) | **Get** /invites | List outstanding invites
 *InvitesApi* | [**SendInvite**](docs/InvitesApi.md#sendinvite) | **Post** /invites | Send an email invite to a new user
@@ -58,6 +58,8 @@ Class | Method | HTTP request | Description
  - [OfacSearch](docs/OfacSearch.md)
  - [Phone](docs/Phone.md)
  - [Register](docs/Register.md)
+ - [RegisterAddress](docs/RegisterAddress.md)
+ - [RegisterPhone](docs/RegisterPhone.md)
  - [SendInvite](docs/SendInvite.md)
  - [UpdateIdentity](docs/UpdateIdentity.md)
 
@@ -81,7 +83,7 @@ r, err := client.Service.Operation(auth, args)
 ```
 
 
-## ServiceAuth
+## LoginAuth
 
 - **Type**: API key
 

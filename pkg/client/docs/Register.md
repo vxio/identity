@@ -14,8 +14,8 @@ Name | Type | Description | Notes
 **Suffix** | Pointer to **string** |  | [optional] 
 **BirthDate** | **string** |  | [optional] 
 **Email** | **string** | Email Address | [optional] 
-**Phones** | [**[]Phone**](Phone.md) |  | [optional] 
-**Addresses** | [**[]Address**](Address.md) |  | [optional] 
+**Phones** | [**[]RegisterPhone**](RegisterPhone.md) |  | [optional] 
+**Addresses** | [**[]RegisterAddress**](RegisterAddress.md) |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
