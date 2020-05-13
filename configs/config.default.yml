@@ -2,9 +2,6 @@ servers:
   public:
     bind:
       address: ":8200"
-  private:
-    bind:
-      address: ":8201"
   admin:
     bind:
       address: ":8202"
@@ -18,12 +15,12 @@ invites:
 session:
   expiration: 1h
 keys:
-  authn-public:
+  authnPublic:
     file:
       path: ./configs/jwk-sig-pub.json
-  gateway-public:
+  gatewayPublic:
     file:
       path: ./configs/jwk-sig-pub.json
-  session-private:
+  sessionPrivate:
     file:
       path: ./configs/jwk-sig-priv.json
