@@ -10,7 +10,7 @@
 package authn
 
 import (
-	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -31,46 +31,83 @@ func NewAuthnAPIController(s api.InternalApiServicer) api.Router {
 func (c *AuthnAPIController) Routes() api.Routes {
 	return api.Routes{
 		{
-			"LoginWithCredentials",
-			strings.ToUpper("Post"),
-			"/login",
-			c.LoginWithCredentials,
+			"Authenticated",
+			strings.ToUpper("Get"),
+			"/authenticated",
+			c.Authenticated,
 		},
 		{
-			"RegisterWithCredentials",
+			"Register",
 			strings.ToUpper("Post"),
 			"/register",
-			c.RegisterWithCredentials,
+			c.Register,
 		},
 	}
 }
 
-// LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
-func (c *AuthnAPIController) LoginWithCredentials(w http.ResponseWriter, r *http.Request) {
-	login := &api.Login{}
-	if err := json.NewDecoder(r.Body).Decode(&login); err != nil {
+// Authenticated - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
+func (c *AuthnAPIController) Authenticated(w http.ResponseWriter, r *http.Request) {
+
+	session, ok := r.Context().Value("LoginSession").(*LoginSession)
+	if !ok || session == nil {
+		fmt.Println("Unable to find LoginSession in context")
 		w.WriteHeader(500)
 		return
 	}
 
-	result, err := c.service.LoginWithCredentials(*login)
+	login := api.Login{
+		Provider:  session.Provider,
+		SubjectID: session.SubjectID,
+	}
+
+	fmt.Println(login)
+
+	result, err := c.service.LoginWithCredentials(login, session.State, session.IP)
 	if err != nil {
-		w.WriteHeader(500)
+		fmt.Println("Error", err.Error())
+
+		w.WriteHeader(200)
+		w.Write([]byte("Not able to exchange login token for session token"))
 		return
 	}
 
-	api.EncodeJSONResponse(result, nil, w)
+	http.SetCookie(w, result)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("You've been authenticated!"))
 }
 
-// RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
-func (c *AuthnAPIController) RegisterWithCredentials(w http.ResponseWriter, r *http.Request) {
-	register := &api.Register{}
-	if err := json.NewDecoder(r.Body).Decode(&register); err != nil {
+// Register - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
+func (c *AuthnAPIController) Register(w http.ResponseWriter, r *http.Request) {
+
+	session, ok := r.Context().Value("LoginSession").(*LoginSession)
+	if !ok || session == nil {
 		w.WriteHeader(500)
 		return
 	}
 
-	result, err := c.service.RegisterWithCredentials(*register)
+	register := api.Register{
+		Provider:  session.Provider,
+		SubjectID: session.SubjectID,
+
+		InviteCode: session.InviteCode,
+
+		FirstName:  session.FirstName,
+		MiddleName: session.MiddleName,
+		LastName:   session.LastName,
+
+		NickName: session.NickName,
+
+		Suffix:    session.Suffix,
+		BirthDate: session.BirthDate,
+
+		Email: session.Email,
+
+		Phones:    session.Phones,
+		Addresses: session.Addresses,
+	}
+
+	result, err := c.service.RegisterWithCredentials(register, session.State, session.IP)
 	if err != nil {
 		w.WriteHeader(500)
 		return

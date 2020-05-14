@@ -24,10 +24,10 @@ func (s *FileJwksService) FetchJwks() (*jose.JSONWebKeySet, error) {
 		return nil, err
 	}
 
-	jsonWebKeySet := new(jose.JSONWebKeySet)
-	if err = json.Unmarshal(contents, jsonWebKeySet); err != nil {
+	jsonWebKeySet := jose.JSONWebKeySet{}
+	if err = json.Unmarshal(contents, &jsonWebKeySet); err != nil {
 		return nil, err
 	}
 
-	return jsonWebKeySet, nil
+	return &jsonWebKeySet, nil
 }

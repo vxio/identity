@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -63,12 +64,14 @@ func (s *GenerateJwksService) FetchJwks() (*jose.JSONWebKeySet, error) {
 }
 
 func (s *GenerateJwksService) Save(path string) error {
-	pubJson, err := s.Public.MarshalJSON()
+	pubJwks := jose.JSONWebKeySet{Keys: []jose.JSONWebKey{s.Public}}
+	pubJson, err := json.Marshal(pubJwks)
 	if err != nil {
 		return err
 	}
 
-	privJson, err := s.Private.MarshalJSON()
+	privJwks := jose.JSONWebKeySet{Keys: []jose.JSONWebKey{s.Private}}
+	privJson, err := json.Marshal(privJwks)
 	if err != nil {
 		return err
 	}

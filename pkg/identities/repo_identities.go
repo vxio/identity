@@ -214,7 +214,7 @@ func (r *sqlIdentityRepo) add(identity api.Identity) (*api.Identity, error) {
 			disabled_on,
 			disabled_by,
 			last_updated_on
-		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	`
 
 	res, err := tx.Exec(qry,
@@ -420,10 +420,6 @@ func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) err
 			address_id = ?
 	`
 
-	insertQry := `
-		INSERT INTO identity_address (identity_id, address_id, type, address_1, address_2, city, state, country, last_updated_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)	
-	`
-
 	for _, a := range updated.Addresses {
 		c, err := tx.Exec(updateQry,
 			a.Type,
@@ -447,6 +443,22 @@ func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) err
 		}
 
 		if cnt == 0 {
+
+			insertQry := `
+				INSERT INTO identity_address (
+					identity_id, 
+					address_id, 
+					type, 
+					address_1, 
+					address_2, 
+					city, 
+					state, 
+					country, 
+					validated, 
+					last_updated_on
+				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)	
+			`
+
 			_, err := tx.Exec(insertQry,
 				updated.IdentityID,
 				a.AddressID,
@@ -456,6 +468,7 @@ func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) err
 				a.City,
 				a.State,
 				a.Country,
+				a.Validated,
 				updated.LastUpdatedOn,
 			)
 			if err != nil {

@@ -11,6 +11,7 @@ package authn
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	api "github.com/moov-io/identity/pkg/api"
@@ -43,7 +44,7 @@ func NewAuthnService(
 }
 
 // RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
-func (s *InternalService) RegisterWithCredentials(register api.Register) (*http.Cookie, error) {
+func (s *InternalService) RegisterWithCredentials(register api.Register, nonce string, ip string) (*http.Cookie, error) {
 	invite, err := s.invites.Redeem(register.InviteCode)
 	if err != nil {
 		return nil, err
@@ -67,14 +68,15 @@ func (s *InternalService) RegisterWithCredentials(register api.Register) (*http.
 		SubjectID: creds.SubjectID,
 	}
 
-	return s.LoginWithCredentials(login)
+	return s.LoginWithCredentials(login, nonce, ip)
 }
 
 // LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
-func (s *InternalService) LoginWithCredentials(login api.Login) (*http.Cookie, error) {
+func (s *InternalService) LoginWithCredentials(login api.Login, nonce string, ip string) (*http.Cookie, error) {
 	// check if they exist in the credentials service and if its enabled.
-	loggedIn, err := s.credentials.Login(login)
+	loggedIn, err := s.credentials.Login(login, nonce, ip)
 	if err != nil {
+		fmt.Println("Failed login ", err.Error())
 		return nil, errors.New("Unauthorized")
 	}
 

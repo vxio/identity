@@ -2,6 +2,8 @@ package credentials
 
 import (
 	"database/sql"
+	"fmt"
+	"time"
 
 	api "github.com/moov-io/identity/pkg/api"
 )
@@ -12,6 +14,7 @@ type CredentialRepository interface {
 	get(credentialID string) (*api.Credential, error)
 	add(credentials api.Credential) (*api.Credential, error)
 	update(updated api.Credential) (*api.Credential, error)
+	record(credentialID string, nonce string, ip string, at time.Time) error
 }
 
 func NewCredentialRepository(db *sql.DB) CredentialRepository {
@@ -26,8 +29,7 @@ func (r *sqlCredsRepo) list(identityID string) ([]api.Credential, error) {
 	qry := `
 		SELECT credential_id, provider, subject_id, identity_id, creaton_on, last_used_on, disabled_on, disabled_by
 		FROM credentials
-		WHERE
-			identity_id = ?
+		WHERE identity_id = ?
 	`
 
 	return r.queryScan(qry, identityID)
@@ -37,7 +39,7 @@ func (r *sqlCredsRepo) lookup(providerID string, subjectID string) (*api.Credent
 	qry := `
 		SELECT credential_id, provider, subject_id, identity_id, created_on, last_used_on, disabled_on, disabled_by
 		FROM credentials
-		WHERE provider_id = ? AND subject_id = ?
+		WHERE provider = ? AND subject_id = ?
 		LIMIT 1
 	`
 
@@ -56,7 +58,7 @@ func (r *sqlCredsRepo) lookup(providerID string, subjectID string) (*api.Credent
 func (r *sqlCredsRepo) get(credentialID string) (*api.Credential, error) {
 	qry := `
 		SELECT credential_id, provider, subject_id, identity_id, created_on, last_used_on, disabled_on, disabled_by
-		FROM 
+		FROM credentials
 		WHERE credential_id = ?
 		LIMIT 1
 	`
@@ -83,8 +85,8 @@ func (r *sqlCredsRepo) add(credentials api.Credential) (*api.Credential, error) 
 			created_on, 
 			last_used_on, 
 			disabled_on, 
-			disabled_by)
-		VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+			disabled_by
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`
 	res, err := r.db.Exec(qry,
 		credentials.CredentialID,
@@ -107,13 +109,42 @@ func (r *sqlCredsRepo) add(credentials api.Credential) (*api.Credential, error) 
 	return &credentials, nil
 }
 
+func (r *sqlCredsRepo) record(credentialID string, nonce string, ip string, at time.Time) error {
+	qry := `
+		INSERT INTO credential_logins(
+			credential_id,
+			nonce,
+			ip,
+			created_on
+		) VALUES (?, ?, ?, ?)
+	`
+
+	res, err := r.db.Exec(qry,
+		credentialID,
+		nonce,
+		ip,
+		at,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if cnt, err := res.RowsAffected(); cnt != 1 || err != nil {
+		fmt.Println("No rows recorded")
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
 func (r *sqlCredsRepo) update(updated api.Credential) (*api.Credential, error) {
 
 	qry := `
 		UPDATE credentials
 		SET
-			last_used_on = ?
-			disabled_on = ?
+			last_used_on = ?,
+			disabled_on = ?,
 			disabled_by = ?
 		WHERE
 			credential_id = ? AND

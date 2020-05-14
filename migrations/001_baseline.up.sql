@@ -12,6 +12,15 @@ CREATE TABLE credentials (
     CONSTRAINT credential_id_pk PRIMARY KEY (credential_id)
 );
 
+CREATE TABLE credential_logins (
+    credential_id   UUID NOT NULL,
+    nonce           VARCHAR(255) NOT NULL,
+    ip              VARCHAR(15) NOT NULL,
+    created_on      TIMESTAMP NOT NULL,
+
+    CONSTRAINT login_pk PRIMARY KEY (credential_id, nonce)
+);
+
 CREATE TABLE invites (
     invite_id       UUID NOT NULL,
     tenant_id       UUID NOT NULL,

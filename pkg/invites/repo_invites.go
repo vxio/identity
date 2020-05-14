@@ -87,7 +87,7 @@ func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite,
 			redeemed_on,
 			expires_on,
 			secret_code
-		) VALUES (?,?,?,?,?,?,?)`
+		) VALUES (?,?,?,?,?,?,?,?)`
 
 	_, err := r.db.Exec(qry,
 		invite.InviteID,

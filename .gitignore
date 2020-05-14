@@ -26,3 +26,4 @@ bin/
 *.db
 
 pkged.go
+/cmd/identity/add_jj.go

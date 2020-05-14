@@ -4,7 +4,7 @@ servers:
       address: ":8200"
   admin:
     bind:
-      address: ":8202"
+      address: ":8201"
 database:
   databaseName: "identity"
   sqllite:
@@ -12,15 +12,18 @@ database:
 invites:
   expiration: 48h
   sendToURL: https://api.moov.io
+notifications:
+  Mock:
+    from: noreply@moov.io
 session:
   expiration: 1h
 keys:
   authnPublic:
     file:
-      path: ./configs/jwk-sig-pub.json
+      path: ./configs/authn-jwks-sig-pub.json
   gatewayPublic:
     file:
-      path: ./configs/jwk-sig-pub.json
+      path: ./configs/gateway-jwks-sig-pub.json
   sessionPrivate:
     file:
-      path: ./configs/jwk-sig-priv.json
+      path: ./configs/identity-jwks-sig-priv.json

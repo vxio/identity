@@ -56,6 +56,7 @@ func (s *sessionService) Generate(identityID string) (string, error) {
 		Audience: "moov",
 		Issuer:   "moov",
 	})
+	token.Header["kid"] = privateKey.KeyID
 
 	tokenString, err := token.SignedString(privateKey.Key)
 	if err != nil {

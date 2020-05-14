@@ -17,18 +17,21 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-func (env *Environment) RunServers() {
+func (env *Environment) RunServers() func() {
 
 	// Listen for application termination.
 	terminationListener := newTerminationListener()
 
 	adminServer := bootAdminServer(terminationListener, env.Logger, env.Config.Servers.Admin)
-	defer adminServer.Shutdown()
 
 	_, shutdownPublicServer := bootHTTPServer("public", &env.PublicRouter, terminationListener, env.Logger, env.Config.Servers.Public)
-	defer shutdownPublicServer()
 
 	awaitTermination(env.Logger, terminationListener)
+
+	return func() {
+		adminServer.Shutdown()
+		shutdownPublicServer()
+	}
 }
 
 func newTerminationListener() chan error {

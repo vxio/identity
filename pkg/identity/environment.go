@@ -36,9 +36,13 @@ type Environment struct {
 	Logger log.Logger
 	Config IdentityConfig
 
-	InviteService invites.InvitesService
+	InviteService      api.InvitesApiServicer
+	IdentitiesService  identities.IdentitiesService
+	CredentialsService credentials.CredentialsService
 
 	PublicRouter mux.Router
+
+	Shutdown func()
 }
 
 func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
@@ -59,7 +63,6 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 
 	//db setup
 	db, close := initializeDatabase(logger, config.Database)
-	defer close()
 
 	TimeService := stime.NewSystemTimeService()
 
@@ -83,7 +86,10 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 
 	SessionService := authn.NewSessionService(TimeService, SessionPrivateKeys, config.Session)
 
-	NotificationsService := notifications.NewNotificationsService(config.Notifications)
+	NotificationsService, err := notifications.NewNotificationsService(config.Notifications)
+	if err != nil {
+		return nil, err
+	}
 
 	IdentityRepository := identities.NewIdentityRepository(db)
 	IdentitiesService := identities.NewIdentitiesService(TimeService, IdentityRepository)
@@ -101,7 +107,7 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 
 	// authn endpoints
 
-	AuthnMiddleware, err := zerotrust.NewJWTMiddleware(AuthnPublicKeys)
+	AuthnMiddleware, err := authn.NewAuthnMiddleware(TimeService, AuthnPublicKeys)
 	if err != nil {
 		logger.Log("main", fmt.Sprintf("Can't startup the Authn middleware - %s", err))
 		return nil, err
@@ -135,7 +141,15 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 		Logger: logger,
 		Config: *config,
 
+		InviteService:      InvitesService,
+		IdentitiesService:  *IdentitiesService,
+		CredentialsService: *CredentialsService,
+
 		PublicRouter: *router,
+
+		Shutdown: func() {
+			close()
+		},
 	}
 
 	return &env, nil
@@ -151,6 +165,7 @@ func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql
 	}
 
 	shutdown := func() {
+		fmt.Println("Shutting down the db")
 		cancelFunc()
 		if err := db.Close(); err != nil {
 			logger.Log("exit", err)

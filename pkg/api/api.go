@@ -75,8 +75,8 @@ type IdentitiesApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type InternalApiServicer interface {
-	LoginWithCredentials(Login) (*http.Cookie, error)
-	RegisterWithCredentials(Register) (*http.Cookie, error)
+	LoginWithCredentials(Login, string, string) (*http.Cookie, error)
+	RegisterWithCredentials(Register, string, string) (*http.Cookie, error)
 }
 
 // InvitesApiServicer defines the api actions for the InvitesApi service

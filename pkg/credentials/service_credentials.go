@@ -59,7 +59,7 @@ func (s *CredentialsService) ListCredentials(identityID string) ([]api.Credentia
 	return s.repository.list(identityID)
 }
 
-func (s *CredentialsService) Login(login api.Login) (*api.Credential, error) {
+func (s *CredentialsService) Login(login api.Login, nonce string, ip string) (*api.Credential, error) {
 	// look into the repo for any matches
 	cred, err := s.repository.lookup(login.Provider, login.SubjectID)
 	if err != nil {
@@ -67,6 +67,13 @@ func (s *CredentialsService) Login(login api.Login) (*api.Credential, error) {
 	}
 
 	cred.LastUsedOn = s.time.Now()
+
+	// Record the login happened and that the nonce is unique.
+	err = s.repository.record(cred.CredentialID, nonce, ip, cred.LastUsedOn)
+	if err != nil {
+		return nil, err
+	}
+
 	saved, err := s.repository.update(*cred)
 	if err != nil {
 		return nil, err

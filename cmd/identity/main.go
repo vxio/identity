@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/moov-io/identity/pkg/identity"
 )
@@ -17,14 +18,25 @@ var (
 func main() {
 	env, err := identity.NewEnvironment(nil)
 	if err != nil {
+		fmt.Println("Error loading up environment. ", err)
 		return
 	}
+	defer env.Shutdown()
 
 	flag.Parse()
 
+	err = AddJJ(env)
+	if err != nil {
+		fmt.Println("Unable to add JJ\n  ", err)
+		return
+	}
+
 	if *fInvite {
+		env.Logger.Log("main", "Sending invite")
 		sendInvite(*env)
 	} else {
-		env.RunServers()
+		env.Logger.Log("main", "Starting services")
+		shutdown := env.RunServers()
+		defer shutdown()
 	}
 }

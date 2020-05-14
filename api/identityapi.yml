@@ -90,7 +90,7 @@ paths:
           $ref: '#/components/responses/Empty'
 
   /authenticated:
-    post:
+    get:
       operationId: Authenticated
       summary: |
         Complete a login via a OIDC.
@@ -106,13 +106,6 @@ paths:
             type: string
       tags:
       - internal
-      requestBody:
-        description: Arguments needed to match up the OIDC user data with a user in the system
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Login'
       responses:
         '200':
           description: User successfully logged in.

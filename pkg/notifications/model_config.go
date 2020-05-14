@@ -2,6 +2,7 @@ package notifications
 
 type NotificationsConfig struct {
 	SMTP *SMTPConfig
+	Mock *MockConfig
 }
 
 type SMTPConfig struct {
@@ -9,5 +10,9 @@ type SMTPConfig struct {
 	port int
 	user string
 	pass string
+	from string
+}
+
+type MockConfig struct {
 	from string
 }
