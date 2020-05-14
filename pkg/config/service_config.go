@@ -25,24 +25,9 @@ func NewConfigService(logger log.Logger) ConfigService {
 func (s *ConfigService) Load(config interface{}) error {
 	s.logger.Log("config", "Loading config")
 
-	f, err := pkger.Open("/configs/config.default.yml")
+	err := s.LoadFile(pkger.Include("/configs/config.default.yml"), config)
 	if err != nil {
-		s.logger.Log("config", fmt.Sprintf("Pkger unable to load config.default.yml - cause: %s", err.Error()))
 		return err
-	}
-
-	deflt := viper.New()
-	deflt.SetConfigType("yaml")
-	if err := deflt.ReadConfig(f); err != nil {
-		msg := "Unable to load the defaults"
-		s.logger.Log("config", msg)
-		return errors.New(msg)
-	}
-
-	if err := deflt.Unmarshal(config); err != nil {
-		msg := fmt.Sprintf("Unable to unmarshal the defaults - %v", err)
-		s.logger.Log("config", msg)
-		return errors.New(msg)
 	}
 
 	overrides := viper.New()
@@ -66,6 +51,32 @@ func (s *ConfigService) Load(config interface{}) error {
 
 	if err := overrides.Unmarshal(config); err != nil {
 		return errors.New(fmt.Sprintf("Unable to load overrides config - %s", err))
+	}
+
+	return nil
+}
+
+func (s *ConfigService) LoadFile(file string, config interface{}) error {
+	s.logger.Log("config", "Loading config", "file", file)
+
+	f, err := pkger.Open(file)
+	if err != nil {
+		s.logger.Log("config", fmt.Sprintf("Pkger unable to load %s - cause: %s", file, err.Error()))
+		return err
+	}
+
+	deflt := viper.New()
+	deflt.SetConfigType("yaml")
+	if err := deflt.ReadConfig(f); err != nil {
+		msg := "Unable to load the defaults"
+		s.logger.Log("config", msg)
+		return errors.New(msg)
+	}
+
+	if err := deflt.Unmarshal(config); err != nil {
+		msg := fmt.Sprintf("Unable to unmarshal the defaults - %v", err)
+		s.logger.Log("config", msg)
+		return errors.New(msg)
 	}
 
 	return nil
