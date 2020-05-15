@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/go-kit/kit/log"
 
@@ -30,27 +31,22 @@ func (s *ConfigService) Load(config interface{}) error {
 		return err
 	}
 
-	overrides := viper.New()
+	if file, ok := os.LookupEnv("APP_CONFIG"); ok && strings.TrimSpace(file) != "" {
+		s.logger.Log("config", fmt.Sprintf("Loading config - %s", file))
+		overrides := viper.New()
+		overrides.SetConfigFile(file)
 
-	if v, s := os.LookupEnv("APP_CONFIG"); s {
-		overrides.SetConfigFile(v)
-	} else {
-		overrides.SetConfigFile("./configs/config.overrides.yml")
-	}
-
-	if err := overrides.ReadInConfig(); err != nil {
-		if _, ok := err.(*os.PathError); ok {
-			s.logger.Log("config", fmt.Sprintf("Didn't find override config, just continuing - %v", err))
-			return nil
-		} else {
-			msg := fmt.Sprintf("Failed loading the override - %v", err)
+		if err := overrides.ReadInConfig(); err != nil {
+			msg := fmt.Sprintf("Failed loading the specific app config - %s", err)
 			s.logger.Log("config", msg)
 			return err
 		}
-	}
 
-	if err := overrides.Unmarshal(config); err != nil {
-		return errors.New(fmt.Sprintf("Unable to load overrides config - %s", err))
+		if err := overrides.Unmarshal(config); err != nil {
+			msg := fmt.Sprintf("Unable to unmarshal the specific app config - %s", err)
+			s.logger.Log("config", msg)
+			return err
+		}
 	}
 
 	return nil
