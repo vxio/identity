@@ -78,9 +78,15 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 		return nil, err
 	}
 
+	SessionPublicKeys, err := webkeys.NewWebKeysService(logger, config.Keys.SessionPublic)
+	if err != nil {
+		logger.Log("main", "Unable to load up up the Session Public JSON Web Key Set")
+		return nil, err
+	}
+
 	SessionPrivateKeys, err := webkeys.NewWebKeysService(logger, config.Keys.SessionPrivate)
 	if err != nil {
-		logger.Log("main", "Unable to load up up the Session JSON Web Key Set")
+		logger.Log("main", "Unable to load up up the Session Private JSON Web Key Set")
 		return nil, err
 	}
 
@@ -105,6 +111,10 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 	// router
 	router := mux.NewRouter()
 
+	// public endpoint
+	jwksController := webkeys.NewJWKSController(SessionPublicKeys)
+	jwksController.AppendRoutes(router.NewRoute().Subrouter())
+
 	// authn endpoints
 
 	AuthnMiddleware, err := authn.NewAuthnMiddleware(TimeService, AuthnPublicKeys)
@@ -119,7 +129,7 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 	authnRouter = api.AppendRouters(authnRouter, AuthnController)
 	authnRouter.Use(AuthnMiddleware.Handler)
 
-	// public server
+	// authed server
 
 	// auth middleware for the tokens coming from the gateway
 	GatewayMiddleware, err := zerotrust.NewJWTMiddleware(GatewayPublicKeys)
@@ -133,9 +143,9 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
 
-	publicRouter := router.NewRoute().Subrouter()
-	publicRouter = api.AppendRouters(publicRouter, IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
-	publicRouter.Use(GatewayMiddleware.Handler)
+	authedRouter := router.NewRoute().Subrouter()
+	authedRouter = api.AppendRouters(authedRouter, IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
+	authedRouter.Use(GatewayMiddleware.Handler)
 
 	env := Environment{
 		Logger: logger,

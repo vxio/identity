@@ -11,7 +11,7 @@ COPY --from=build /build/bin/identity /app/identity
 
 VOLUME [ "/data", "/configs" ]
 
-COPY configs/jwk* /configs/
+#COPY configs/*jwks* /configs/
 
 EXPOSE 8200/tcp
 EXPOSE 8201/tcp

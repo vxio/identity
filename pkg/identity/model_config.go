@@ -39,5 +39,6 @@ type BindAddress struct {
 type KeysConfig struct {
 	AuthnPublic    webkeys.WebKeysConfig
 	GatewayPublic  webkeys.WebKeysConfig
+	SessionPublic  webkeys.WebKeysConfig
 	SessionPrivate webkeys.WebKeysConfig
 }

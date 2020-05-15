@@ -24,6 +24,9 @@ keys:
   gatewayPublic:
     file:
       path: ./configs/gateway-jwks-sig-pub.json
+  sessionPublic:
+    file:
+      path: ./configs/identity-jwks-sig-pub.json
   sessionPrivate:
     file:
       path: ./configs/identity-jwks-sig-priv.json

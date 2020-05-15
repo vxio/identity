@@ -18,7 +18,7 @@ func (s *mockService) SendInvite(email string, secretCode string, acceptInvitati
 	subject := "Invite for Moov.io"
 	body := "Here is your invite for Moov.io"
 
-	fmt.Printf("  From: %s\n  To: %s\n  Subject: %s\n  Message: %s\n", s.config.from, email, subject, body)
+	fmt.Printf("  From: %s\n  To: %s\n  Subject: %s\n  Message: %s\n", s.config.From, email, subject, body)
 
 	return nil
 }

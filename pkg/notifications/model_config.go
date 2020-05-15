@@ -6,13 +6,13 @@ type NotificationsConfig struct {
 }
 
 type SMTPConfig struct {
-	host string
-	port int
-	user string
-	pass string
-	from string
+	Host string
+	Port int
+	User string
+	Pass string
+	From string
 }
 
 type MockConfig struct {
-	from string
+	From string
 }

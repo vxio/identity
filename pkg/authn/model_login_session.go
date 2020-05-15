@@ -14,6 +14,9 @@ type LoginSession struct {
 	// IP Address of the login
 	IP string `json:"ip"`
 
+	// Scope of what this token is allow to do.
+	Scopes []string `'json:"scp"`
+
 	// standard JWT claims like expirations etc...
 	jwt.StandardClaims
 
