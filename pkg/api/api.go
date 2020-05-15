@@ -77,6 +77,7 @@ type IdentitiesApiServicer interface {
 type InternalApiServicer interface {
 	LoginWithCredentials(Login, string, string) (*http.Cookie, error)
 	RegisterWithCredentials(Register, string, string) (*http.Cookie, error)
+	LandingURL() string
 }
 
 // InvitesApiServicer defines the api actions for the InvitesApi service

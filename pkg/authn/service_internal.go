@@ -28,6 +28,7 @@ type InternalService struct {
 	identities  identities.IdentitiesService
 	token       SessionService
 	invites     invites.InvitesService
+	landingURL  string
 }
 
 // NewInternalService creates a default api service
@@ -35,11 +36,13 @@ func NewAuthnService(
 	credentials credentials.CredentialsService,
 	identities identities.IdentitiesService,
 	token SessionService,
+	landingURL string,
 ) api.InternalApiServicer {
 	return &InternalService{
 		credentials: credentials,
 		identities:  identities,
 		token:       token,
+		landingURL:  landingURL,
 	}
 }
 
@@ -87,4 +90,8 @@ func (s *InternalService) LoginWithCredentials(login api.Login, nonce string, ip
 	}
 
 	return cookie, nil
+}
+
+func (s *InternalService) LandingURL() string {
+	return s.landingURL
 }

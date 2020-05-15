@@ -78,7 +78,7 @@ func (s *sessionService) GenerateCookie(identityID string) (*http.Cookie, error)
 		Path:     "/",
 		Expires:  s.calculateExpiration(),
 		MaxAge:   int(s.expiration.Seconds()),
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteDefaultMode,
 		Secure:   false,
 		HttpOnly: true,
 	}, nil

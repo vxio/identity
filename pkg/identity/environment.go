@@ -62,7 +62,11 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 	}
 
 	//db setup
-	db, close := initializeDatabase(logger, config.Database)
+	db, close, err := initializeDatabase(logger, config.Database)
+	if err != nil {
+		close()
+		return nil, err
+	}
 
 	TimeService := stime.NewSystemTimeService()
 
@@ -106,14 +110,15 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 	InvitesRepository := invites.NewInvitesRepository(db)
 	InvitesService := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService)
 
-	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService)
+	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService, config.Session.LandingURL)
 
 	// router
 	router := mux.NewRouter()
 
 	// public endpoint
 	jwksController := webkeys.NewJWKSController(SessionPublicKeys)
-	jwksController.AppendRoutes(router.NewRoute().Subrouter())
+	jwksRouter := router.NewRoute().Subrouter()
+	jwksRouter = jwksController.AppendRoutes(jwksRouter)
 
 	// authn endpoints
 
@@ -165,17 +170,19 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 	return &env, nil
 }
 
-func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql.DB, func()) {
+func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql.DB, func(), error) {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 
 	// migrate database
 	db, err := database.New(ctx, logger, config)
 	if err != nil {
-		panic(fmt.Sprintf("error creating database: %v", err))
+		msg := fmt.Sprintf("error creating database: %v", err)
+		logger.Log("msg", msg)
+		return nil, func() {}, err
 	}
 
 	shutdown := func() {
-		fmt.Println("Shutting down the db")
+		logger.Log("msg", "Shutting down the db")
 		cancelFunc()
 		if err := db.Close(); err != nil {
 			logger.Log("exit", err)
@@ -183,8 +190,12 @@ func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql
 	}
 
 	if err := database.RunMigrations(db, config); err != nil {
-		panic(fmt.Sprintf("Error running migrations: %s", err))
+		msg := fmt.Sprintf("Error running migrations: %s", err)
+		logger.Log("msg", msg)
+		return nil, shutdown, err
 	}
 
-	return db, shutdown
+	logger.Log("msg", "finished....")
+
+	return db, shutdown, err
 }

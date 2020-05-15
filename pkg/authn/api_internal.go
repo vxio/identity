@@ -72,9 +72,7 @@ func (c *AuthnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 	}
 
 	http.SetCookie(w, result)
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("You've been authenticated!"))
+	http.Redirect(w, r, c.service.LandingURL(), http.StatusFound)
 }
 
 // Register - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.

@@ -17,6 +17,7 @@ notifications:
     from: noreply@moov.io
 session:
   expiration: 1h
+  landingUrl: "/whoami"
 keys:
   authnPublic:
     file:
