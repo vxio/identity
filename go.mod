@@ -11,8 +11,8 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.11.0
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.4
-	github.com/markbates/pkger v0.15.1
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible
+	github.com/markbates/pkger v0.16.0
+	github.com/mattn/go-sqlite3 v2.0.5+incompatible
 	github.com/moov-io/base v0.11.0
 	github.com/ory/dockertest/v3 v3.6.0
 	github.com/prometheus/client_golang v1.6.0
