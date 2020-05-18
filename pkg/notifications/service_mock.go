@@ -14,11 +14,10 @@ func NewMockNotificationsService(config MockConfig) NotificationsService {
 	}
 }
 
-func (s *mockService) SendInvite(email string, secretCode string, acceptInvitationUrl string) error {
-	subject := "Invite for Moov.io"
-	body := "Here is your invite for Moov.io"
+func (s *mockService) SendEmail(to string, email EmailTemplate) error {
+	subject := email.EmailSubject()
 
-	fmt.Printf("  From: %s\n  To: %s\n  Subject: %s\n  Message: %s\n", s.config.From, email, subject, body)
+	fmt.Printf("  From: %s\n  To: %s\n  Subject: %s\n  Template: %+v\n", s.config.From, email, subject, email)
 
 	return nil
 }

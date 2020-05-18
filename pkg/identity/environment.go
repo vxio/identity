@@ -96,7 +96,12 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 
 	SessionService := authn.NewSessionService(TimeService, SessionPrivateKeys, config.Session)
 
-	NotificationsService, err := notifications.NewNotificationsService(config.Notifications)
+	templateService, err := notifications.NewTemplateRepository(logger)
+	if err != nil {
+		return nil, err
+	}
+
+	NotificationsService, err := notifications.NewNotificationsService(logger, config.Notifications, templateService)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +113,10 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 	CredentialsService := credentials.NewCredentialsService(TimeService, CredentialRepository)
 
 	InvitesRepository := invites.NewInvitesRepository(db)
-	InvitesService := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService)
+	InvitesService, err := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService)
+	if err != nil {
+		return nil, err
+	}
 
 	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService, config.Session.LandingURL)
 

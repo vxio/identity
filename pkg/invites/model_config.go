@@ -1,6 +1,8 @@
 package invites
 
-import "time"
+import (
+	"time"
+)
 
 type InvitesConfig struct {
 	Expiration time.Duration

@@ -23,6 +23,8 @@ func main() {
 	}
 	defer env.Shutdown()
 
+	env.Logger.Log("msg", "Environment built")
+
 	flag.Parse()
 
 	err = AddJJ(env)

@@ -12,6 +12,8 @@ package invites
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"net/url"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/notifications"
@@ -22,19 +24,27 @@ import (
 )
 
 type InvitesService struct {
-	config        InvitesConfig
+	sendToUrl     url.URL
+	expiration    time.Duration
 	time          stime.TimeService
 	repository    InvitesRepository
 	notifications notifications.NotificationsService
 }
 
-func NewInvitesService(config InvitesConfig, time stime.TimeService, repository InvitesRepository, notifications notifications.NotificationsService) api.InvitesApiServicer {
+func NewInvitesService(config InvitesConfig, time stime.TimeService, repository InvitesRepository, notifications notifications.NotificationsService) (api.InvitesApiServicer, error) {
+
+	url, err := url.Parse(config.SendToURL)
+	if err != nil {
+		return nil, err
+	}
+
 	return &InvitesService{
-		config:        config,
+		sendToUrl:     *url,
+		expiration:    config.Expiration,
 		time:          time,
 		repository:    repository,
 		notifications: notifications,
-	}
+	}, nil
 }
 
 // ListInvites - List outstanding invites
@@ -52,7 +62,7 @@ func (s *InvitesService) SendInvite(session zerotrust.Session, send api.SendInvi
 		InvitedBy:  session.CallerID.String(),
 		InvitedOn:  s.time.Now(),
 		RedeemedOn: nil,
-		ExpiresOn:  s.time.Now().Add(s.config.Expiration),
+		ExpiresOn:  s.time.Now().Add(s.expiration),
 		DisabledBy: nil,
 		DisabledOn: nil,
 	}
@@ -62,8 +72,16 @@ func (s *InvitesService) SendInvite(session zerotrust.Session, send api.SendInvi
 		return nil, err1
 	}
 
+	// duplicate it so we can append the invite code to the mutable value
+	sendTo, _ := url.Parse(s.sendToUrl.String())
+	qry := sendTo.Query()
+	qry.Add("invite_code", *code)
+	sendTo.RawQuery = qry.Encode()
+
+	notification := notifications.NewInviteEmail(sendTo.String())
+
 	// send email @TODO get url fixed up
-	if err := s.notifications.SendInvite(invite.Email, *code, s.config.SendToURL); err != nil {
+	if err := s.notifications.SendEmail(invite.Email, &notification); err != nil {
 		return nil, err
 	}
 
@@ -109,12 +127,12 @@ func (s *InvitesService) Redeem(code string) (*api.Invite, error) {
 
 // Generate a large random crypto string to work as the invitation token
 func generateInviteCode() (*string, error) {
-	b := make([]byte, 36)
+	b := make([]byte, 32)
 	_, err := rand.Read(b)
 	if err != nil {
 		return nil, err
 	}
 
-	code := base64.RawStdEncoding.EncodeToString(b)
+	code := base64.RawURLEncoding.EncodeToString(b)
 	return &code, nil
 }

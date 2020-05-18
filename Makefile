@@ -24,6 +24,7 @@ install:
 	go get github.com/markbates/pkger/cmd/pkger
 
 docker: install
+	pkger
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o ${PWD}/bin/.docker/identity cmd/identity/*
 	docker build -f Dockerfile -t moov/identity .
 	

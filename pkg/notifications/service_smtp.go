@@ -1,31 +1,62 @@
 package notifications
 
 import (
+	"crypto/tls"
+	"fmt"
+
+	"github.com/go-kit/kit/log"
 	"gopkg.in/gomail.v2"
 )
 
 type smtpService struct {
-	dailer gomail.Dialer
-	config SMTPConfig
+	logger    log.Logger
+	dailer    gomail.Dialer
+	config    SMTPConfig
+	templates TemplateRepository
 }
 
-func NewSmtpNotificationsService(config SMTPConfig) NotificationsService {
+func NewSmtpNotificationsService(logger log.Logger, config SMTPConfig, templates TemplateRepository) NotificationsService {
+	d := *gomail.NewDialer(config.Host, config.Port, config.User, config.Pass)
+	d.SSL = config.SSL
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+
 	return &smtpService{
-		dailer: *gomail.NewDialer(config.Host, config.Port, config.User, config.Pass),
-		config: config,
+		logger:    logger,
+		dailer:    d,
+		config:    config,
+		templates: templates,
 	}
 }
 
-func (s *smtpService) SendInvite(email string, secretCode string, acceptInvitationUrl string) error {
+func (s *smtpService) SendEmail(to string, email EmailTemplate) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", s.config.From)
-	m.SetHeader("To", email)
-	m.SetHeader("Subject", "Invite for Moov.io")
-	m.SetBody("text/plain", "Here is your invite for Moov.io")
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", email.EmailSubject())
 
-	if err := s.dailer.DialAndSend(m); err != nil {
+	txt, err := s.templates.Text(email)
+	if err != nil {
 		return err
 	}
 
+	if txt != "" {
+		m.SetBody("text/plain", txt)
+	}
+
+	html, err := s.templates.HTML(email)
+	if err != nil {
+		return err
+	}
+
+	if html != "" {
+		m.SetBody("text/html", html)
+	}
+
+	if err := s.dailer.DialAndSend(m); err != nil {
+		s.logger.Log("level", "error", "msg", fmt.Sprintf("Failed to send email - %s\n", err))
+		return err
+	}
+
+	s.logger.Log("level", "info", "msg", fmt.Sprintf("Successfully sent email to - %s", email))
 	return nil
 }

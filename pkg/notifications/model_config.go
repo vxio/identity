@@ -11,6 +11,7 @@ type SMTPConfig struct {
 	User string
 	Pass string
 	From string
+	SSL  bool
 }
 
 type MockConfig struct {
