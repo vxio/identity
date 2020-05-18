@@ -11,10 +11,10 @@ type WebKeysService interface {
 }
 
 func NewWebKeysService(logger log.Logger, config WebKeysConfig) (WebKeysService, error) {
-	if config.File != nil {
-		return NewFileJwksService(config.File.Path), nil
-	} else if config.HTTP != nil {
+	if config.HTTP != nil {
 		return NewHTTPJwksService(config.HTTP.URL), nil
+	} else if config.File != nil {
+		return NewFileJwksService(config.File.Path), nil
 	} else {
 		logger.Log("jwks", "Generating new JWKS keys")
 		return NewGenerateJwksService()
