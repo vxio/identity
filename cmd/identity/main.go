@@ -27,15 +27,11 @@ func main() {
 
 	flag.Parse()
 
-	err = AddJJ(env)
-	if err != nil {
-		fmt.Println("Unable to add JJ\n  ", err)
-		return
-	}
-
 	if *fInvite {
 		env.Logger.Log("main", "Sending invite")
-		sendInvite(*env)
+		if err := sendInvite(*env); err != nil {
+			env.Logger.Log("level", "fatal", "msg", "Unable to send invite", "error", err.Error)
+		}
 	} else {
 		env.Logger.Log("main", "Starting services")
 		shutdown := env.RunServers()

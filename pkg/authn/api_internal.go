@@ -31,16 +31,22 @@ func NewAuthnAPIController(s api.InternalApiServicer) api.Router {
 func (c *AuthnAPIController) Routes() api.Routes {
 	return api.Routes{
 		{
-			"Authenticated",
-			strings.ToUpper("Get"),
-			"/authenticated",
-			c.Authenticated,
+			Name:        "Authenticated",
+			Method:      strings.ToUpper("Get"),
+			Pattern:     "/authenticated",
+			HandlerFunc: c.Authenticated,
 		},
 		{
-			"Register",
-			strings.ToUpper("Post"),
-			"/register",
-			c.Register,
+			Name:        "Register",
+			Method:      strings.ToUpper("Get"),
+			Pattern:     "/register",
+			HandlerFunc: c.Register,
+		},
+		{
+			Name:        "SubmitRegistration",
+			Method:      strings.ToUpper("Post"),
+			Pattern:     "/register",
+			HandlerFunc: c.Register,
 		},
 	}
 }
@@ -77,6 +83,12 @@ func (c *AuthnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 
 // Register - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
 func (c *AuthnAPIController) Register(w http.ResponseWriter, r *http.Request) {
+
+	// Show registration page but we don't really have one yet... so lets jut register with what we do have...
+	c.SubmitRegistration(w, r)
+}
+
+func (c *AuthnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.Request) {
 
 	session, ok := r.Context().Value("LoginSession").(*LoginSession)
 	if !ok || session == nil {

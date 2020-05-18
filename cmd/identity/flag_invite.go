@@ -13,18 +13,23 @@ import (
 )
 
 func sendInvite(env identity.Environment) error {
+	env.Logger.Log("level", "info", "msg", "Sending invite", "email", *fEmail, "tenant", *fTenantID, "caller", *fCallerID)
+
 	tID, err := uuid.Parse(*fTenantID)
 	if err != nil {
+		env.Logger.Log("level", "fatal", "msg", "Unable to parse tenantID: "+*fTenantID)
 		return err
 	}
 
 	cID, err := uuid.Parse(*fCallerID)
 	if err != nil {
+		env.Logger.Log("level", "fatal", "msg", "Unable to parse callerID: "+*fCallerID)
 		return err
 	}
 
 	email := fEmail
-	if fEmail == nil || strings.Contains(*email, "@") {
+	if fEmail == nil || !strings.Contains(*email, "@") {
+		env.Logger.Log("level", "fatal", "msg", "Is not a valid email: "+*fEmail)
 		return errors.New("email is required and isn't valid")
 	}
 
