@@ -87,5 +87,6 @@ type InternalApiServicer interface {
 type InvitesApiServicer interface {
 	DisableInvite(zerotrust.Session, string) error
 	ListInvites(zerotrust.Session) ([]Invite, error)
-	SendInvite(zerotrust.Session, SendInvite) (*Invite, error)
+	SendInvite(zerotrust.Session, SendInvite) (*Invite, string, error)
+	Redeem(code string) (*Invite, error)
 }

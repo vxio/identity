@@ -118,7 +118,7 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService, config.Session.LandingURL)
+	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService, InvitesService, config.Session.LandingURL)
 
 	// router
 	router := mux.NewRouter()

@@ -92,7 +92,7 @@ func (c *InvitesController) SendInvite(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		result, err := c.service.SendInvite(session, *invite)
+		result, _, err := c.service.SendInvite(session, *invite)
 		if err != nil {
 			w.WriteHeader(500)
 			return

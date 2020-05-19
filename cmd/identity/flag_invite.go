@@ -42,7 +42,7 @@ func sendInvite(env identity.Environment) error {
 		Email: *email,
 	}
 
-	sent, err := env.InviteService.SendInvite(session, invite)
+	sent, _, err := env.InviteService.SendInvite(session, invite)
 	if err != nil {
 		return err
 	}

@@ -57,6 +57,6 @@ func (s *smtpService) SendEmail(to string, email EmailTemplate) error {
 		return err
 	}
 
-	s.logger.Log("level", "info", "msg", fmt.Sprintf("Successfully sent email to - %s", email))
+	s.logger.Log("level", "info", "msg", fmt.Sprintf("Successfully sent email to: %s", to))
 	return nil
 }

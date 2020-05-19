@@ -12,7 +12,9 @@ package invites
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,7 +25,7 @@ import (
 	api "github.com/moov-io/identity/pkg/api"
 )
 
-type InvitesService struct {
+type invitesService struct {
 	sendToUrl     url.URL
 	expiration    time.Duration
 	time          stime.TimeService
@@ -38,7 +40,7 @@ func NewInvitesService(config InvitesConfig, time stime.TimeService, repository 
 		return nil, err
 	}
 
-	return &InvitesService{
+	return &invitesService{
 		sendToUrl:     *url,
 		expiration:    config.Expiration,
 		time:          time,
@@ -48,13 +50,13 @@ func NewInvitesService(config InvitesConfig, time stime.TimeService, repository 
 }
 
 // ListInvites - List outstanding invites
-func (s *InvitesService) ListInvites(session zerotrust.Session) ([]api.Invite, error) {
+func (s *invitesService) ListInvites(session zerotrust.Session) ([]api.Invite, error) {
 	invites, err := s.repository.list(session.TenantID)
 	return invites, err
 }
 
 // SendInvite - Send an email invite to a new user
-func (s *InvitesService) SendInvite(session zerotrust.Session, send api.SendInvite) (*api.Invite, error) {
+func (s *invitesService) SendInvite(session zerotrust.Session, send api.SendInvite) (*api.Invite, string, error) {
 	invite := api.Invite{
 		InviteID:   uuid.New().String(),
 		TenantID:   session.TenantID.String(),
@@ -69,7 +71,7 @@ func (s *InvitesService) SendInvite(session zerotrust.Session, send api.SendInvi
 
 	code, err1 := generateInviteCode()
 	if err1 != nil {
-		return nil, err1
+		return nil, "", err1
 	}
 
 	// duplicate it so we can append the invite code to the mutable value
@@ -82,20 +84,20 @@ func (s *InvitesService) SendInvite(session zerotrust.Session, send api.SendInvi
 
 	// send email @TODO get url fixed up
 	if err := s.notifications.SendEmail(invite.Email, &notification); err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// add to DB
 	created, err2 := s.repository.add(invite, *code)
 	if err2 != nil {
-		return nil, err2
+		return nil, "", err2
 	}
 
-	return created, nil
+	return created, *code, nil
 }
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
-func (s *InvitesService) DisableInvite(session zerotrust.Session, inviteID string) error {
+func (s *invitesService) DisableInvite(session zerotrust.Session, inviteID string) error {
 	invite, err := s.repository.get(session.TenantID, inviteID)
 	if err != nil {
 		return err
@@ -109,10 +111,20 @@ func (s *InvitesService) DisableInvite(session zerotrust.Session, inviteID strin
 	return s.repository.update(*invite)
 }
 
-func (s *InvitesService) Redeem(code string) (*api.Invite, error) {
-	invite, err := s.repository.getByCode(code)
+func (s *invitesService) Redeem(code string) (*api.Invite, error) {
+	fmt.Println("Values coming in", s.repository, code)
+
+	invite, err := s.repository.getByCode(strings.TrimSpace(code))
 	if err != nil {
 		return nil, err
+	}
+
+	if invite.ExpiresOn.Before(s.time.Now()) {
+		return nil, ErrTokenExpired
+	}
+
+	if invite.DisabledOn != nil {
+		return nil, ErrTokenDisabled
 	}
 
 	redeemedOn := s.time.Now()

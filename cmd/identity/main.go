@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
+	"time"
 
 	"github.com/moov-io/identity/pkg/identity"
 )
@@ -16,6 +18,8 @@ var (
 )
 
 func main() {
+	rand.Seed(time.Now().Unix())
+
 	env, err := identity.NewEnvironment(nil)
 	if err != nil {
 		fmt.Println("Error loading up environment. ", err)

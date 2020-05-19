@@ -57,7 +57,7 @@ func (c *AuthnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 	session, ok := r.Context().Value("LoginSession").(*LoginSession)
 	if !ok || session == nil {
 		fmt.Println("Unable to find LoginSession in context")
-		w.WriteHeader(500)
+		w.WriteHeader(404)
 		return
 	}
 
@@ -92,7 +92,8 @@ func (c *AuthnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 
 	session, ok := r.Context().Value("LoginSession").(*LoginSession)
 	if !ok || session == nil {
-		w.WriteHeader(500)
+		fmt.Println("Unable to find LoginSession in context")
+		w.WriteHeader(404)
 		return
 	}
 
@@ -119,6 +120,7 @@ func (c *AuthnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 
 	result, err := c.service.RegisterWithCredentials(register, session.State, session.IP)
 	if err != nil {
+		fmt.Println("Unable to RegisterWithCredentials", err)
 		w.WriteHeader(500)
 		return
 	}

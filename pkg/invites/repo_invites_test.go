@@ -14,138 +14,127 @@ import (
 )
 
 func TestGetById(t *testing.T) {
-	WithRepository(func(repository InvitesRepository) {
-		invite, _ := AddTestingInvite(t, repository)
+	repository := NewTestRepository(t)
+	invite, _ := AddTestingInvite(t, repository)
 
-		tenantID := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
+	tenantID := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
 
-		found, err := repository.get(tenantID, invite.InviteID)
-		if err != nil {
-			t.Error(err)
-		}
+	found, err := repository.get(tenantID, invite.InviteID)
+	if err != nil {
+		t.Error(err)
+	}
 
-		if *found != invite {
-			t.Errorf("Found  by IDdoesn't Invite")
-		}
+	if *found != invite {
+		t.Errorf("Found  by IDdoesn't Invite")
+	}
 
-		badTenantID := zerotrust.TenantID(uuid.New())
-		found, err = repository.get(badTenantID, invite.InviteID)
-		if err != sql.ErrNoRows {
-			t.Error(err)
-		}
-	})
+	badTenantID := zerotrust.TenantID(uuid.New())
+	found, err = repository.get(badTenantID, invite.InviteID)
+	if err != sql.ErrNoRows {
+		t.Error(err)
+	}
 }
 
 func TestGetByCode(t *testing.T) {
-	WithRepository(func(repository InvitesRepository) {
-		invite, code := AddTestingInvite(t, repository)
+	repository := NewTestRepository(t)
 
-		found, err := repository.getByCode(code)
-		if err != nil {
-			t.Error(err)
-		}
+	invite, code := AddTestingInvite(t, repository)
 
-		if *found != invite {
-			t.Error("Found by code doesn't match invite", found, invite)
-		}
+	found, err := repository.getByCode(code)
+	if err != nil {
+		t.Error(err)
+	}
 
-		_, err = repository.getByCode("doesnotexist")
-		if err != sql.ErrNoRows {
-			t.Error(err)
-		}
-	})
+	if *found != invite {
+		t.Error("Found by code doesn't match invite", found, invite)
+	}
+
+	_, err = repository.getByCode("doesnotexist")
+	if err != sql.ErrNoRows {
+		t.Error(err)
+	}
 }
 
 func TestList(t *testing.T) {
-	WithRepository(func(repository InvitesRepository) {
-		invite, _ := AddTestingInvite(t, repository)
-		tenantID1 := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
+	repository := NewTestRepository(t)
 
-		// Add noise and other invites on other tenants
-		AddTestingInvite(t, repository)
-		AddTestingInvite(t, repository)
-		AddTestingInvite(t, repository)
+	invite, _ := AddTestingInvite(t, repository)
+	tenantID1 := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
 
-		found, err := repository.list(tenantID1)
-		if err != nil {
-			t.Error(err)
-		}
+	// Add noise and other invites on other tenants
+	AddTestingInvite(t, repository)
+	AddTestingInvite(t, repository)
+	AddTestingInvite(t, repository)
 
-		if len(found) != 1 {
-			t.Error("Found more than one invite on a tenant with only 1")
-		}
+	found, err := repository.list(tenantID1)
+	if err != nil {
+		t.Error(err)
+	}
 
-		if found[0] != invite {
-			t.Error("Invite from first tenant doesn't match list of first tenant")
-		}
+	if len(found) != 1 {
+		t.Error("Found more than one invite on a tenant with only 1")
+	}
 
-		badTenantID := zerotrust.TenantID(uuid.New())
-		found, err = repository.list(badTenantID)
-		if err != nil {
-			t.Error(err)
-		}
+	if found[0] != invite {
+		t.Error("Invite from first tenant doesn't match list of first tenant")
+	}
 
-		if len(found) != 0 {
-			t.Error("Returned rows on a bad tenant")
-		}
-	})
+	badTenantID := zerotrust.TenantID(uuid.New())
+	found, err = repository.list(badTenantID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(found) != 0 {
+		t.Error("Returned rows on a bad tenant")
+	}
 }
 
 func TestUpdate(t *testing.T) {
-	WithRepository(func(repository InvitesRepository) {
-		invite, _ := AddTestingInvite(t, repository)
-		tenantID := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
+	repository := NewTestRepository(t)
 
-		updated := invite
-		redeemedOn := time.Now().In(time.UTC)
-		disabledBy := uuid.New().String()
-		updated.RedeemedOn = &redeemedOn
-		updated.DisabledBy = &disabledBy
-		updated.DisabledOn = &redeemedOn
+	invite, _ := AddTestingInvite(t, repository)
+	tenantID := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
 
-		err := repository.update(updated)
-		if err != nil {
-			t.Error(err)
-		}
+	updated := invite
+	redeemedOn := time.Now().In(time.UTC)
+	disabledBy := uuid.New().String()
+	updated.RedeemedOn = &redeemedOn
+	updated.DisabledBy = &disabledBy
+	updated.DisabledOn = &redeemedOn
 
-		found, err := repository.get(tenantID, updated.InviteID)
-		if err != nil {
-			t.Error(err)
-		}
+	err := repository.update(updated)
+	if err != nil {
+		t.Error(err)
+	}
 
-		if !cmp.Equal(*found, updated) {
-			t.Errorf("The updated found doesn't match the update\n%s", cmp.Diff(*found, updated))
-		}
+	found, err := repository.get(tenantID, updated.InviteID)
+	if err != nil {
+		t.Error(err)
+	}
 
-		badUpdate := updated
-		badUpdate.TenantID = uuid.New().String()
+	if !cmp.Equal(*found, updated) {
+		t.Errorf("The updated found doesn't match the update\n%s", cmp.Diff(*found, updated))
+	}
 
-		err = repository.update(badUpdate)
-		if err != sql.ErrNoRows {
-			t.Error(err)
-		}
+	badUpdate := updated
+	badUpdate.TenantID = uuid.New().String()
 
-		/*
-
-			SET
-				redeemed_on = ?,
-				disabled_by = ?,
-				disabled_on = ?
-			WHERE
-				tenant_id = ? AND
-				invite_id = ?
-		*/
-
-	})
+	err = repository.update(badUpdate)
+	if err != sql.ErrNoRows {
+		t.Error(err)
+	}
 }
 
-func WithRepository(run func(InvitesRepository)) sql.DB {
+func NewTestRepository(t *testing.T) InvitesRepository {
 	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		panic(err)
 	}
 
-	defer db.Close()
+	t.Cleanup(func() {
+		db.Close()
+	})
 
 	err = database.RunMigrations(db, database.DatabaseConfig{
 		SqlLite: &database.SqlLiteConfig{
@@ -158,9 +147,8 @@ func WithRepository(run func(InvitesRepository)) sql.DB {
 	}
 
 	repo := NewInvitesRepository(db)
-	run(repo)
 
-	return *db
+	return repo
 }
 
 func AddTestingInvite(t *testing.T, repository InvitesRepository) (api.Invite, string) {
