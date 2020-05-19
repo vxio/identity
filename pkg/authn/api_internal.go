@@ -125,5 +125,6 @@ func (c *AuthnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	api.EncodeJSONResponse(result, nil, w)
+	http.SetCookie(w, result)
+	http.Redirect(w, r, c.service.LandingURL(), http.StatusFound)
 }
