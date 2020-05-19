@@ -152,7 +152,7 @@ func (r *sqlCredsRepo) update(updated api.Credential) (*api.Credential, error) {
 			subject_id = ? AND
 			identity_id = ?
 	`
-	res, err := r.db.Exec(qry,
+	_, err := r.db.Exec(qry,
 		updated.LastUsedOn,
 		updated.DisabledOn,
 		updated.DisabledBy,
@@ -163,10 +163,6 @@ func (r *sqlCredsRepo) update(updated api.Credential) (*api.Credential, error) {
 
 	if err != nil {
 		return nil, err
-	}
-
-	if cnt, err := res.RowsAffected(); cnt != 1 || err != nil {
-		return nil, sql.ErrNoRows
 	}
 
 	return &updated, nil

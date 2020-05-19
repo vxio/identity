@@ -51,7 +51,7 @@ func (s *CredentialsService) DisableCredentials(auth zerotrust.Session, identity
 
 	// @TODO send notification to the email to notify them?
 
-	return saved, err
+	return saved, nil
 }
 
 // ListCredentials - List the credentials this user has used.
@@ -105,5 +105,5 @@ func (s *CredentialsService) Register(identityID string, provider string, subjec
 
 	// @TODO email that a new credential was registered
 
-	return saved, err
+	return saved, nil
 }
