@@ -16,5 +16,5 @@ func NewSystemTimeService() TimeService {
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
 func (s *timeService) Now() time.Time {
-	return time.Now()
+	return time.Now().In(time.UTC)
 }
