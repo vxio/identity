@@ -129,39 +129,16 @@ func TestUpdate(t *testing.T) {
 	})
 }
 
-func NewTestRepository(t *testing.T) InvitesRepository {
-	db, err := sql.Open("sqlite3", ":memory:")
-	if err != nil {
-		panic(err)
-	}
-
-	t.Cleanup(func() {
-		db.Close()
-	})
-
-	err = database.RunMigrations(db, database.DatabaseConfig{
-		SqlLite: &database.SqlLiteConfig{
-			Path: ":memory:",
-		},
-	})
-
-	if err != nil {
-		panic(err)
-	}
-
-	repo := NewInvitesRepository(db)
-
-	return repo
+var InMemorySqliteConfig = database.DatabaseConfig{
+	DatabaseName: "sqlite",
+	SqlLite: &database.SqlLiteConfig{
+		Path: ":memory:",
+	},
 }
 
 func ForEachDatabase(t *testing.T, run func(t *testing.T, repository InvitesRepository)) {
 	cases := map[string]database.DatabaseConfig{
-		"sqlite": database.DatabaseConfig{
-			DatabaseName: "sqlite",
-			SqlLite: &database.SqlLiteConfig{
-				Path: ":memory:",
-			},
-		},
+		"sqlite": InMemorySqliteConfig,
 		"mysql": database.DatabaseConfig{
 			DatabaseName: "identity",
 			MySql: &database.MySqlConfig{
@@ -174,28 +151,37 @@ func ForEachDatabase(t *testing.T, run func(t *testing.T, repository InvitesRepo
 
 	for k, tc := range cases {
 		t.Run(k, func(t *testing.T) {
-			db, err := database.New(context.Background(), log.NewNopLogger(), tc)
-
-			//db, err := sql.Open("sqlite3", ":memory:")
-			if err != nil {
-				panic(err)
-			}
-
-			t.Cleanup(func() {
-				db.Close()
-			})
-
-			err = database.RunMigrations(db, tc)
-
-			if err != nil {
-				panic(err)
-			}
-
+			db := LoadDatabase(t, tc)
 			repo := NewInvitesRepository(db)
-
 			run(t, repo)
 		})
 	}
+}
+
+func LoadDatabase(t *testing.T, config database.DatabaseConfig) *sql.DB {
+	db, err := database.New(context.Background(), log.NewNopLogger(), config)
+	if err != nil {
+		panic(err)
+	}
+
+	t.Cleanup(func() {
+		db.Close()
+	})
+
+	err = database.RunMigrations(db, config)
+	if err != nil {
+		panic(err)
+	}
+
+	return db
+}
+
+func NewInMemoryInvitesRepository(t *testing.T) InvitesRepository {
+	db := LoadDatabase(t, InMemorySqliteConfig)
+
+	repo := NewInvitesRepository(db)
+
+	return repo
 }
 
 func AddTestingInvite(t *testing.T, repository InvitesRepository) (api.Invite, string) {

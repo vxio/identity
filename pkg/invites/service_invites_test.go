@@ -112,7 +112,7 @@ func TestExpiredInvite(t *testing.T) {
 func NewInvitesScope(t *testing.T) InvitesServiceScope {
 	session := NewSession()
 
-	repository := NewTestRepository(t)
+	repository := NewInMemoryInvitesRepository(t)
 
 	config := InvitesConfig{
 		Expiration: time.Hour,
