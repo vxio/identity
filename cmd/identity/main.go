@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/moov-io/identity/pkg/identity"
@@ -23,7 +24,7 @@ func main() {
 	env, err := identity.NewEnvironment(nil)
 	if err != nil {
 		fmt.Println("Error loading up environment. ", err)
-		return
+		os.Exit(1)
 	}
 	defer env.Shutdown()
 
@@ -35,10 +36,13 @@ func main() {
 		env.Logger.Log("main", "Sending invite")
 		if err := sendInvite(*env); err != nil {
 			env.Logger.Log("level", "fatal", "msg", "Unable to send invite", "error", err.Error)
+			os.Exit(1)
 		}
 	} else {
 		env.Logger.Log("main", "Starting services")
 		shutdown := env.RunServers()
 		defer shutdown()
 	}
+
+	os.Exit(0)
 }

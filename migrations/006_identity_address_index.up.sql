@@ -1,0 +1,1 @@
+CREATE INDEX identity_address_identity_id ON identity_address (identity_id);

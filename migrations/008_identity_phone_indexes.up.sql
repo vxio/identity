@@ -1,0 +1,1 @@
+CREATE INDEX identity_phone_identity_id ON identity_phone (identity_id);
