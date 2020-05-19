@@ -15,7 +15,7 @@ type staticTimeService struct {
 
 func NewStaticTimeService() StaticTimeService {
 	return &staticTimeService{
-		time: time.Now().In(time.UTC),
+		time: time.Now().In(time.UTC).Round(time.Second),
 	}
 }
 

@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+    mysql:
+        image: mysql:latest
+        restart: always
+        ports:
+        - "4306:3306"
+        environment: 
+        - MYSQL_DATABASE=identity
+        - MYSQL_USER=identity
+        - MYSQL_PASSWORD=identity
+        - MYSQL_RANDOM_ROOT_PASSWORD=yes
+        networks:
+        - intranet
+
+    mailslurper:
+        image: oryd/mailslurper:latest-smtps
+        ports:
+        - "4336:4436"
+        - "4337:4437"
+        networks:
+        - intranet
+
+networks:
+    intranet:
