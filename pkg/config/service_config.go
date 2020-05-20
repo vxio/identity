@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/go-kit/kit/log"
 
@@ -25,9 +26,38 @@ func NewConfigService(logger log.Logger) ConfigService {
 func (s *ConfigService) Load(config interface{}) error {
 	s.logger.Log("config", "Loading config")
 
-	f, err := pkger.Open("/configs/config.default.yml")
+	err := s.LoadFile(pkger.Include("/configs/config.default.yml"), config)
 	if err != nil {
-		s.logger.Log("config", fmt.Sprintf("Pkger unable to load config.default.yml - cause: %s", err.Error()))
+		return err
+	}
+
+	if file, ok := os.LookupEnv("APP_CONFIG"); ok && strings.TrimSpace(file) != "" {
+		s.logger.Log("config", fmt.Sprintf("Loading config - %s", file))
+		overrides := viper.New()
+		overrides.SetConfigFile(file)
+
+		if err := overrides.ReadInConfig(); err != nil {
+			msg := fmt.Sprintf("Failed loading the specific app config - %s", err)
+			s.logger.Log("config", msg)
+			return err
+		}
+
+		if err := overrides.Unmarshal(config); err != nil {
+			msg := fmt.Sprintf("Unable to unmarshal the specific app config - %s", err)
+			s.logger.Log("config", msg)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *ConfigService) LoadFile(file string, config interface{}) error {
+	s.logger.Log("config", "Loading config", "file", file)
+
+	f, err := pkger.Open(file)
+	if err != nil {
+		s.logger.Log("config", fmt.Sprintf("Pkger unable to load %s - cause: %s", file, err.Error()))
 		return err
 	}
 
@@ -43,29 +73,6 @@ func (s *ConfigService) Load(config interface{}) error {
 		msg := fmt.Sprintf("Unable to unmarshal the defaults - %v", err)
 		s.logger.Log("config", msg)
 		return errors.New(msg)
-	}
-
-	overrides := viper.New()
-
-	if v, s := os.LookupEnv("APP_CONFIG"); s {
-		overrides.SetConfigFile(v)
-	} else {
-		overrides.SetConfigFile("./configs/config.overrides.yml")
-	}
-
-	if err := overrides.ReadInConfig(); err != nil {
-		if _, ok := err.(*os.PathError); ok {
-			s.logger.Log("config", fmt.Sprintf("Didn't find override config, just continuing - %v", err))
-			return nil
-		} else {
-			msg := fmt.Sprintf("Failed loading the override - %v", err)
-			s.logger.Log("config", msg)
-			return err
-		}
-	}
-
-	if err := overrides.Unmarshal(config); err != nil {
-		return errors.New(fmt.Sprintf("Unable to load overrides config - %s", err))
 	}
 
 	return nil

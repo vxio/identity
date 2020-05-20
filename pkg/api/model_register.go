@@ -35,7 +35,7 @@ type Register struct {
 	// Email Address
 	Email string `json:"email,omitempty"`
 
-	Phones []Phone `json:"phones,omitempty"`
+	Phones []RegisterPhone `json:"phones,omitempty"`
 
-	Addresses []Address `json:"addresses,omitempty"`
+	Addresses []RegisterAddress `json:"addresses,omitempty"`
 }

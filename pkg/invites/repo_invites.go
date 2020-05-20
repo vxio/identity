@@ -87,7 +87,7 @@ func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite,
 			redeemed_on,
 			expires_on,
 			secret_code
-		) VALUES (?,?,?,?,?,?,?)`
+		) VALUES (?,?,?,?,?,?,?,?)`
 
 	_, err := r.db.Exec(qry,
 		invite.InviteID,
@@ -110,7 +110,7 @@ func (r *sqlInvitesRepo) update(updated api.Invite) error {
 	qry := `
 		UPDATE invites 
 		SET 
-			redeemed = ?,
+			redeemed_on = ?,
 			disabled_by = ?,
 			disabled_on = ?
 		WHERE
@@ -146,7 +146,7 @@ var inviteSelect = `
 	invites.email,
 	invites.invited_by,
 	invites.invited_on,
-	invites.redeemed,
+	invites.redeemed_on,
 	invites.expires_on,
 	invites.disabled_on,
 	invites.disabled_by

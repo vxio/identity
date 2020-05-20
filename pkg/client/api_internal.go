@@ -25,12 +25,13 @@ var (
 type InternalApiService service
 
 /*
-LoginWithCredentials Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.       
+Authenticated Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param moovLogin Encrypted and signed token that they authenticated via one of the approved services
  * @param login Arguments needed to match up the OIDC user data with a user in the system
 @return LoggedIn
 */
-func (a *InternalApiService) LoginWithCredentials(ctx _context.Context, login Login) (LoggedIn, *_nethttp.Response, error) {
+func (a *InternalApiService) Authenticated(ctx _context.Context, moovLogin string, login Login) (LoggedIn, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -41,7 +42,7 @@ func (a *InternalApiService) LoginWithCredentials(ctx _context.Context, login Lo
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/login"
+	localVarPath := a.client.cfg.BasePath + "/authenticated"
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
@@ -65,18 +66,6 @@ func (a *InternalApiService) LoginWithCredentials(ctx _context.Context, login Lo
 	}
 	// body params
 	localVarPostBody = &login
-	if ctx != nil {
-		// API Key Authentication
-		if auth, ok := ctx.Value(ContextAPIKey).(APIKey); ok {
-			var key string
-			if auth.Prefix != "" {
-				key = auth.Prefix + " " + auth.Key
-			} else {
-				key = auth.Key
-			}
-			localVarHeaderParams["X-Request-Hash"] = key
-		}
-	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -131,12 +120,13 @@ func (a *InternalApiService) LoginWithCredentials(ctx _context.Context, login Lo
 }
 
 /*
-RegisterWithCredentials Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user. 
+RegisterWithCredentials If the OIDC client specified it got an invite code that token will be exchanged here to login 
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param moovLogin Encrypted and signed token that they authenticated via one of the approved services
  * @param register Arguments needed register a user with OIDC credentials.
 @return LoggedIn
 */
-func (a *InternalApiService) RegisterWithCredentials(ctx _context.Context, register Register) (LoggedIn, *_nethttp.Response, error) {
+func (a *InternalApiService) RegisterWithCredentials(ctx _context.Context, moovLogin string, register Register) (LoggedIn, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -171,18 +161,6 @@ func (a *InternalApiService) RegisterWithCredentials(ctx _context.Context, regis
 	}
 	// body params
 	localVarPostBody = &register
-	if ctx != nil {
-		// API Key Authentication
-		if auth, ok := ctx.Value(ContextAPIKey).(APIKey); ok {
-			var key string
-			if auth.Prefix != "" {
-				key = auth.Prefix + " " + auth.Key
-			} else {
-				key = auth.Key
-			}
-			localVarHeaderParams["X-Request-Hash"] = key
-		}
-	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err

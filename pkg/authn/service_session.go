@@ -12,28 +12,28 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
-type TokenService interface {
+type SessionService interface {
 	Generate(identityID string) (string, error)
 	GenerateCookie(identityID string) (*http.Cookie, error)
 }
 
-type tokenService struct {
-	time       stime.TimeService
-	jwks       webkeys.WebKeysService
-	expiration time.Duration
+type sessionService struct {
+	time               stime.TimeService
+	sessionPrivateKeys webkeys.WebKeysService
+	expiration         time.Duration
 }
 
-func NewTokenService(time stime.TimeService, jwks webkeys.WebKeysService, expiration time.Duration) TokenService {
-	return &tokenService{
-		time:       time,
-		jwks:       jwks,
-		expiration: expiration,
+func NewSessionService(time stime.TimeService, sessionPrivateKeys webkeys.WebKeysService, config SessionConfig) SessionService {
+	return &sessionService{
+		time:               time,
+		sessionPrivateKeys: sessionPrivateKeys,
+		expiration:         config.Expiration,
 	}
 }
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
-func (s *tokenService) Generate(identityID string) (string, error) {
-	keys, err := s.jwks.FetchJwks()
+func (s *sessionService) Generate(identityID string) (string, error) {
+	keys, err := s.sessionPrivateKeys.FetchJwks()
 	if err != nil {
 		return "", err
 	}
@@ -56,6 +56,7 @@ func (s *tokenService) Generate(identityID string) (string, error) {
 		Audience: "moov",
 		Issuer:   "moov",
 	})
+	token.Header["kid"] = privateKey.KeyID
 
 	tokenString, err := token.SignedString(privateKey.Key)
 	if err != nil {
@@ -65,7 +66,7 @@ func (s *tokenService) Generate(identityID string) (string, error) {
 	return tokenString, nil
 }
 
-func (s *tokenService) GenerateCookie(identityID string) (*http.Cookie, error) {
+func (s *sessionService) GenerateCookie(identityID string) (*http.Cookie, error) {
 	value, err := s.Generate(identityID)
 	if err != nil {
 		return nil, err
@@ -77,13 +78,13 @@ func (s *tokenService) GenerateCookie(identityID string) (*http.Cookie, error) {
 		Path:     "/",
 		Expires:  s.calculateExpiration(),
 		MaxAge:   int(s.expiration.Seconds()),
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteDefaultMode,
 		Secure:   false,
 		HttpOnly: true,
 	}, nil
 }
 
-func (s *tokenService) calculateExpiration() time.Time {
+func (s *sessionService) calculateExpiration() time.Time {
 	return s.time.Now().Add(s.expiration)
 }
 

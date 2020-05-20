@@ -21,7 +21,10 @@ func NewJWTMiddleware(jwksLoader webkeys.WebKeysService) (*jwtmiddleware.JWTMidd
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 
 			// get the key ID `kid` from the jwt.Token
-			kid := token.Header["kid"].(string)
+			kid, ok := token.Header["kid"].(string)
+			if !ok {
+				return nil, errors.New("kid not specified")
+			}
 
 			// search the returned keys from the JWKS
 			k := jwks.Key(kid)
@@ -29,7 +32,7 @@ func NewJWTMiddleware(jwksLoader webkeys.WebKeysService) (*jwtmiddleware.JWTMidd
 				return nil, errors.New("Could not find the kid in the jwks web key set")
 			}
 
-			return k[0], nil
+			return k[0].Key, nil
 		},
 		SigningMethod: jwt.SigningMethodRS256,
 	})

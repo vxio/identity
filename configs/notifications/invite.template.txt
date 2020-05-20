@@ -1,0 +1,9 @@
+Hello,
+
+Welcome to Moov.io! Please use the link below to complete registration.
+
+	{{.AcceptInvitationURL}}
+
+If you have any problems email us at support@moov.io
+
+You're recieving this email because someone invited you to join moov.io.

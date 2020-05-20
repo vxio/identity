@@ -1,21 +1,33 @@
-http:
-  bind:
-    address: ":8200"
-admin:
-  bind:
-    address: ":8201"
+servers:
+  public:
+    bind:
+      address: ":8200"
+  admin:
+    bind:
+      address: ":8201"
 database:
   databaseName: "identity"
   sqllite:
     path: ./data/identity.db
-authentication:
-  frontchannel:
-    expiration: 1h
-    file:
-      path: ./configs/jwk-sig-priv.json
-  backchannel:
-    file:
-      path: ./configs/jwk-sig-pub.json
 invites:
   expiration: 48h
   sendToURL: https://api.moov.io
+notifications:
+  Mock:
+    from: noreply@moov.io
+session:
+  expiration: 1h
+  landingUrl: "/whoami"
+keys:
+  authnPublic:
+    file:
+      path: ./configs/authn-jwks-sig-pub.json
+  gatewayPublic:
+    file:
+      path: ./configs/gateway-jwks-sig-pub.json
+  sessionPublic:
+    file:
+      path: ./configs/identity-jwks-sig-pub.json
+  sessionPrivate:
+    file:
+      path: ./configs/identity-jwks-sig-priv.json

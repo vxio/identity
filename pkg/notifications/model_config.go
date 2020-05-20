@@ -2,12 +2,18 @@ package notifications
 
 type NotificationsConfig struct {
 	SMTP *SMTPConfig
+	Mock *MockConfig
 }
 
 type SMTPConfig struct {
-	host string
-	port int
-	user string
-	pass string
-	from string
+	Host string
+	Port int
+	User string
+	Pass string
+	From string
+	SSL  bool
+}
+
+type MockConfig struct {
+	From string
 }

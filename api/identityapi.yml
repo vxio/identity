@@ -65,7 +65,6 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
-
   /invites/{inviteID}:
     delete:
       operationId: DisableInvite
@@ -87,6 +86,69 @@ paths:
         '404':
           description: Invite was not found.
           $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+
+  /authenticated:
+    get:
+      operationId: Authenticated
+      summary: |
+        Complete a login via a OIDC.
+        Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.    
+      security:
+      - LoginAuth: []
+      parameters:
+        - in: cookie
+          name: moov-login
+          description: Encrypted and signed token that they authenticated via one of the approved services
+          required: true
+          schema:
+            type: string
+      tags:
+      - internal
+      responses:
+        '200':
+          description: User successfully logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggedIn'
+        '404':
+          description: User was not located.
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+
+  /register:
+    post:
+      operationId: RegisterWithCredentials
+      summary: |
+        If the OIDC client specified it got an invite code that token will be exchanged here to login
+      security:
+      - LoginAuth: []
+      parameters:
+        - in: cookie
+          name: moov-login
+          description: Encrypted and signed token that they authenticated via one of the approved services
+          required: true
+          schema:
+            type: string
+      tags:
+      - internal
+      requestBody:
+        description: Arguments needed register a user with OIDC credentials.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+      responses:
+        '200':
+          description: User successfully registered, they can now log in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggedIn'
         default:
           $ref: '#/components/responses/Empty'
 
@@ -231,7 +293,6 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
-
   /identities/{identityID}/credentials/{credentialID}:
     get:
       operationId: DisableCredentials
@@ -269,68 +330,6 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
-# Internal only
-  /login:
-    post:
-      operationId: LoginWithCredentials
-      summary: |
-        Complete a login via a OIDC.
-        Once the OIDC client service has authenticated their identity the client service will call 
-        this endpoint to record and finish the login to get their token to use the API.
-
-        If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.      
-      security:
-      - ServiceAuth: []
-      tags:
-      - internal
-      requestBody:
-        description: Arguments needed to match up the OIDC user data with a user in the system
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Login'
-      responses:
-        '200':
-          description: User successfully logged in.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggedIn'
-        '404':
-          description: User was not located.
-          $ref: '#/components/responses/Empty'
-        default:
-          $ref: '#/components/responses/Empty'
-
-  /register:
-    post:
-      operationId: RegisterWithCredentials
-      summary: |
-        Register user based on OIDC credentials. 
-        This is called by the OIDC client services we create to register the user with what 
-        available information they have and obtain from the user.
-      security:
-      - ServiceAuth: []
-      tags:
-      - internal
-      requestBody:
-        description: Arguments needed register a user with OIDC credentials.
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Register'
-      responses:
-        '200':
-          description: User successfully registered, they can now log in
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggedIn'
-        default:
-          $ref: '#/components/responses/Empty'
-
 components:
   responses:
     Empty:
@@ -350,11 +349,10 @@ components:
       bearerFormat: JWT
       description: JWT that comes from the gateway that validates against the gateways public RSA key
       
-    ServiceAuth:
+    LoginAuth:
       type: apiKey
-      in: header
-      name: X-Request-Hash
-      description: Hash of HMAC(X-Timestamp +'|' + X-Nonce, Secret)
+      in: cookie
+      name: moov-login
 
   schemas:
     UUID:
@@ -608,7 +606,6 @@ components:
       required:
         - firstName
         - lastName
-        - email
 
     LastLogin:
       description: |
@@ -834,10 +831,71 @@ components:
           type: array
           maxItems: 50
           items:
-            $ref: '#/components/schemas/Phone'
+            $ref: '#/components/schemas/RegisterPhone'
         addresses:
           type: array
           maxItems: 50
           items:
-            $ref: '#/components/schemas/Address'
-    
+            $ref: '#/components/schemas/RegisterAddress'
+
+    RegisterPhone:
+      description: Phone number
+      type: object
+      additionalProperties: false
+      properties:
+        number:
+          type: string
+          format: phone
+          pattern: ^[0-9]+$
+          maxLength: 15
+        type:
+          type: string
+          enum:
+          - home
+          - mobile
+          - work
+
+    RegisterAddress:
+      description: Address of the Identity
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          enum:
+          - primary
+          - secondary
+        address1:
+          type: string
+          example: 111 Main St.
+          pattern: ^\w+$
+          maxLength: 255
+        address2:
+          type: string
+          pattern: ^\w*$
+          maxLength: 255
+          nullable: true
+        city:
+          type: string
+          example: Cedar Falls
+          pattern: ^\w+$
+          maxLength: 255
+        state:
+          type: string
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          example: IA
+        postalCode:
+          type: string
+          minLength: 5
+          maxLength: 5
+          pattern: ^\d+$
+          example: 50613
+        country:
+          type: string
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          example: US
+              

@@ -115,6 +115,100 @@ paths:
       summary: Delete an invite that was sent and invalidate the token.
       tags:
       - invites
+  /authenticated:
+    post:
+      operationId: Authenticated
+      parameters:
+      - description: Encrypted and signed token that they authenticated via one of
+          the approved services
+        explode: true
+        in: cookie
+        name: moov-login
+        required: true
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        description: Arguments needed to match up the OIDC user data with a user in
+          the system
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggedIn'
+          description: User successfully logged in.
+        "404":
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - LoginAuth: []
+      summary: "Complete a login via a OIDC.\nOnce the OIDC client service has authenticated\
+        \ their identity the client service redirect to this endpoint.    \n"
+      tags:
+      - internal
+  /register:
+    post:
+      operationId: RegisterWithCredentials
+      parameters:
+      - description: Encrypted and signed token that they authenticated via one of
+          the approved services
+        explode: true
+        in: cookie
+        name: moov-login
+        required: true
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+        description: Arguments needed register a user with OIDC credentials.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggedIn'
+          description: User successfully registered, they can now log in
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - LoginAuth: []
+      summary: |
+        If the OIDC client specified it got an invite code that token will be exchanged here to login
+      tags:
+      - internal
   /identities:
     get:
       operationId: ListIdentities
@@ -375,85 +469,6 @@ paths:
       summary: Disables a credential so it can't be used anymore to login
       tags:
       - credentials
-  /login:
-    post:
-      operationId: LoginWithCredentials
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Login'
-        description: Arguments needed to match up the OIDC user data with a user in
-          the system
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggedIn'
-          description: User successfully logged in.
-        "404":
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-        default:
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-      security:
-      - ServiceAuth: []
-      summary: "Complete a login via a OIDC.\nOnce the OIDC client service has authenticated\
-        \ their identity the client service will call \nthis endpoint to record and\
-        \ finish the login to get their token to use the API.\n\nIf the client service\
-        \ recieves a 404 they must send them to registration if its allowed per the\
-        \ client or check for an invite for authenticated users email before sending\
-        \ to registration.      \n"
-      tags:
-      - internal
-  /register:
-    post:
-      operationId: RegisterWithCredentials
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Register'
-        description: Arguments needed register a user with OIDC credentials.
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggedIn'
-          description: User successfully registered, they can now log in
-        default:
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-      security:
-      - ServiceAuth: []
-      summary: "Register user based on OIDC credentials. \nThis is called by the OIDC\
-        \ client services we create to register the user with what \navailable information\
-        \ they have and obtain from the user.\n"
-      tags:
-      - internal
 components:
   responses:
     Empty:
@@ -935,7 +950,6 @@ components:
           maxItems: 300
           type: array
       required:
-      - email
       - firstName
       - lastName
       type: object
@@ -1192,83 +1206,53 @@ components:
         lastName: Doe
         addresses:
         - country: US
-          validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
           type: primary
-          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
-          validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
           type: primary
-          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
-          validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
           type: primary
-          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
-          validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
           type: primary
-          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         - country: US
-          validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
           type: primary
-          addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         provider: google
         nickName: nickName
         inviteCode: inviteCode
         phones:
         - number: number
-          validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         - number: number
-          validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         - number: number
-          validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         - number: number
-          validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         - number: number
-          validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-          phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         middleName: Jimmy
         suffix: suffix
@@ -1334,14 +1318,84 @@ components:
           type: string
         phones:
           items:
-            $ref: '#/components/schemas/Phone'
+            $ref: '#/components/schemas/RegisterPhone'
           maxItems: 50
           type: array
         addresses:
           items:
-            $ref: '#/components/schemas/Address'
+            $ref: '#/components/schemas/RegisterAddress'
           maxItems: 50
           type: array
+      type: object
+    RegisterPhone:
+      additionalProperties: false
+      description: Phone number
+      example:
+        number: number
+        type: home
+      properties:
+        number:
+          format: phone
+          maxLength: 15
+          pattern: ^[0-9]+$
+          type: string
+        type:
+          enum:
+          - home
+          - mobile
+          - work
+          type: string
+      type: object
+    RegisterAddress:
+      additionalProperties: false
+      description: Address of the Identity
+      example:
+        country: US
+        address2: address2
+        city: Cedar Falls
+        address1: 111 Main St.
+        postalCode: "50613"
+        state: IA
+        type: primary
+      properties:
+        type:
+          enum:
+          - primary
+          - secondary
+          type: string
+        address1:
+          example: 111 Main St.
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        address2:
+          maxLength: 255
+          nullable: true
+          pattern: ^\w*$
+          type: string
+        city:
+          example: Cedar Falls
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        state:
+          example: IA
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          type: string
+        postalCode:
+          example: "50613"
+          maxLength: 5
+          minLength: 5
+          pattern: ^\d+$
+          type: string
+        country:
+          example: US
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          type: string
       type: object
   securitySchemes:
     GatewayAuth:
@@ -1350,8 +1404,7 @@ components:
         public RSA key
       scheme: bearer
       type: http
-    ServiceAuth:
-      description: Hash of HMAC(X-Timestamp +'|' + X-Nonce, Secret)
-      in: header
-      name: X-Request-Hash
+    LoginAuth:
+      in: cookie
+      name: moov-login
       type: apiKey
