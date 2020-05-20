@@ -2,9 +2,7 @@ package main
 
 import (
 	"flag"
-	"math/rand"
 	"os"
-	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/moov-io/identity/pkg/identity"
@@ -19,8 +17,6 @@ var (
 )
 
 func main() {
-	rand.Seed(time.Now().Unix())
-
 	logger := NewLogger()
 
 	env, err := identity.NewEnvironment(logger, nil)
