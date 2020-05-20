@@ -17,6 +17,7 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
+// RunServers - Boots up all the servers and awaits till they are stopped.
 func (env *Environment) RunServers() func() {
 
 	// Listen for application termination.

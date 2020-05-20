@@ -8,14 +8,16 @@ import (
 	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
-type IdentityRepository interface {
+// Repository - Used for interacting identities on the data store
+type Repository interface {
 	list(tenantID zerotrust.TenantID) ([]api.Identity, error)
 	get(tenantID zerotrust.TenantID, identityID string) (*api.Identity, error)
 	update(updated api.Identity) (*api.Identity, error)
 	add(identity api.Identity) (*api.Identity, error)
 }
 
-func NewIdentityRepository(db *sql.DB) IdentityRepository {
+// NewIdentityRepository - Builds a new repository tied to the DB passed in.
+func NewIdentityRepository(db *sql.DB) Repository {
 	return &sqlIdentityRepo{db: db}
 }
 

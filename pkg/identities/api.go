@@ -10,48 +10,48 @@ import (
 	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
-// A IdentitiesApiController binds http requests to an api service and writes the service results to the http response
-type IdentitiesApiController struct {
+// A Controller binds http requests to an api service and writes the service results to the http response
+type Controller struct {
 	service api.IdentitiesApiServicer
 }
 
-// NewIdentitiesApiController creates a default api controller
-func NewIdentitiesApiController(s api.IdentitiesApiServicer) api.Router {
-	return &IdentitiesApiController{service: s}
+// NewIdentitiesController creates a default api controller
+func NewIdentitiesController(s api.IdentitiesApiServicer) api.Router {
+	return &Controller{service: s}
 }
 
 // Routes returns all of the api route for the IdentitiesApiController
-func (c *IdentitiesApiController) Routes() api.Routes {
+func (c *Controller) Routes() api.Routes {
 	return api.Routes{
 		{
-			"DisableIdentity",
-			strings.ToUpper("Delete"),
-			"/identities/{identityID}",
-			c.DisableIdentity,
+			Name:        "DisableIdentity",
+			Method:      strings.ToUpper("Delete"),
+			Pattern:     "/identities/{identityID}",
+			HandlerFunc: c.DisableIdentity,
 		},
 		{
-			"GetIdentity",
-			strings.ToUpper("Get"),
-			"/identities/{identityID}",
-			c.GetIdentity,
+			Name:        "GetIdentity",
+			Method:      strings.ToUpper("Get"),
+			Pattern:     "/identities/{identityID}",
+			HandlerFunc: c.GetIdentity,
 		},
 		{
-			"ListIdentities",
-			strings.ToUpper("Get"),
-			"/identities",
-			c.ListIdentities,
+			Name:        "ListIdentities",
+			Method:      strings.ToUpper("Get"),
+			Pattern:     "/identities",
+			HandlerFunc: c.ListIdentities,
 		},
 		{
-			"UpdateIdentity",
-			strings.ToUpper("Put"),
-			"/identities/{identityID}",
-			c.UpdateIdentity,
+			Name:        "UpdateIdentity",
+			Method:      strings.ToUpper("Put"),
+			Pattern:     "/identities/{identityID}",
+			HandlerFunc: c.UpdateIdentity,
 		},
 	}
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
-func (c *IdentitiesApiController) DisableIdentity(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
 	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
@@ -66,7 +66,7 @@ func (c *IdentitiesApiController) DisableIdentity(w http.ResponseWriter, r *http
 }
 
 // GetIdentity - List identities and associates userId
-func (c *IdentitiesApiController) GetIdentity(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
 	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
@@ -81,7 +81,7 @@ func (c *IdentitiesApiController) GetIdentity(w http.ResponseWriter, r *http.Req
 }
 
 // ListIdentities - List identities and associates userId
-func (c *IdentitiesApiController) ListIdentities(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
 	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		query := r.URL.Query()
 		orgID := query.Get("orgID")
@@ -96,7 +96,7 @@ func (c *IdentitiesApiController) ListIdentities(w http.ResponseWriter, r *http.
 }
 
 // UpdateIdentity - Update a specific Identity
-func (c *IdentitiesApiController) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
 	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]

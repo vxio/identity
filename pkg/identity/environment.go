@@ -22,12 +22,13 @@ import (
 	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
+// Environment - Contains everything thats been instantiated for this service.
 type Environment struct {
 	Logger log.Logger
-	Config IdentityConfig
+	Config Config
 
 	InviteService      api.InvitesApiServicer
-	IdentitiesService  identities.IdentitiesService
+	IdentitiesService  identities.Service
 	CredentialsService credentials.CredentialsService
 
 	PublicRouter mux.Router
@@ -35,14 +36,15 @@ type Environment struct {
 	Shutdown func()
 }
 
-func NewEnvironment(logger log.Logger, configOverride *IdentityConfig) (*Environment, error) {
-	var config *IdentityConfig
+// NewEnvironment - Generates a new default environment. Overrides can be specified via configs.
+func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, error) {
+	var config *Config
 	if configOverride != nil {
 		config = configOverride
 	} else {
 		ConfigService := configpkg.NewConfigService(logger)
 
-		config = &IdentityConfig{}
+		config = &Config{}
 		if err := ConfigService.Load(config); err != nil {
 			return nil, err
 		}
@@ -139,7 +141,7 @@ func NewEnvironment(logger log.Logger, configOverride *IdentityConfig) (*Environ
 	}
 
 	WhoAmIController := authn.NewWhoAmIController()
-	IdentitiesController := identities.NewIdentitiesApiController(IdentitiesService)
+	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
 
@@ -173,7 +175,7 @@ func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql
 	if err != nil {
 		msg := fmt.Sprintf("error creating database: %v", err)
 		logger.Log("msg", msg)
-		return nil, func() {}, err
+		return nil, cancelFunc, err
 	}
 
 	shutdown := func() {

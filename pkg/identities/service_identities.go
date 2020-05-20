@@ -9,24 +9,24 @@ import (
 	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
-// IdentitiesApiService is a service that implents the logic for the IdentitiesApiServicer
+// Service - Service that implents the logic for the IdentitiesApiServicer
 // This service should implement the business logic for every endpoint for the IdentitiesApi API.
 // Include any external packages or services that will be required by this service.
-type IdentitiesService struct {
+type Service struct {
 	time       stime.TimeService
-	repository IdentityRepository
+	repository Repository
 }
 
-// NewIdentitiesApiService creates a default api service
-func NewIdentitiesService(time stime.TimeService, repository IdentityRepository) *IdentitiesService {
-	return &IdentitiesService{
+// NewIdentitiesService creates a default service
+func NewIdentitiesService(time stime.TimeService, repository Repository) *Service {
+	return &Service{
 		time:       time,
 		repository: repository,
 	}
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
-func (s *IdentitiesService) DisableIdentity(session zerotrust.Session, identityID string) error {
+func (s *Service) DisableIdentity(session zerotrust.Session, identityID string) error {
 	identity, err := s.repository.get(session.TenantID, identityID)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (s *IdentitiesService) DisableIdentity(session zerotrust.Session, identityI
 }
 
 // GetIdentity - List identities and associates userId
-func (s *IdentitiesService) GetIdentity(session zerotrust.Session, identityID string) (*api.Identity, error) {
+func (s *Service) GetIdentity(session zerotrust.Session, identityID string) (*api.Identity, error) {
 	i, e := s.repository.get(session.TenantID, identityID)
 	if e != nil {
 		return nil, errors.New("Identity not found")
@@ -59,13 +59,13 @@ func (s *IdentitiesService) GetIdentity(session zerotrust.Session, identityID st
 }
 
 // ListIdentities - List identities and associates userId
-func (s *IdentitiesService) ListIdentities(session zerotrust.Session, orgID string) ([]api.Identity, error) {
+func (s *Service) ListIdentities(session zerotrust.Session, orgID string) ([]api.Identity, error) {
 	identities, err := s.repository.list(session.TenantID)
 	return identities, err
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *IdentitiesService) UpdateIdentity(session zerotrust.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
+func (s *Service) UpdateIdentity(session zerotrust.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
 	identity, err := s.repository.get(session.TenantID, identityID)
 	if err != nil {
 		return nil, err
@@ -92,7 +92,8 @@ func (s *IdentitiesService) UpdateIdentity(session zerotrust.Session, identityID
 	return updated, err
 }
 
-func (s *IdentitiesService) Register(invite api.Invite, register api.Register) (*api.Identity, error) {
+// Register - Takes an invite and the registration information and creates the new identity from it.
+func (s *Service) Register(invite api.Invite, register api.Register) (*api.Identity, error) {
 	identityID := uuid.New().String()
 
 	phones := []api.Phone{}

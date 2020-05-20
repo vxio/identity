@@ -15,7 +15,7 @@ import (
 // Include any external packages or services that will be required by this service.
 type internalService struct {
 	credentials credentials.CredentialsService
-	identities  identities.IdentitiesService
+	identities  identities.Service
 	token       SessionService
 	invites     api.InvitesApiServicer
 	landingURL  string
@@ -24,7 +24,7 @@ type internalService struct {
 // NewInternalService creates a default api service
 func NewAuthnService(
 	credentials credentials.CredentialsService,
-	identities identities.IdentitiesService,
+	identities identities.Service,
 	token SessionService,
 	invites api.InvitesApiServicer,
 	landingURL string,
