@@ -15,7 +15,7 @@ type IdentityConfig struct {
 	Keys          KeysConfig
 	Session       authn.SessionConfig
 	Notifications notifications.NotificationsConfig
-	Invites       invites.InvitesConfig
+	Invites       invites.Config
 }
 
 type ServerConfig struct {

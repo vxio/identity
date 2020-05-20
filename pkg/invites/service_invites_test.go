@@ -85,7 +85,7 @@ func TestDisableInvite(t *testing.T) {
 	}
 
 	_, err = s.service.Redeem(code)
-	if err != ErrTokenDisabled {
+	if err != ErrInviteCodeDisabled {
 		t.Error("Disabled token didn't redeem will disabled failure")
 	}
 }
@@ -104,7 +104,7 @@ func TestExpiredInvite(t *testing.T) {
 	fmt.Println(s.time.Now())
 
 	_, err = s.service.Redeem(code)
-	if err != ErrTokenExpired {
+	if err != ErrInviteCodeExpired {
 		t.Error("Expired token didn't redeem with expired failure")
 	}
 }
@@ -114,7 +114,7 @@ func NewInvitesScope(t *testing.T) InvitesServiceScope {
 
 	repository := NewInMemoryInvitesRepository(t)
 
-	config := InvitesConfig{
+	config := Config{
 		Expiration: time.Hour,
 		SendToURL:  "http://local.moov.io",
 	}

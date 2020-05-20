@@ -16,7 +16,7 @@ import (
 )
 
 func TestGetById(t *testing.T) {
-	ForEachDatabase(t, func(t *testing.T, repository InvitesRepository) {
+	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, _ := AddTestingInvite(t, repository)
 
 		tenantID := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
@@ -39,7 +39,7 @@ func TestGetById(t *testing.T) {
 }
 
 func TestGetByCode(t *testing.T) {
-	ForEachDatabase(t, func(t *testing.T, repository InvitesRepository) {
+	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, code := AddTestingInvite(t, repository)
 
 		found, err := repository.getByCode(code)
@@ -59,7 +59,7 @@ func TestGetByCode(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	ForEachDatabase(t, func(t *testing.T, repository InvitesRepository) {
+	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, _ := AddTestingInvite(t, repository)
 		tenantID1 := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
 
@@ -94,7 +94,7 @@ func TestList(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	ForEachDatabase(t, func(t *testing.T, repository InvitesRepository) {
+	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, _ := AddTestingInvite(t, repository)
 		tenantID := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
 
@@ -136,10 +136,10 @@ var InMemorySqliteConfig = database.DatabaseConfig{
 	},
 }
 
-func ForEachDatabase(t *testing.T, run func(t *testing.T, repository InvitesRepository)) {
+func ForEachDatabase(t *testing.T, run func(t *testing.T, repository Repository)) {
 	cases := map[string]database.DatabaseConfig{
 		"sqlite": InMemorySqliteConfig,
-		"mysql": database.DatabaseConfig{
+		"mysql": {
 			DatabaseName: "identity",
 			MySql: &database.MySqlConfig{
 				Address:  "tcp(localhost:4306)",
@@ -176,7 +176,7 @@ func LoadDatabase(t *testing.T, config database.DatabaseConfig) *sql.DB {
 	return db
 }
 
-func NewInMemoryInvitesRepository(t *testing.T) InvitesRepository {
+func NewInMemoryInvitesRepository(t *testing.T) Repository {
 	db := LoadDatabase(t, InMemorySqliteConfig)
 
 	repo := NewInvitesRepository(db)
@@ -184,7 +184,7 @@ func NewInMemoryInvitesRepository(t *testing.T) InvitesRepository {
 	return repo
 }
 
-func AddTestingInvite(t *testing.T, repository InvitesRepository) (api.Invite, string) {
+func AddTestingInvite(t *testing.T, repository Repository) (api.Invite, string) {
 	i := RandomInvite()
 	code, err := generateInviteCode()
 	if err != nil {

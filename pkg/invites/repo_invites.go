@@ -8,7 +8,8 @@ import (
 	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
-type InvitesRepository interface {
+// Repository allows for interacting with the invites data store.
+type Repository interface {
 	list(tenantID zerotrust.TenantID) ([]api.Invite, error)
 	get(tenantID zerotrust.TenantID, inviteID string) (*api.Invite, error)
 	getByCode(code string) (*api.Invite, error)
@@ -16,7 +17,8 @@ type InvitesRepository interface {
 	update(updated api.Invite) error
 }
 
-func NewInvitesRepository(db *sql.DB) InvitesRepository {
+// NewInvitesRepository instantiates a new InvitesRepository
+func NewInvitesRepository(db *sql.DB) Repository {
 	return &sqlInvitesRepo{db: db}
 }
 
