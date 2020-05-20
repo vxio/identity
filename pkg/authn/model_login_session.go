@@ -1,10 +1,14 @@
 package authn
 
 import (
+	"errors"
+	"net/http"
+
 	"github.com/dgrijalva/jwt-go"
 	api "github.com/moov-io/identity/pkg/api"
 )
 
+// LoginSession is the values of the JWT coming in from the Authentication services.
 type LoginSession struct {
 	State string `json:"state"` // CSRF state token used during login
 
@@ -22,4 +26,12 @@ type LoginSession struct {
 
 	// Store whatever we can get from the OIDC provider if the invite code isn't empty
 	api.Register
+}
+
+func LoginSessionFromRequest(r *http.Request) (*LoginSession, error) {
+	session, ok := r.Context().Value(loginSessionContextKey).(*LoginSession)
+	if !ok || session == nil {
+		return nil, errors.New("Unable to find LoginSession in context")
+	}
+	return session, nil
 }

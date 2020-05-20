@@ -119,7 +119,7 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 
 	// authn endpoints
 
-	AuthnMiddleware, err := authn.NewAuthnMiddleware(TimeService, AuthnPublicKeys)
+	AuthnMiddleware, err := authn.NewMiddleware(TimeService, AuthnPublicKeys)
 	if err != nil {
 		logger.Log("main", fmt.Sprintf("Can't startup the Authn middleware - %s", err))
 		return nil, err

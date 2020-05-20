@@ -9,25 +9,27 @@ import (
 	api "github.com/moov-io/identity/pkg/api"
 )
 
-type WhoAmiIController struct{}
+type whoAmIController struct{}
 
+// NewWhoAmIController - Router for the Who Am I api routes.
 func NewWhoAmIController() api.Router {
-	return &WhoAmiIController{}
+	return &whoAmIController{}
 }
 
 // Routes returns all of the api route for the InternalApiController
-func (c *WhoAmiIController) Routes() api.Routes {
+func (c *whoAmIController) Routes() api.Routes {
 	return api.Routes{
 		{
-			"WhoAmI",
-			strings.ToUpper("Get"),
-			"/whoami",
-			c.WhoAmI,
+			Name:        "WhoAmI",
+			Method:      strings.ToUpper("Get"),
+			Pattern:     "/whoami",
+			HandlerFunc: c.WhoAmI,
 		},
 	}
 }
 
-func (c *WhoAmiIController) WhoAmI(w http.ResponseWriter, r *http.Request) {
+// WhoAmI - Responds back with information about the authenticated session
+func (c *whoAmIController) WhoAmI(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user")
 	fmt.Fprintf(w, "This is an authenticated request")
 	fmt.Fprintf(w, "Claim content:\n")

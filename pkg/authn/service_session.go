@@ -12,6 +12,7 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
+// SessionService - Generates the tokens for their fully logged in session.
 type SessionService interface {
 	Generate(identityID string) (string, error)
 	GenerateCookie(identityID string) (*http.Cookie, error)
@@ -23,6 +24,7 @@ type sessionService struct {
 	expiration         time.Duration
 }
 
+// NewSessionService - Creates a default instance of a SessionService
 func NewSessionService(time stime.TimeService, sessionPrivateKeys webkeys.WebKeysService, config SessionConfig) SessionService {
 	return &sessionService{
 		time:               time,
@@ -31,7 +33,7 @@ func NewSessionService(time stime.TimeService, sessionPrivateKeys webkeys.WebKey
 	}
 }
 
-// DeleteInvite - Delete an invite that was sent and invalidate the token.
+// Generate - Creates the token string
 func (s *sessionService) Generate(identityID string) (string, error) {
 	keys, err := s.sessionPrivateKeys.FetchJwks()
 	if err != nil {
@@ -66,6 +68,7 @@ func (s *sessionService) Generate(identityID string) (string, error) {
 	return tokenString, nil
 }
 
+// GenerateCookie - Generates the token and the cookie version of it.
 func (s *sessionService) GenerateCookie(identityID string) (*http.Cookie, error) {
 	value, err := s.Generate(identityID)
 	if err != nil {
