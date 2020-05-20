@@ -52,6 +52,6 @@ func sendInvite(env identity.Environment) error {
 		return err
 	}
 
-	fmt.Printf("%s\n", string(prettyJSON))
+	env.Logger.Log("level", "info", "msg", fmt.Sprintf("%s\n", string(prettyJSON)))
 	return nil
 }

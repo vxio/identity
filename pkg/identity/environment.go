@@ -13,7 +13,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 
 	"github.com/gorilla/mux"
 	_ "github.com/moov-io/identity" // need to import the embedded files
@@ -45,10 +44,7 @@ type Environment struct {
 	Shutdown func()
 }
 
-func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
-
-	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
-
+func NewEnvironment(logger log.Logger, configOverride *IdentityConfig) (*Environment, error) {
 	var config *IdentityConfig
 	if configOverride != nil {
 		config = configOverride
@@ -136,7 +132,7 @@ func NewEnvironment(configOverride *IdentityConfig) (*Environment, error) {
 		return nil, err
 	}
 
-	AuthnController := authn.NewAuthnAPIController(AuthnService)
+	AuthnController := authn.NewAuthnAPIController(logger, AuthnService)
 
 	authnRouter := router.NewRoute().Subrouter()
 	authnRouter = api.AppendRouters(authnRouter, AuthnController)

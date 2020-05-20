@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"math/rand"
 	"os"
 	"time"
 
+	"github.com/go-kit/kit/log"
 	"github.com/moov-io/identity/pkg/identity"
 )
 
@@ -21,14 +21,16 @@ var (
 func main() {
 	rand.Seed(time.Now().Unix())
 
-	env, err := identity.NewEnvironment(nil)
+	logger := NewLogger()
+
+	env, err := identity.NewEnvironment(logger, nil)
 	if err != nil {
-		fmt.Println("Error loading up environment. ", err)
+		logger.Log("level", "fatal", "msg", "Error loading up environment.", "error", err)
 		os.Exit(1)
 	}
 	defer env.Shutdown()
 
-	env.Logger.Log("msg", "Environment built")
+	env.Logger.Log("level", "info", "msg", "Environment built")
 
 	flag.Parse()
 
@@ -45,4 +47,8 @@ func main() {
 	}
 
 	os.Exit(0)
+}
+
+func NewLogger() log.Logger {
+	return log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 }

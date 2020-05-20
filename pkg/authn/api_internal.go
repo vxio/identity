@@ -10,20 +10,21 @@
 package authn
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/go-kit/kit/log"
 	api "github.com/moov-io/identity/pkg/api"
 )
 
 // A AuthnAPIController binds http requests to an api service and writes the service results to the http response
 type AuthnAPIController struct {
+	logger  log.Logger
 	service api.InternalApiServicer
 }
 
 // NewAuthnAPIController creates a default api controller
-func NewAuthnAPIController(s api.InternalApiServicer) api.Router {
+func NewAuthnAPIController(logger log.Logger, s api.InternalApiServicer) api.Router {
 	return &AuthnAPIController{service: s}
 }
 
@@ -56,7 +57,7 @@ func (c *AuthnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 
 	session, ok := r.Context().Value("LoginSession").(*LoginSession)
 	if !ok || session == nil {
-		fmt.Println("Unable to find LoginSession in context")
+		c.logger.Log("level", "error", "msg", "Unable to find LoginSession in context")
 		w.WriteHeader(404)
 		return
 	}
@@ -66,14 +67,10 @@ func (c *AuthnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 		SubjectID: session.SubjectID,
 	}
 
-	fmt.Println(login)
-
 	result, err := c.service.LoginWithCredentials(login, session.State, session.IP)
 	if err != nil {
-		fmt.Println("Error", err.Error())
-
-		w.WriteHeader(200)
-		w.Write([]byte("Not able to exchange login token for session token"))
+		c.logger.Log("level", "error", "msg", "Not able to exchange login token for session token", "error", err.Error())
+		w.WriteHeader(404)
 		return
 	}
 
@@ -92,7 +89,7 @@ func (c *AuthnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 
 	session, ok := r.Context().Value("LoginSession").(*LoginSession)
 	if !ok || session == nil {
-		fmt.Println("Unable to find LoginSession in context")
+		c.logger.Log("level", "error", "msg", "Unable to find LoginSession in context")
 		w.WriteHeader(404)
 		return
 	}
@@ -120,8 +117,8 @@ func (c *AuthnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 
 	result, err := c.service.RegisterWithCredentials(register, session.State, session.IP)
 	if err != nil {
-		fmt.Println("Unable to RegisterWithCredentials", err)
-		w.WriteHeader(500)
+		c.logger.Log("level", "error", "msg", "Unable to RegisterWithCredentials", "error", err)
+		w.WriteHeader(400)
 		return
 	}
 
