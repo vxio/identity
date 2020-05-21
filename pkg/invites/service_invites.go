@@ -3,7 +3,6 @@ package invites
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -74,7 +73,6 @@ func (s *invitesService) SendInvite(session zerotrust.Session, send api.SendInvi
 
 	notification := notifications.NewInviteEmail(sendTo.String())
 
-	// send email @TODO get url fixed up
 	if err := s.notifications.SendEmail(invite.Email, &notification); err != nil {
 		return nil, "", err
 	}
@@ -104,8 +102,6 @@ func (s *invitesService) DisableInvite(session zerotrust.Session, inviteID strin
 }
 
 func (s *invitesService) Redeem(code string) (*api.Invite, error) {
-	fmt.Println("Values coming in", s.repository, code)
-
 	invite, err := s.repository.getByCode(strings.TrimSpace(code))
 	if err != nil {
 		return nil, err

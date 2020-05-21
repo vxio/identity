@@ -12,7 +12,6 @@ import (
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/zerotrust"
-	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 )
 
 type InvitesServiceScope struct {
@@ -136,13 +135,4 @@ func NewInvitesScope(t *testing.T) InvitesServiceScope {
 	}
 
 	return scope
-}
-
-func NewSession() zerotrust.Session {
-	iid, _ := uuid.New()
-	tid, _ := uuid.New()
-	return zerotrust.Session{
-		CallerID: zerotrust.IdentityID(iid),
-		TenantID: zerotrust.TenantID(tid),
-	}
 }

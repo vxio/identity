@@ -2,6 +2,7 @@ package zerotrust
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -21,47 +22,29 @@ func (id IdentityID) String() string {
 }
 
 type Session struct {
-	CallerID IdentityID
-	TenantID TenantID
+	CallerID IdentityID `json:"iid"`
+	TenantID TenantID   `json:"tid"`
 }
 
-func NewSessionFromRequest(r *http.Request) (*Session, error) {
-	token, ok := r.Context().Value("user").(*jwt.Token)
-	if !ok {
-		return nil, errors.New("Unable to cast context `user` into jwt.Token")
-	}
+type SessionJwt struct {
+	jwt.StandardClaims
 
-	m, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return nil, errors.New("Unable to cast context `Claims` into `jwt.MapClaims`")
-	}
+	Session
+}
 
-	sub, ok := m[`sub`].(string)
-	if !ok {
-		return nil, errors.New("Unable to cast context `m[sub]` into `string``")
+func SessionFromRequest(r *http.Request) (*Session, error) {
+	session, ok := r.Context().Value(SessionContextKey).(*Session)
+	if !ok || session == nil {
+		fmt.Printf("%+v\n", r.Context())
+		return nil, errors.New("Unable to find Session in context")
 	}
-
-	caller, err := uuid.Parse(sub)
-	if err != nil {
-		return nil, err
-	}
-
-	tenant, err := uuid.Parse(r.Header.Get("x-tenant-id"))
-	if err != nil {
-		return nil, err
-	}
-
-	session := Session{
-		CallerID: IdentityID(caller),
-		TenantID: TenantID(tenant),
-	}
-
-	return &session, nil
+	return session, nil
 }
 
 func WithSession(w http.ResponseWriter, r *http.Request, run func(Session)) {
-	session, err := NewSessionFromRequest(r)
+	session, err := SessionFromRequest(r)
 	if err != nil {
+		fmt.Println("Session not found", err)
 		w.WriteHeader(500)
 		return
 	}

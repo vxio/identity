@@ -134,7 +134,7 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 	// authed server
 
 	// auth middleware for the tokens coming from the gateway
-	GatewayMiddleware, err := zerotrust.NewJWTMiddleware(GatewayPublicKeys)
+	GatewayMiddleware, err := zerotrust.NewGatewayMiddleware(TimeService, GatewayPublicKeys)
 	if err != nil {
 		logger.Log("main", fmt.Sprintf("Can't startup the Gateway middleware - %s", err))
 		return nil, err
