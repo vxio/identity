@@ -44,7 +44,7 @@ func (s *GatewayMiddleware) Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		session, err := s.FromRequest(r)
 		if err != nil {
-			fmt.Println("Session Middleware Failure", err)
+			fmt.Println("Gateway Token Failure", err)
 			w.WriteHeader(404)
 			return
 		}
