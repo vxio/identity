@@ -37,6 +37,10 @@ func (r *sqlIdentityRepo) list(tenantID zerotrust.TenantID) ([]api.Identity, err
 		return nil, err
 	}
 
+	if len(identities) == 0 {
+		return identities, nil
+	}
+
 	qry = fmt.Sprintf(`
 		SELECT %s
 		FROM identity_address
@@ -61,7 +65,9 @@ func (r *sqlIdentityRepo) list(tenantID zerotrust.TenantID) ([]api.Identity, err
 		return nil, err
 	}
 
-	for _, i := range identities {
+	for idx := range identities {
+		i := &identities[idx]
+
 		for _, a := range addresses {
 			if a.IdentityID == i.IdentityID {
 				i.Addresses = append(i.Addresses, a)
@@ -87,9 +93,13 @@ func (r *sqlIdentityRepo) get(tenantID zerotrust.TenantID, identityID string) (*
 		LIMIT 1
 	`, identitySelect)
 
-	identities, err := r.queryScanIdentity(qry, tenantID, identityID)
+	identities, err := r.queryScanIdentity(qry, tenantID.String(), identityID)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(identities) != 1 {
+		return nil, sql.ErrNoRows
 	}
 
 	qry = fmt.Sprintf(`
@@ -99,7 +109,7 @@ func (r *sqlIdentityRepo) get(tenantID zerotrust.TenantID, identityID string) (*
 		WHERE identity.tenant_id = ? AND identity.identity_id = ?
 	`, addressSelect)
 
-	addresses, err := r.queryScanAddresses(qry, tenantID, identityID)
+	addresses, err := r.queryScanAddresses(qry, tenantID.String(), identityID)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +121,7 @@ func (r *sqlIdentityRepo) get(tenantID zerotrust.TenantID, identityID string) (*
 		WHERE identity.tenant_id = ? AND identity.identity_id = ?
 	`, phoneSelect)
 
-	phones, err := r.queryScanPhone(qry, tenantID, identityID)
+	phones, err := r.queryScanPhone(qry, tenantID.String(), identityID)
 	if err != nil {
 		return nil, err
 	}
@@ -264,6 +274,7 @@ func (r *sqlIdentityRepo) add(identity api.Identity) (*api.Identity, error) {
 // Matches the order pulled in by the rows.Scan below in queryScanIdentity
 var identitySelect = `
 	identity.identity_id, 
+	identity.tenant_id,
 	identity.first_name, 
 	identity.middle_name, 
 	identity.last_name, 
@@ -276,7 +287,8 @@ var identitySelect = `
 	identity.registered_on, 
 	identity.invite_id,
 	identity.disabled_on, 
-	identity.disabled_by
+	identity.disabled_by,
+	identity.last_updated_on
 `
 
 func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) ([]api.Identity, error) {
@@ -291,6 +303,7 @@ func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) (
 		item := api.Identity{}
 		if err := rows.Scan(
 			&item.IdentityID,
+			&item.TenantID,
 			&item.FirstName,
 			&item.MiddleName,
 			&item.LastName,
@@ -301,8 +314,10 @@ func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) (
 			&item.Email,
 			&item.EmailVerified,
 			&item.RegisteredOn,
+			&item.InviteID,
 			&item.DisabledOn,
 			&item.DisabledBy,
+			&item.LastUpdatedOn,
 		); err != nil {
 			return nil, err
 		}
@@ -325,10 +340,10 @@ var addressSelect = `
 	identity_address.address_1, 
 	identity_address.address_2, 
 	identity_address.city, 
+	identity_address.postal_code,
 	identity_address.state, 
 	identity_address.country, 
-	identity_address.validated, 
-	identity_address.active
+	identity_address.validated
 `
 
 func (r *sqlIdentityRepo) queryScanAddresses(query string, args ...interface{}) ([]api.Address, error) {
@@ -348,6 +363,7 @@ func (r *sqlIdentityRepo) queryScanAddresses(query string, args ...interface{}) 
 			&item.Address1,
 			&item.Address2,
 			&item.City,
+			&item.PostalCode,
 			&item.State,
 			&item.Country,
 			&item.Validated,
@@ -369,9 +385,9 @@ func (r *sqlIdentityRepo) queryScanAddresses(query string, args ...interface{}) 
 var phoneSelect = `
 	identity_phone.identity_id,
 	identity_phone.phone_id,
+	identity_phone.type,
 	identity_phone.number,
-	identity_phone.valid,
-	identity_phone.type
+	identity_phone.validated
 `
 
 func (r *sqlIdentityRepo) queryScanPhone(query string, args ...interface{}) ([]api.Phone, error) {
@@ -387,9 +403,9 @@ func (r *sqlIdentityRepo) queryScanPhone(query string, args ...interface{}) ([]a
 		if err := rows.Scan(
 			&item.IdentityID,
 			&item.PhoneID,
+			&item.Type,
 			&item.Number,
 			&item.Validated,
-			&item.Type,
 		); err != nil {
 			return nil, err
 		}
@@ -413,6 +429,7 @@ func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) err
 			address_1 = ?,
 			address_2 = ?,
 			city = ?,
+			postal_code = ?,
 			state = ?,
 			country = ?,
 			validated = ?,
@@ -428,6 +445,7 @@ func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) err
 			a.Address1,
 			a.Address2,
 			a.City,
+			a.PostalCode,
 			a.State,
 			a.Country,
 			a.Validated,
@@ -454,11 +472,12 @@ func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) err
 					address_1, 
 					address_2, 
 					city, 
+					postal_code,
 					state, 
 					country, 
 					validated, 
 					last_updated_on
-				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)	
+				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)	
 			`
 
 			_, err := tx.Exec(insertQry,
@@ -468,6 +487,7 @@ func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) err
 				a.Address1,
 				a.Address2,
 				a.City,
+				a.PostalCode,
 				a.State,
 				a.Country,
 				a.Validated,
@@ -501,10 +521,6 @@ func (r *sqlIdentityRepo) upsertPhones(tx *sql.Tx, updated *api.Identity) error 
 			phone_id = ?
 	`
 
-	insertQry := `
-		INSERT INTO identity_phone (identity_id, phone_id, type, number, validated, last_updated_on) VALUES (?, ?, ?, ?, ?, ?)	
-	`
-
 	for _, p := range updated.Phones {
 		c, err := tx.Exec(updateQry,
 			p.Type,
@@ -524,6 +540,18 @@ func (r *sqlIdentityRepo) upsertPhones(tx *sql.Tx, updated *api.Identity) error 
 		}
 
 		if cnt == 0 {
+
+			insertQry := `
+				INSERT INTO identity_phone (
+					identity_id, 
+					phone_id, 
+					type, 
+					number, 
+					validated, 
+					last_updated_on
+				) VALUES (?, ?, ?, ?, ?, ?)	
+			`
+
 			_, err := tx.Exec(insertQry,
 				updated.IdentityID,
 				p.PhoneID,
@@ -539,7 +567,7 @@ func (r *sqlIdentityRepo) upsertPhones(tx *sql.Tx, updated *api.Identity) error 
 	}
 
 	// cleanout non-updated phones
-	if _, err := tx.Exec(`DELETE FROM identity_phone   WHERE identity_id = ? AND last_updated_on < ?`, updated.IdentityID, updated.LastUpdatedOn); err != nil {
+	if _, err := tx.Exec(`DELETE FROM identity_phone WHERE identity_id = ? AND last_updated_on < ?`, updated.IdentityID, updated.LastUpdatedOn); err != nil {
 		return err
 	}
 

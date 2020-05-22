@@ -479,10 +479,7 @@ components:
           pattern: ^\w+$
           maxLength: 255
         birthDate:
-          type: string
-          format: date
-          example: 2020-12-31
-          maxLength: 10
+          $ref: '#/components/schemas/DateTime'
         status: 
           type: string
           enum:
@@ -573,10 +570,7 @@ components:
           pattern: ^\w+$
           maxLength: 255
         birthDate:
-          type: string
-          format: date
-          example: 2020-12-31
-          maxLength: 10
+          $ref: '#/components/schemas/DateTime'
         status: 
           type: string
           enum:
@@ -590,16 +584,87 @@ components:
           type: array
           maxItems: 300
           items:
-            $ref: '#/components/schemas/Phone'
+            $ref: '#/components/schemas/UpdatePhone'
         addresses:
           type: array
           maxItems: 300
           items:
-            $ref: '#/components/schemas/Address'
+            $ref: '#/components/schemas/UpdateAddress'
       required:
         - firstName
         - lastName
 
+    UpdatePhone:
+      description: Phone number
+      type: object
+      additionalProperties: false
+      properties:
+        phoneID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        number:
+          type: string
+          format: phone
+          pattern: ^[0-9]+$
+          maxLength: 15
+        validated: 
+          type: boolean
+        type:
+          type: string
+          enum:
+          - home
+          - mobile
+          - work
+
+    UpdateAddress:
+      description: Address of the Identity
+      type: object
+      additionalProperties: false
+      properties:
+        addressID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        type:
+          type: string
+          enum:
+          - primary
+          - secondary
+        address1:
+          type: string
+          example: 111 Main St.
+          pattern: ^\w+$
+          maxLength: 255
+        address2:
+          type: string
+          pattern: ^\w*$
+          maxLength: 255
+          nullable: true
+        city:
+          type: string
+          example: Cedar Falls
+          pattern: ^\w+$
+          maxLength: 255
+        postalCode:
+          type: string
+          minLength: 5
+          maxLength: 5
+          pattern: ^\d+$
+          example: 50613
+        state:
+          type: string
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          example: IA
+        country:
+          type: string
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          example: US
+        validated: 
+          type: boolean
+          
     LastLogin:
       description: |
         Defines when and what credential was used for the last login
@@ -813,10 +878,7 @@ components:
           pattern: ^\w+$
           maxLength: 255
         birthDate:
-          type: string
-          format: date
-          example: 2020-12-31
-          maxLength: 10
+          $ref: '#/components/schemas/DateTime'
         email:
           $ref: '#/components/schemas/Email'
           writeOnly: true

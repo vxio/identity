@@ -1,6 +1,7 @@
 package identities
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -50,6 +51,16 @@ func (c *Controller) Routes() api.Routes {
 	}
 }
 
+func errorHandling(w http.ResponseWriter, err error) {
+	switch err {
+	case sql.ErrNoRows:
+		w.WriteHeader(404)
+	default:
+		w.WriteHeader(500)
+		return
+	}
+}
+
 // DisableIdentity - Disable an identity. Its left around for historical reporting
 func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
 	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
@@ -57,7 +68,7 @@ func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
 		identityID := params["identityID"]
 		err := c.service.DisableIdentity(session, identityID)
 		if err != nil {
-			w.WriteHeader(500)
+			errorHandling(w, err)
 			return
 		}
 
@@ -72,7 +83,7 @@ func (c *Controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
 		identityID := params["identityID"]
 		result, err := c.service.GetIdentity(session, identityID)
 		if err != nil {
-			w.WriteHeader(500)
+			errorHandling(w, err)
 			return
 		}
 
@@ -87,7 +98,7 @@ func (c *Controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
 		orgID := query.Get("orgID")
 		result, err := c.service.ListIdentities(session, orgID)
 		if err != nil {
-			w.WriteHeader(500)
+			errorHandling(w, err)
 			return
 		}
 
@@ -102,13 +113,13 @@ func (c *Controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
 		identityID := params["identityID"]
 		identity := &api.UpdateIdentity{}
 		if err := json.NewDecoder(r.Body).Decode(&identity); err != nil {
-			w.WriteHeader(500)
+			w.WriteHeader(400)
 			return
 		}
 
 		result, err := c.service.UpdateIdentity(session, identityID, *identity)
 		if err != nil {
-			w.WriteHeader(500)
+			errorHandling(w, err)
 			return
 		}
 

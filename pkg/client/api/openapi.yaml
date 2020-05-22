@@ -677,7 +677,7 @@ components:
           phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         suffix: suffix
-        birthDate: 2020-12-31T00:00:00.000+0000
+        birthDate: 2000-01-23T04:56:07.000+00:00
         firstName: John
         emailVerified: true
         disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -728,9 +728,8 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          example: 2020-12-31
-          format: date
-          maxLength: 10
+          format: date-time
+          maxLength: 24
           type: string
         status:
           enum:
@@ -807,7 +806,6 @@ components:
           validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
@@ -817,7 +815,6 @@ components:
           validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
@@ -827,7 +824,6 @@ components:
           validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
@@ -837,7 +833,6 @@ components:
           validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
@@ -847,7 +842,6 @@ components:
           validated: true
           address2: address2
           city: Cedar Falls
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           address1: 111 Main St.
           postalCode: "50613"
           state: IA
@@ -857,32 +851,27 @@ components:
         phones:
         - number: number
           validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         - number: number
           validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         - number: number
           validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         - number: number
           validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         - number: number
           validated: true
-          identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         middleName: Jimmy
         suffix: suffix
-        birthDate: 2020-12-31T00:00:00.000+0000
+        birthDate: 2000-01-23T04:56:07.000+00:00
         status: rejected
       properties:
         firstName:
@@ -911,9 +900,8 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          example: 2020-12-31
-          format: date
-          maxLength: 10
+          format: date-time
+          maxLength: 24
           type: string
         status:
           enum:
@@ -926,17 +914,107 @@ components:
           type: string
         phones:
           items:
-            $ref: '#/components/schemas/Phone'
+            $ref: '#/components/schemas/UpdatePhone'
           maxItems: 300
           type: array
         addresses:
           items:
-            $ref: '#/components/schemas/Address'
+            $ref: '#/components/schemas/UpdateAddress'
           maxItems: 300
           type: array
       required:
       - firstName
       - lastName
+      type: object
+    UpdatePhone:
+      additionalProperties: false
+      description: Phone number
+      example:
+        number: number
+        validated: true
+        phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        type: home
+      properties:
+        phoneID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        number:
+          format: phone
+          maxLength: 15
+          pattern: ^[0-9]+$
+          type: string
+        validated:
+          type: boolean
+        type:
+          enum:
+          - home
+          - mobile
+          - work
+          type: string
+      type: object
+    UpdateAddress:
+      additionalProperties: false
+      description: Address of the Identity
+      example:
+        country: US
+        validated: true
+        address2: address2
+        city: Cedar Falls
+        address1: 111 Main St.
+        postalCode: "50613"
+        state: IA
+        type: primary
+        addressID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        addressID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        type:
+          enum:
+          - primary
+          - secondary
+          type: string
+        address1:
+          example: 111 Main St.
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        address2:
+          maxLength: 255
+          nullable: true
+          pattern: ^\w*$
+          type: string
+        city:
+          example: Cedar Falls
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        postalCode:
+          example: "50613"
+          maxLength: 5
+          minLength: 5
+          pattern: ^\d+$
+          type: string
+        state:
+          example: IA
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          type: string
+        country:
+          example: US
+          maxLength: 2
+          minLength: 2
+          pattern: ^\w+$
+          type: string
+        validated:
+          type: boolean
       type: object
     LastLogin:
       additionalProperties: false
@@ -1238,7 +1316,7 @@ components:
           type: home
         middleName: Jimmy
         suffix: suffix
-        birthDate: 2020-12-31T00:00:00.000+0000
+        birthDate: 2000-01-23T04:56:07.000+00:00
         subjectID: aSDDfasd23Dfasdf
         email: john.doe@gmail.com
       properties:
@@ -1287,9 +1365,8 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          example: 2020-12-31
-          format: date
-          maxLength: 10
+          format: date-time
+          maxLength: 24
           type: string
         email:
           description: Email Address

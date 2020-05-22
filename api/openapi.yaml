@@ -677,7 +677,7 @@ components:
           phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         suffix: suffix
-        birthDate: 2020-12-31T00:00:00.000+0000
+        birthDate: 2000-01-23T04:56:07.000+00:00
         firstName: John
         emailVerified: true
         disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -728,9 +728,8 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          example: 2020-12-31
-          format: date
-          maxLength: 10
+          format: date-time
+          maxLength: 24
           type: string
         status:
           enum:
@@ -882,7 +881,7 @@ components:
           type: home
         middleName: Jimmy
         suffix: suffix
-        birthDate: 2020-12-31T00:00:00.000+0000
+        birthDate: 2000-01-23T04:56:07.000+00:00
         status: rejected
       properties:
         firstName:
@@ -911,9 +910,8 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          example: 2020-12-31
-          format: date
-          maxLength: 10
+          format: date-time
+          maxLength: 24
           type: string
         status:
           enum:
@@ -1238,7 +1236,7 @@ components:
           type: home
         middleName: Jimmy
         suffix: suffix
-        birthDate: 2020-12-31T00:00:00.000+0000
+        birthDate: 2000-01-23T04:56:07.000+00:00
         subjectID: aSDDfasd23Dfasdf
         email: john.doe@gmail.com
       properties:
@@ -1287,9 +1285,8 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          example: 2020-12-31
-          format: date
-          maxLength: 10
+          format: date-time
+          maxLength: 24
           type: string
         email:
           description: Email Address

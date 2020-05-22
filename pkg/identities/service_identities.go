@@ -1,8 +1,6 @@
 package identities
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/stime"
@@ -52,7 +50,7 @@ func (s *Service) DisableIdentity(session zerotrust.Session, identityID string) 
 func (s *Service) GetIdentity(session zerotrust.Session, identityID string) (*api.Identity, error) {
 	i, e := s.repository.get(session.TenantID, identityID)
 	if e != nil {
-		return nil, errors.New("Identity not found")
+		return nil, e
 	}
 
 	return i, nil
@@ -78,9 +76,50 @@ func (s *Service) UpdateIdentity(session zerotrust.Session, identityID string, u
 	identity.Suffix = update.Suffix
 	identity.BirthDate = update.BirthDate
 	identity.Status = update.Status
-	identity.Phones = update.Phones
-	identity.Addresses = update.Addresses
 	identity.LastUpdatedOn = s.time.Now()
+
+	identity.Phones = []api.Phone{}
+	for _, p := range update.Phones {
+		_, err := uuid.Parse(p.PhoneID)
+		if err != nil {
+			p.PhoneID = uuid.New().String()
+		}
+
+		identity.Phones = append(
+			identity.Phones,
+			api.Phone{
+				IdentityID: identity.IdentityID,
+				PhoneID:    p.PhoneID,
+				Number:     p.Number,
+				Validated:  p.Validated,
+				Type:       p.Type,
+			},
+		)
+	}
+
+	identity.Addresses = []api.Address{}
+	for _, a := range update.Addresses {
+		_, err := uuid.Parse(a.AddressID)
+		if err != nil {
+			a.AddressID = uuid.New().String()
+		}
+
+		identity.Addresses = append(
+			identity.Addresses,
+			api.Address{
+				IdentityID: identity.IdentityID,
+				AddressID:  a.AddressID,
+				Type:       a.Type,
+				Address1:   a.Address1,
+				Address2:   a.Address2,
+				City:       a.City,
+				State:      a.State,
+				PostalCode: a.PostalCode,
+				Country:    a.Country,
+				Validated:  a.Validated,
+			},
+		)
+	}
 
 	updated, err := s.repository.update(*identity)
 	if err != nil {
@@ -124,7 +163,9 @@ func (s *Service) Register(invite api.Invite, register api.Register) (*api.Ident
 	}
 
 	identity := api.Identity{
-		IdentityID:    uuid.New().String(),
+		IdentityID:    identityID,
+		TenantID:      invite.TenantID,
+		InviteID:      invite.InviteID,
 		FirstName:     register.FirstName,
 		MiddleName:    register.MiddleName,
 		LastName:      register.LastName,
@@ -138,7 +179,6 @@ func (s *Service) Register(invite api.Invite, register api.Register) (*api.Ident
 		Addresses:     addresses,
 		RegisteredOn:  s.time.Now(),
 		LastLogin:     api.LastLogin{},
-		InviteID:      invite.InviteID,
 		LastUpdatedOn: s.time.Now(),
 	}
 

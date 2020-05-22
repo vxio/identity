@@ -61,7 +61,9 @@ Class | Method | HTTP request | Description
  - [RegisterAddress](docs/RegisterAddress.md)
  - [RegisterPhone](docs/RegisterPhone.md)
  - [SendInvite](docs/SendInvite.md)
+ - [UpdateAddress](docs/UpdateAddress.md)
  - [UpdateIdentity](docs/UpdateIdentity.md)
+ - [UpdatePhone](docs/UpdatePhone.md)
 
 
 ## Documentation For Authorization
