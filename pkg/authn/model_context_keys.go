@@ -4,5 +4,5 @@ package authn
 // other packages.
 type contextKey string
 
-// loginSessionContextKey is the context key for the Login Session
-const loginSessionContextKey contextKey = "login-session"
+// LoginSessionContextKey is the context key for the Login Session
+const LoginSessionContextKey contextKey = "login-session"

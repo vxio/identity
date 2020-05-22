@@ -29,7 +29,7 @@ type LoginSession struct {
 }
 
 func LoginSessionFromRequest(r *http.Request) (*LoginSession, error) {
-	session, ok := r.Context().Value(loginSessionContextKey).(*LoginSession)
+	session, ok := r.Context().Value(LoginSessionContextKey).(*LoginSession)
 	if !ok || session == nil {
 		return nil, errors.New("Unable to find LoginSession in context")
 	}
