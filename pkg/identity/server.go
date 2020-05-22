@@ -18,7 +18,7 @@ import (
 )
 
 // RunServers - Boots up all the servers and awaits till they are stopped.
-func (env *Environment) RunServers() func() {
+func (env *Environment) RunServers(await bool) func() {
 
 	// Listen for application termination.
 	terminationListener := newTerminationListener()
@@ -27,7 +27,9 @@ func (env *Environment) RunServers() func() {
 
 	_, shutdownPublicServer := bootHTTPServer("public", &env.PublicRouter, terminationListener, env.Logger, env.Config.Servers.Public)
 
-	awaitTermination(env.Logger, terminationListener)
+	if await {
+		awaitTermination(env.Logger, terminationListener)
+	}
 
 	return func() {
 		adminServer.Shutdown()

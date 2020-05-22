@@ -8,7 +8,7 @@ servers:
 database:
   databaseName: "identity"
   sqllite:
-    path: ./data/identity.db
+    path: ":memory:"
 invites:
   expiration: 48h
   sendToURL: https://api.moov.io
@@ -19,15 +19,20 @@ session:
   expiration: 1h
   landingUrl: "/whoami"
 keys:
-  authnPublic:
-    file:
-      path: ./configs/authn-jwks-sig-pub.json
-  gatewayPublic:
-    file:
-      path: ./configs/gateway-jwks-sig-pub.json
-  sessionPublic:
-    file:
-      path: ./configs/identity-jwks-sig-pub.json
-  sessionPrivate:
-    file:
-      path: ./configs/identity-jwks-sig-priv.json
+  # Examples of how to set up this config.
+  # authnPublic:
+  #   http:
+  #    url: http://authn:8202/.well-known/jwks.json
+  #   file:
+  #     path: ./configs/authn-jwks-sig-pub.json
+  # gatewayPublic:
+  #   http:
+  #    url: http://oathkeeper:4456/.well-known/jwks.json
+  #   file:
+  #     path: ./configs/gateway-jwks-sig-pub.json
+  # sessionPublic:
+  #   file:
+  #     path: ./configs/identity-jwks-sig-pub.json
+  # sessionPrivate:
+  #   file:
+  #     path: ./configs/identity-jwks-sig-priv.json

@@ -38,7 +38,7 @@ func main() {
 		}
 	} else {
 		env.Logger.Log("main", "Starting services")
-		shutdown := env.RunServers()
+		shutdown := env.RunServers(true)
 		defer shutdown()
 	}
 
