@@ -294,7 +294,7 @@ paths:
           $ref: '#/components/responses/Empty'
 
   /identities/{identityID}/credentials/{credentialID}:
-    get:
+    delete:
       operationId: DisableCredentials
       summary: Disables a credential so it can't be used anymore to login
       tags:
@@ -315,17 +315,10 @@ paths:
         schema:
           $ref: '#/components/schemas/UUID'
       responses:
-        '200':
-          description: List of credentials tied to this identity
-          content:
-            application/json:
-              schema:
-                type: array
-                maxItems: 300
-                items:
-                  $ref: '#/components/schemas/Credential'
+        '204':
+          description: Credential was disabled
         '404':
-          description: IdentityID doesn't exist
+          description: Credential was not found.
           $ref: '#/components/responses/Empty'
         default:
           $ref: '#/components/responses/Empty'

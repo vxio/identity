@@ -25,7 +25,7 @@ func NewCredentialsService(time stime.TimeService, repository CredentialReposito
 
 // DisableCredentials - Disables a credential so it can&#39;t be used anymore to login
 func (s *CredentialsService) DisableCredentials(auth zerotrust.Session, identityID string, credentialID string) (*api.Credential, error) {
-	cred, err := s.repository.get(credentialID)
+	cred, err := s.repository.get(identityID, credentialID)
 	if err != nil {
 		return nil, err
 	}

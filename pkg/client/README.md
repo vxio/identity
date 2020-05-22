@@ -33,13 +33,13 @@ All URIs are relative to *https://local.moov.io*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*CredentialsApi* | [**DisableCredentials**](docs/CredentialsApi.md#disablecredentials) | **Get** /identities/{identityID}/credentials/{credentialID} | Disables a credential so it can&#39;t be used anymore to login
+*CredentialsApi* | [**DisableCredentials**](docs/CredentialsApi.md#disablecredentials) | **Delete** /identities/{identityID}/credentials/{credentialID} | Disables a credential so it can&#39;t be used anymore to login
 *CredentialsApi* | [**ListCredentials**](docs/CredentialsApi.md#listcredentials) | **Get** /identities/{identityID}/credentials | List the credentials this user has used.
 *IdentitiesApi* | [**DisableIdentity**](docs/IdentitiesApi.md#disableidentity) | **Delete** /identities/{identityID} | Disable an identity. Its left around for historical reporting
 *IdentitiesApi* | [**GetIdentity**](docs/IdentitiesApi.md#getidentity) | **Get** /identities/{identityID} | List identities and associates userId
 *IdentitiesApi* | [**ListIdentities**](docs/IdentitiesApi.md#listidentities) | **Get** /identities | List identities and associates userId
 *IdentitiesApi* | [**UpdateIdentity**](docs/IdentitiesApi.md#updateidentity) | **Put** /identities/{identityID} | Update a specific Identity
-*InternalApi* | [**Authenticated**](docs/InternalApi.md#authenticated) | **Post** /authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
+*InternalApi* | [**Authenticated**](docs/InternalApi.md#authenticated) | **Get** /authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
 *InternalApi* | [**RegisterWithCredentials**](docs/InternalApi.md#registerwithcredentials) | **Post** /register | If the OIDC client specified it got an invite code that token will be exchanged here to login 
 *InvitesApi* | [**DisableInvite**](docs/InvitesApi.md#disableinvite) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
 *InvitesApi* | [**ListInvites**](docs/InvitesApi.md#listinvites) | **Get** /invites | List outstanding invites

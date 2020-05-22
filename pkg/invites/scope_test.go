@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
 	client "github.com/moov-io/identity/pkg/client"
@@ -65,12 +64,5 @@ func NewScope(t *testing.T) Scope {
 		service:       service,
 		routes:        routes,
 		api:           testApi,
-	}
-}
-
-func NewSession() zerotrust.Session {
-	return zerotrust.Session{
-		CallerID: zerotrust.IdentityID(uuid.New()),
-		TenantID: zerotrust.TenantID(uuid.New()),
 	}
 }

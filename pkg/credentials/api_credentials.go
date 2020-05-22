@@ -1,6 +1,7 @@
 package credentials
 
 import (
+	"database/sql"
 	"net/http"
 	"strings"
 
@@ -24,7 +25,7 @@ func (c *CredentialsApiController) Routes() api.Routes {
 	return api.Routes{
 		{
 			"DisableCredentials",
-			strings.ToUpper("Get"),
+			strings.ToUpper("Delete"),
 			"/identities/{identityID}/credentials/{credentialID}",
 			c.DisableCredentials,
 		},
@@ -43,13 +44,19 @@ func (c *CredentialsApiController) DisableCredentials(w http.ResponseWriter, r *
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		credentialID := params["credentialID"]
-		result, err := c.service.DisableCredentials(session, identityID, credentialID)
+		_, err := c.service.DisableCredentials(session, identityID, credentialID)
 		if err != nil {
-			w.WriteHeader(500)
+			switch err {
+			case sql.ErrNoRows:
+				w.WriteHeader(404)
+			default:
+				w.WriteHeader(500)
+			}
+
 			return
 		}
 
-		api.EncodeJSONResponse(result, nil, w)
+		w.WriteHeader(204)
 	})
 }
 

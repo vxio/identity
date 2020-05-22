@@ -48,3 +48,10 @@ func WithSession(w http.ResponseWriter, r *http.Request, run func(Session)) {
 
 	run(*session)
 }
+
+func NewRandomSession() Session {
+	return Session{
+		CallerID: IdentityID(uuid.New()),
+		TenantID: TenantID(uuid.New()),
+	}
+}

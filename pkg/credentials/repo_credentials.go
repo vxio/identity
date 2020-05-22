@@ -11,7 +11,7 @@ import (
 type CredentialRepository interface {
 	list(identityID string) ([]api.Credential, error)
 	lookup(providerID string, subjectID string) (*api.Credential, error)
-	get(credentialID string) (*api.Credential, error)
+	get(identityID string, credentialID string) (*api.Credential, error)
 	add(credentials api.Credential) (*api.Credential, error)
 	update(updated api.Credential) (*api.Credential, error)
 	record(credentialID string, nonce string, ip string, at time.Time) error
@@ -27,7 +27,7 @@ type sqlCredsRepo struct {
 
 func (r *sqlCredsRepo) list(identityID string) ([]api.Credential, error) {
 	qry := `
-		SELECT credential_id, provider, subject_id, identity_id, creaton_on, last_used_on, disabled_on, disabled_by
+		SELECT credential_id, provider, subject_id, identity_id, created_on, last_used_on, disabled_on, disabled_by
 		FROM credentials
 		WHERE identity_id = ?
 	`
@@ -55,15 +55,15 @@ func (r *sqlCredsRepo) lookup(providerID string, subjectID string) (*api.Credent
 	return &results[0], nil
 }
 
-func (r *sqlCredsRepo) get(credentialID string) (*api.Credential, error) {
+func (r *sqlCredsRepo) get(identityID string, credentialID string) (*api.Credential, error) {
 	qry := `
 		SELECT credential_id, provider, subject_id, identity_id, created_on, last_used_on, disabled_on, disabled_by
 		FROM credentials
-		WHERE credential_id = ?
+		WHERE credential_id = ? AND identity_id = ?
 		LIMIT 1
 	`
 
-	results, err := r.queryScan(qry, credentialID)
+	results, err := r.queryScan(qry, credentialID, identityID)
 	if err != nil {
 		return nil, err
 	}

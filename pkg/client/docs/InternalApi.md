@@ -4,14 +4,14 @@ All URIs are relative to *https://local.moov.io*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**Authenticated**](InternalApi.md#Authenticated) | **Post** /authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
+[**Authenticated**](InternalApi.md#Authenticated) | **Get** /authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
 [**RegisterWithCredentials**](InternalApi.md#RegisterWithCredentials) | **Post** /register | If the OIDC client specified it got an invite code that token will be exchanged here to login 
 
 
 
 ## Authenticated
 
-> LoggedIn Authenticated(ctx, moovLogin, login)
+> LoggedIn Authenticated(ctx, moovLogin)
 
 Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
 
@@ -22,7 +22,6 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **moovLogin** | **string**| Encrypted and signed token that they authenticated via one of the approved services | 
-**login** | [**Login**](Login.md)| Arguments needed to match up the OIDC user data with a user in the system | 
 
 ### Return type
 
@@ -34,7 +33,7 @@ Name | Type | Description  | Notes
 
 ### HTTP request headers
 
-- **Content-Type**: application/json
+- **Content-Type**: Not defined
 - **Accept**: application/json, text/plain
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

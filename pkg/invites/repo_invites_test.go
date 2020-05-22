@@ -129,13 +129,6 @@ func TestUpdate(t *testing.T) {
 	})
 }
 
-var InMemorySqliteConfig = database.DatabaseConfig{
-	DatabaseName: "sqlite",
-	SqlLite: &database.SqlLiteConfig{
-		Path: ":memory:",
-	},
-}
-
 func ForEachDatabase(t *testing.T, run func(t *testing.T, repository Repository)) {
 	cases := map[string]database.DatabaseConfig{
 		"sqlite": InMemorySqliteConfig,
@@ -177,7 +170,11 @@ func LoadDatabase(t *testing.T, config database.DatabaseConfig) *sql.DB {
 }
 
 func NewInMemoryInvitesRepository(t *testing.T) Repository {
-	db := LoadDatabase(t, InMemorySqliteConfig)
+	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, log.NewNopLogger(), context.Background())
+	t.Cleanup(close)
+	if err != nil {
+		t.Error(err)
+	}
 
 	repo := NewInvitesRepository(db)
 
