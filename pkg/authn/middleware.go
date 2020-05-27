@@ -3,6 +3,7 @@ package authn
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -35,6 +36,7 @@ func (s *Middleware) Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		session, err := s.FromRequest(r)
 		if err != nil {
+			w.WriteHeader(404)
 			return
 		}
 
@@ -80,6 +82,7 @@ func (s *Middleware) Parse(tokenString string) (*LoginSession, error) {
 	})
 
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 

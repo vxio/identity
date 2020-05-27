@@ -5,17 +5,19 @@ import (
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
+	"github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/webkeys"
 )
 
 // Config defines all the configuration for the app
 type Config struct {
-	Servers       ServerConfig
-	Database      database.DatabaseConfig
-	Keys          KeysConfig
-	Session       authn.SessionConfig
-	Notifications notifications.NotificationsConfig
-	Invites       invites.Config
+	Servers        ServerConfig
+	Database       database.DatabaseConfig
+	Keys           KeysConfig
+	Authentication authn.Config
+	Session        session.Config
+	Notifications  notifications.NotificationsConfig
+	Invites        invites.Config
 }
 
 // ServerConfig - Groups all the http configs for the servers and ports that get opened.

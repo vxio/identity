@@ -8,12 +8,13 @@ import (
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/identities"
+	"github.com/moov-io/identity/pkg/session"
 )
 
 type authnService struct {
 	credentials credentials.CredentialsService
 	identities  identities.Service
-	token       SessionService
+	token       session.SessionService
 	invites     api.InvitesApiServicer
 	landingURL  string
 }
@@ -22,7 +23,7 @@ type authnService struct {
 func NewAuthnService(
 	credentials credentials.CredentialsService,
 	identities identities.Service,
-	token SessionService,
+	token session.SessionService,
 	invites api.InvitesApiServicer,
 	landingURL string,
 ) api.InternalApiServicer {

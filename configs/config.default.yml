@@ -15,9 +15,10 @@ invites:
 notifications:
   Mock:
     from: noreply@moov.io
+authentication:
+  landingUrl: "/whoami"
 session:
   expiration: 1h
-  landingUrl: "/whoami"
 keys:
   # Examples of how to set up this config.
   # authnPublic:

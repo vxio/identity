@@ -25,7 +25,7 @@ func Test_Register(t *testing.T) {
 
 	redirectTo, err := resp.Location()
 	a.Nil(err)
-	a.Equal(redirectTo.String(), s.sessionConfig.LandingURL)
+	a.Equal(redirectTo.String(), s.authnConfig.LandingURL)
 }
 
 func Test_Register_InvalidInviteCode(t *testing.T) {

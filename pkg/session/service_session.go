@@ -1,4 +1,4 @@
-package authn
+package session
 
 import (
 	"errors"
@@ -25,7 +25,7 @@ type sessionService struct {
 }
 
 // NewSessionService - Creates a default instance of a SessionService
-func NewSessionService(time stime.TimeService, sessionPrivateKeys webkeys.WebKeysService, config SessionConfig) SessionService {
+func NewSessionService(time stime.TimeService, sessionPrivateKeys webkeys.WebKeysService, config Config) SessionService {
 	return &sessionService{
 		time:               time,
 		sessionPrivateKeys: sessionPrivateKeys,

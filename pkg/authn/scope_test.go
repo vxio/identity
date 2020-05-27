@@ -1,14 +1,13 @@
 package authn_test
 
 import (
+	"context"
+	"net/http"
 	"os"
 	"testing"
 	"time"
 
 	. "github.com/moov-io/identity/pkg/authn"
-
-	"context"
-	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-kit/kit/log"
@@ -23,11 +22,16 @@ import (
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
+	sessionpkg "github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
 	"github.com/moov-io/identity/pkg/zerotrust"
 	"github.com/stretchr/testify/require"
 )
+
+// pull these out so it speeds up testing
+var authnKeys, _ = webkeys.NewGenerateJwksService()
+var identityKeys, _ = webkeys.NewGenerateJwksService()
 
 func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	a := require.New(t)
@@ -57,16 +61,11 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	credsRepo := credentials.NewCredentialRepository(db)
 	creds := credentials.NewCredentialsService(stime, credsRepo)
 
-	identityKeys, err := webkeys.NewGenerateJwksService()
-	a.Nil(err)
+	sessionConfig := sessionpkg.Config{Expiration: time.Hour}
+	token := sessionpkg.NewSessionService(stime, identityKeys, sessionConfig)
 
-	sessionConfig := SessionConfig{
-		Expiration: time.Hour,
-		LandingURL: "https://localhost/whoami",
-	}
-	token := NewSessionService(stime, identityKeys, sessionConfig)
-
-	service := NewAuthnService(*creds, *identities, token, invites, sessionConfig.LandingURL)
+	authnConfig := Config{LandingURL: "https://localhost/whoami"}
+	service := NewAuthnService(*creds, *identities, token, invites, authnConfig.LandingURL)
 
 	f := fuzz.New().Funcs(
 		func(e *LoginSession, c fuzz.Continue) {
@@ -75,7 +74,7 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 
 			e.StandardClaims = jwt.StandardClaims{
 				ExpiresAt: stime.Now().Add(time.Hour).Unix(),
-				NotBefore: stime.Now().Unix(),
+				NotBefore: stime.Now().Add(time.Second * -5).Unix(),
 				IssuedAt:  stime.Now().Unix(),
 				Id:        uuid.New().String(),
 				Subject:   uuid.New().String(),
@@ -94,25 +93,30 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 
 	return a, Scope{
 		sessionConfig: sessionConfig,
+		authnConfig:   authnConfig,
 		session:       session,
 		stime:         stime,
 		logger:        logger,
 		service:       service,
 		invites:       invites,
+		authnKeys:     authnKeys,
 	}, f
 }
 
 type Scope struct {
-	sessionConfig SessionConfig
+	sessionConfig sessionpkg.Config
+	authnConfig   Config
 	session       zerotrust.Session
 	stime         stime.StaticTimeService
 	logger        log.Logger
 	service       api.InternalApiServicer
 	invites       api.InvitesApiServicer
+	authnKeys     *webkeys.GenerateJwksService
 }
 
 func (s *Scope) NewClient(loginSession LoginSession) *client.APIClient {
 	testAuthnMiddleware := NewTestMiddleware(s.stime, loginSession)
+
 	controller := NewAuthnAPIController(s.logger, s.service)
 
 	routes := mux.NewRouter()
@@ -146,4 +150,28 @@ func (s *TestMiddleware) Handler(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, r.Clone(ctx))
 	})
+}
+
+func (s *Scope) Cookie(session LoginSession) *http.Cookie {
+	privateKey := s.authnKeys.Private
+	signingMethod := jwt.GetSigningMethod(privateKey.Algorithm)
+
+	token := jwt.NewWithClaims(signingMethod, session)
+	token.Header["kid"] = privateKey.KeyID
+
+	tokenString, err := token.SignedString(privateKey.Key)
+	if err != nil {
+		panic(err)
+	}
+
+	return &http.Cookie{
+		Name:     "moov-authn",
+		Value:    tokenString,
+		Path:     "/",
+		Expires:  time.Unix(session.ExpiresAt, 0),
+		MaxAge:   int(time.Unix(session.ExpiresAt, 0).Second()),
+		SameSite: http.SameSiteDefaultMode,
+		Secure:   false,
+		HttpOnly: true,
+	}
 }

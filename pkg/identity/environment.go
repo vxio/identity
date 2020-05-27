@@ -17,6 +17,7 @@ import (
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
+	"github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
 	"github.com/moov-io/identity/pkg/zerotrust"
@@ -83,7 +84,7 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 		return nil, err
 	}
 
-	SessionService := authn.NewSessionService(TimeService, SessionPrivateKeys, config.Session)
+	SessionService := session.NewSessionService(TimeService, SessionPrivateKeys, config.Session)
 
 	templateService, err := notifications.NewTemplateRepository(logger)
 	if err != nil {
@@ -107,7 +108,7 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService, InvitesService, config.Session.LandingURL)
+	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService, InvitesService, config.Authentication.LandingURL)
 
 	// router
 	router := mux.NewRouter()
@@ -140,7 +141,7 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 		return nil, err
 	}
 
-	WhoAmIController := authn.NewWhoAmIController()
+	WhoAmIController := session.NewWhoAmIController()
 	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
