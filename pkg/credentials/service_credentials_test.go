@@ -1,4 +1,4 @@
-package credentials
+package credentials_test
 
 import (
 	"testing"

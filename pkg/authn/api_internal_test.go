@@ -1,10 +1,11 @@
-package authn
+package authn_test
 
 import (
 	"context"
 	"testing"
 
 	fuzz "github.com/google/gofuzz"
+	. "github.com/moov-io/identity/pkg/authn"
 	"github.com/moov-io/identity/pkg/client"
 )
 

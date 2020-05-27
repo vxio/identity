@@ -1,4 +1,4 @@
-package zerotrust
+package zerotrust_test
 
 import (
 	"testing"
@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
+	. "github.com/moov-io/identity/pkg/zerotrust"
 	"github.com/stretchr/testify/assert"
 )
 

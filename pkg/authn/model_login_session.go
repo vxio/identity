@@ -29,6 +29,7 @@ type LoginSession struct {
 	api.Register
 }
 
+// LoginSessionFromRequest - Pulls the Login Session out of the context of a request
 func LoginSessionFromRequest(r *http.Request) (*LoginSession, error) {
 	session, ok := r.Context().Value(LoginSessionContextKey).(*LoginSession)
 	if !ok || session == nil {
@@ -37,6 +38,7 @@ func LoginSessionFromRequest(r *http.Request) (*LoginSession, error) {
 	return session, nil
 }
 
+// WithLoginSessionFromRequest - Pulls the Login Session out of the context of a request if its not available returns an error response on `w`.
 func WithLoginSessionFromRequest(l log.Logger, w http.ResponseWriter, r *http.Request, run func(LoginSession)) {
 	session, err := LoginSessionFromRequest(r)
 	if err != nil {

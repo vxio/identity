@@ -26,3 +26,4 @@ bin/
 *.db
 
 pkged.go
+cover.out

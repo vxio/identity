@@ -2,7 +2,7 @@
 USERID := $(shell id -u $$USER)
 GROUPID:= $(shell id -g $$USER)
 
-build: identity
+build: identity rotate
 
 identity:
 	pkger
@@ -15,6 +15,10 @@ rotate:
 run: identity
 	./bin/identity
 
+test: build
+	docker-compose up -d
+	go test -cover ./...
+
 migrate:
 	pkger
 	cd ./cmd/migrate && go build -o $(PWD)/bin/migrate
@@ -23,7 +27,7 @@ migrate:
 install:
 	go get github.com/markbates/pkger/cmd/pkger
 
-docker: install
+docker: install test
 	pkger
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o ${PWD}/bin/.docker/identity cmd/identity/*
 	docker build -f Dockerfile -t moov/identity .

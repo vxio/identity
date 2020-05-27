@@ -1,4 +1,4 @@
-package credentials
+package credentials_test
 
 import (
 	"testing"
@@ -8,6 +8,7 @@ import (
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
+	. "github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/zerotrust"

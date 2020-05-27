@@ -131,7 +131,7 @@ func TestUpdate(t *testing.T) {
 
 func ForEachDatabase(t *testing.T, run func(t *testing.T, repository Repository)) {
 	cases := map[string]database.DatabaseConfig{
-		"sqlite": InMemorySqliteConfig,
+		"sqlite": database.InMemorySqliteConfig,
 		"mysql": {
 			DatabaseName: "identity",
 			MySql: &database.MySqlConfig{

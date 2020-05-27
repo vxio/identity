@@ -109,7 +109,7 @@ func TestExpiredInvite(t *testing.T) {
 }
 
 func NewInvitesScope(t *testing.T) InvitesServiceScope {
-	session := NewSession()
+	session := zerotrust.NewRandomSession()
 
 	repository := NewInMemoryInvitesRepository(t)
 

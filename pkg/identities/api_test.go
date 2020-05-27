@@ -1,4 +1,4 @@
-package identities
+package identities_test
 
 import (
 	"context"
@@ -18,10 +18,10 @@ func Test_Register(t *testing.T) {
 	r := api.Register{}
 	f.Fuzz(&r)
 
-	r.Phones = []api.RegisterPhone{api.RegisterPhone{}}
+	r.Phones = make([]api.RegisterPhone, 1)
 	f.Fuzz(&r.Phones[0])
 
-	r.Addresses = []api.RegisterAddress{api.RegisterAddress{}}
+	r.Addresses = make([]api.RegisterAddress, 1)
 	f.Fuzz(&r.Addresses[0])
 
 	i, err := s.service.Register(invite, r)
@@ -147,7 +147,7 @@ func Test_UpdateAPI(t *testing.T) {
 	a.Equal(updates.Status, updated.Status)
 
 	a.Len(updated.Phones, len(updates.Phones))
-	for idx, _ := range updated.Phones {
+	for idx := range updated.Phones {
 		exp := updates.Phones[idx]
 		cur := updated.Phones[idx]
 
@@ -158,7 +158,7 @@ func Test_UpdateAPI(t *testing.T) {
 	}
 
 	a.Len(updated.Addresses, len(updates.Addresses))
-	for idx, _ := range updated.Addresses {
+	for idx := range updated.Addresses {
 		exp := updates.Addresses[idx]
 		cur := updated.Addresses[idx]
 

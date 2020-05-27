@@ -1,4 +1,4 @@
-package zerotrust
+package zerotrust_test
 
 import (
 	"net/http"
@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	. "github.com/moov-io/identity/pkg/zerotrust"
 	"gotest.tools/v3/assert"
 )
 

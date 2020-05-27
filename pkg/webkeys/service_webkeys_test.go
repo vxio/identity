@@ -1,4 +1,4 @@
-package webkeys
+package webkeys_test
 
 import (
 	"io/ioutil"
@@ -10,6 +10,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	. "github.com/moov-io/identity/pkg/webkeys"
 	"github.com/stretchr/testify/assert"
 )
 

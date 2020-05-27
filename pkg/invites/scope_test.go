@@ -26,7 +26,7 @@ type Scope struct {
 }
 
 func NewScope(t *testing.T) Scope {
-	session := NewSession()
+	session := zerotrust.NewRandomSession()
 
 	invitesConfig := Config{
 		Expiration: time.Hour,
@@ -53,7 +53,7 @@ func NewScope(t *testing.T) Scope {
 	testMiddleware := zerotrusttest.NewTestMiddleware(times, session)
 	routes.Use(testMiddleware.Handler)
 
-	testApi := clienttest.NewTestClient(routes)
+	testAPI := clienttest.NewTestClient(routes)
 
 	return Scope{
 		session:       session,
@@ -63,6 +63,6 @@ func NewScope(t *testing.T) Scope {
 		repository:    repository,
 		service:       service,
 		routes:        routes,
-		api:           testApi,
+		api:           testAPI,
 	}
 }

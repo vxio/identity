@@ -1,4 +1,4 @@
-package identities
+package identities_test
 
 import (
 	"testing"
@@ -11,6 +11,7 @@ import (
 	"github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
 	"github.com/moov-io/identity/pkg/database"
+	. "github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/zerotrust"
 	"github.com/moov-io/identity/pkg/zerotrust/zerotrusttest"
@@ -74,7 +75,7 @@ func (s *Scope) RandomInvite() api.Invite {
 
 func RandStringN(c fuzz.Continue, n int) string {
 	s := make([]rune, n)
-	for i, _ := range s {
+	for i := range s {
 		c.Fuzz(&s[i])
 	}
 	return string(s)
@@ -143,12 +144,12 @@ func NewFuzzer() *fuzz.Fuzzer {
 			e.Email = c.RandString() + "@test.moov.io"
 
 			e.Phones = make([]api.RegisterPhone, c.Intn(3)+1)
-			for i, _ := range e.Phones {
+			for i := range e.Phones {
 				c.Fuzz(&e.Phones[i])
 			}
 
 			e.Addresses = make([]api.RegisterAddress, c.Intn(3)+1)
-			for i, _ := range e.Addresses {
+			for i := range e.Addresses {
 				c.Fuzz(&e.Addresses[i])
 			}
 		},
@@ -163,12 +164,12 @@ func NewFuzzer() *fuzz.Fuzzer {
 			e.Status = RandStringN(c, 10)
 
 			e.Phones = make([]client.UpdatePhone, c.Intn(3)+1)
-			for i, _ := range e.Phones {
+			for i := range e.Phones {
 				c.Fuzz(&e.Phones[i])
 			}
 
 			e.Addresses = make([]client.UpdateAddress, c.Intn(3)+1)
-			for i, _ := range e.Addresses {
+			for i := range e.Addresses {
 				c.Fuzz(&e.Addresses[i])
 			}
 		},

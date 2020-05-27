@@ -1,9 +1,11 @@
-package authn
+package authn_test
 
 import (
 	"os"
 	"testing"
 	"time"
+
+	. "github.com/moov-io/identity/pkg/authn"
 
 	"context"
 	"net/http"
