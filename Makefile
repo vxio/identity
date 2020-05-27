@@ -10,7 +10,6 @@ identity:
 
 rotate:
 	go build -o ${PWD}/bin/rotate cmd/rotate/*
-	./bin/rotate
 
 run: identity
 	./bin/identity
