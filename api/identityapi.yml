@@ -94,16 +94,9 @@ paths:
       operationId: Authenticated
       summary: |
         Complete a login via a OIDC.
-        Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.    
+        Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.
       security:
       - LoginAuth: []
-      parameters:
-        - in: cookie
-          name: moov-login
-          description: Encrypted and signed token that they authenticated via one of the approved services
-          required: true
-          schema:
-            type: string
       tags:
       - internal
       responses:
@@ -123,16 +116,10 @@ paths:
     post:
       operationId: RegisterWithCredentials
       summary: |
-        If the OIDC client specified it got an invite code that token will be exchanged here to login
+        Called when the user is registering for the first time. It requires that they have authenticated with a 
+        supported OIDC provider and recieved a valid invite code.
       security:
       - LoginAuth: []
-      parameters:
-        - in: cookie
-          name: moov-login
-          description: Encrypted and signed token that they authenticated via one of the approved services
-          required: true
-          schema:
-            type: string
       tags:
       - internal
       requestBody:
@@ -345,7 +332,7 @@ components:
     LoginAuth:
       type: apiKey
       in: cookie
-      name: moov-login
+      name: moov-authn
 
   schemas:
     UUID:

@@ -22,7 +22,7 @@ func Test_GenerateKeys(t *testing.T) {
 
 	keys, err := service.FetchJwks()
 	a.Nil(err)
-	a.Len(keys.Keys, 1)
+	a.Len(keys.Keys, 2)
 
 	generator, ok := service.(*GenerateJwksService)
 	a.True(ok)
@@ -62,8 +62,12 @@ func Test_HttpKeys(t *testing.T) {
 
 	keys, err := service.FetchJwks()
 	a.Nil(err)
-
 	a.Len(keys.Keys, 1)
+
+	// Fetching from the server will only produce public keys
+	for _, v := range keys.Keys {
+		a.True(v.IsPublic())
+	}
 }
 
 func Test_HttpKeys_NotFound(t *testing.T) {

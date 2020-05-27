@@ -14,7 +14,15 @@ func NewTestClient(handler http.Handler) *client.APIClient {
 	}
 
 	mockClient := &http.Client{
+
+		// Mock handler that sends the request to the handler passed in and returns the response without a server
+		// middleman.
 		Transport: &mockHandler,
+
+		// Disables following redirects for testing.
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
 	}
 
 	config := client.NewConfiguration()

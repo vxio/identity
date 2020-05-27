@@ -1,6 +1,7 @@
 package authn
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -29,7 +30,7 @@ import (
 func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	a := require.New(t)
 
-	logger := log.NewNopLogger()
+	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 	session := zerotrust.NewRandomSession()
 
 	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, logger, nil)
@@ -90,20 +91,22 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	)
 
 	return a, Scope{
-		session: session,
-		stime:   stime,
-		logger:  logger,
-		service: service,
-		invites: invites,
+		sessionConfig: sessionConfig,
+		session:       session,
+		stime:         stime,
+		logger:        logger,
+		service:       service,
+		invites:       invites,
 	}, f
 }
 
 type Scope struct {
-	session zerotrust.Session
-	stime   stime.StaticTimeService
-	logger  log.Logger
-	service api.InternalApiServicer
-	invites api.InvitesApiServicer
+	sessionConfig SessionConfig
+	session       zerotrust.Session
+	stime         stime.StaticTimeService
+	logger        log.Logger
+	service       api.InternalApiServicer
+	invites       api.InvitesApiServicer
 }
 
 func (s *Scope) NewClient(loginSession LoginSession) *client.APIClient {

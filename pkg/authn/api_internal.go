@@ -1,6 +1,7 @@
 package authn
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -45,27 +46,23 @@ func (c *authnAPIController) Routes() api.Routes {
 
 // Authenticated - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
 func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Request) {
-	session, err := LoginSessionFromRequest(r)
-	if err != nil {
-		c.logger.Log("level", "error", "msg", err.Error())
-		w.WriteHeader(404)
-		return
-	}
+	WithLoginSessionFromRequest(c.logger, w, r, func(session LoginSession) {
 
-	login := api.Login{
-		Provider:  session.Provider,
-		SubjectID: session.SubjectID,
-	}
+		login := api.Login{
+			Provider:  session.Provider,
+			SubjectID: session.SubjectID,
+		}
 
-	result, err := c.service.LoginWithCredentials(login, session.State, session.IP)
-	if err != nil {
-		c.logger.Log("level", "error", "msg", "Not able to exchange login token for session token", "error", err.Error())
-		w.WriteHeader(404)
-		return
-	}
+		result, err := c.service.LoginWithCredentials(login, session.State, session.IP)
+		if err != nil {
+			c.logger.Log("level", "error", "msg", "Not able to exchange login token for session token", "error", err.Error())
+			w.WriteHeader(404)
+			return
+		}
 
-	http.SetCookie(w, result)
-	http.Redirect(w, r, c.service.LandingURL(), http.StatusFound)
+		http.SetCookie(w, result)
+		http.Redirect(w, r, c.service.LandingURL(), http.StatusFound)
+	})
 }
 
 // Register - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
@@ -77,41 +74,21 @@ func (c *authnAPIController) Register(w http.ResponseWriter, r *http.Request) {
 
 // SubmitRegistration - Finalizes the registration and handles all the user creation and first login
 func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.Request) {
-	session, err := LoginSessionFromRequest(r)
-	if err != nil {
-		c.logger.Log("level", "error", "msg", err.Error())
-		w.WriteHeader(404)
-		return
-	}
+	WithLoginSessionFromRequest(c.logger, w, r, func(session LoginSession) {
+		registration := &api.Register{}
+		if err := json.NewDecoder(r.Body).Decode(&registration); err != nil {
+			w.WriteHeader(400)
+			return
+		}
 
-	register := api.Register{
-		Provider:  session.Provider,
-		SubjectID: session.SubjectID,
+		result, err := c.service.RegisterWithCredentials(*registration, session.State, session.IP)
+		if err != nil {
+			c.logger.Log("level", "error", "msg", "Unable to RegisterWithCredentials", "error", err)
+			w.WriteHeader(400)
+			return
+		}
 
-		InviteCode: session.InviteCode,
-
-		FirstName:  session.FirstName,
-		MiddleName: session.MiddleName,
-		LastName:   session.LastName,
-
-		NickName: session.NickName,
-
-		Suffix:    session.Suffix,
-		BirthDate: session.BirthDate,
-
-		Email: session.Email,
-
-		Phones:    session.Phones,
-		Addresses: session.Addresses,
-	}
-
-	result, err := c.service.RegisterWithCredentials(register, session.State, session.IP)
-	if err != nil {
-		c.logger.Log("level", "error", "msg", "Unable to RegisterWithCredentials", "error", err)
-		w.WriteHeader(400)
-		return
-	}
-
-	http.SetCookie(w, result)
-	http.Redirect(w, r, c.service.LandingURL(), http.StatusFound)
+		http.SetCookie(w, result)
+		http.Redirect(w, r, c.service.LandingURL(), http.StatusFound)
+	})
 }

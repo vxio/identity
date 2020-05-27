@@ -39,8 +39,8 @@ Class | Method | HTTP request | Description
 *IdentitiesApi* | [**GetIdentity**](docs/IdentitiesApi.md#getidentity) | **Get** /identities/{identityID} | List identities and associates userId
 *IdentitiesApi* | [**ListIdentities**](docs/IdentitiesApi.md#listidentities) | **Get** /identities | List identities and associates userId
 *IdentitiesApi* | [**UpdateIdentity**](docs/IdentitiesApi.md#updateidentity) | **Put** /identities/{identityID} | Update a specific Identity
-*InternalApi* | [**Authenticated**](docs/InternalApi.md#authenticated) | **Get** /authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
-*InternalApi* | [**RegisterWithCredentials**](docs/InternalApi.md#registerwithcredentials) | **Post** /register | If the OIDC client specified it got an invite code that token will be exchanged here to login 
+*InternalApi* | [**Authenticated**](docs/InternalApi.md#authenticated) | **Get** /authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint. 
+*InternalApi* | [**RegisterWithCredentials**](docs/InternalApi.md#registerwithcredentials) | **Post** /register | Called when the user is registering for the first time. It requires that they have authenticated with a  supported OIDC provider and recieved a valid invite code. 
 *InvitesApi* | [**DisableInvite**](docs/InvitesApi.md#disableinvite) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
 *InvitesApi* | [**ListInvites**](docs/InvitesApi.md#listinvites) | **Get** /invites | List outstanding invites
 *InvitesApi* | [**SendInvite**](docs/InvitesApi.md#sendinvite) | **Post** /invites | Send an email invite to a new user

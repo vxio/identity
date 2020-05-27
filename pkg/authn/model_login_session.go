@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-kit/kit/log"
 	api "github.com/moov-io/identity/pkg/api"
 )
 
@@ -34,4 +35,15 @@ func LoginSessionFromRequest(r *http.Request) (*LoginSession, error) {
 		return nil, errors.New("Unable to find LoginSession in context")
 	}
 	return session, nil
+}
+
+func WithLoginSessionFromRequest(l log.Logger, w http.ResponseWriter, r *http.Request, run func(LoginSession)) {
+	session, err := LoginSessionFromRequest(r)
+	if err != nil {
+		l.Log("level", "error", "msg", err.Error())
+		w.WriteHeader(404)
+		return
+	}
+
+	run(*session)
 }

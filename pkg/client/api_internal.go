@@ -25,12 +25,11 @@ var (
 type InternalApiService service
 
 /*
-Authenticated Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
+Authenticated Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint. 
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param moovLogin Encrypted and signed token that they authenticated via one of the approved services
 @return LoggedIn
 */
-func (a *InternalApiService) Authenticated(ctx _context.Context, moovLogin string) (LoggedIn, *_nethttp.Response, error) {
+func (a *InternalApiService) Authenticated(ctx _context.Context) (LoggedIn, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -117,13 +116,12 @@ func (a *InternalApiService) Authenticated(ctx _context.Context, moovLogin strin
 }
 
 /*
-RegisterWithCredentials If the OIDC client specified it got an invite code that token will be exchanged here to login 
+RegisterWithCredentials Called when the user is registering for the first time. It requires that they have authenticated with a  supported OIDC provider and recieved a valid invite code. 
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param moovLogin Encrypted and signed token that they authenticated via one of the approved services
  * @param register Arguments needed register a user with OIDC credentials.
 @return LoggedIn
 */
-func (a *InternalApiService) RegisterWithCredentials(ctx _context.Context, moovLogin string, register Register) (LoggedIn, *_nethttp.Response, error) {
+func (a *InternalApiService) RegisterWithCredentials(ctx _context.Context, register Register) (LoggedIn, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
