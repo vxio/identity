@@ -1,4 +1,4 @@
-package zerotrust
+package gateway
 
 import (
 	"context"
@@ -20,27 +20,27 @@ type contextKey string
 // SessionContextKey is the context key for the Login Session
 const SessionContextKey contextKey = "session"
 
-// GatewayMiddleware - Handles authenticating a request came from the authn services
-type GatewayMiddleware struct {
+// Middleware - Handles authenticating a request came from the authn services
+type Middleware struct {
 	time       stime.TimeService
 	publicKeys jose.JSONWebKeySet
 }
 
-// NewGatewayMiddleware - Generates a default AuthnMiddleware for use with authenticating a request came from the authn services
-func NewGatewayMiddleware(time stime.TimeService, publicKeyLoader webkeys.WebKeysService) (*GatewayMiddleware, error) {
+// NewMiddleware - Generates a default AuthnMiddleware for use with authenticating a request came from the authn services
+func NewMiddleware(time stime.TimeService, publicKeyLoader webkeys.WebKeysService) (*Middleware, error) {
 	publicKeys, err := publicKeyLoader.FetchJwks()
 	if err != nil {
 		return nil, err
 	}
 
-	return &GatewayMiddleware{
+	return &Middleware{
 		time:       time,
 		publicKeys: *publicKeys,
 	}, nil
 }
 
 // Handler - Generates the handler you use to wrap the http routes
-func (s *GatewayMiddleware) Handler(h http.Handler) http.Handler {
+func (s *Middleware) Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		session, err := s.FromRequest(r)
 		if err != nil {
@@ -57,7 +57,7 @@ func (s *GatewayMiddleware) Handler(h http.Handler) http.Handler {
 }
 
 // FromRequest - Pulls out authenticationd details from the Request and calls Parse.
-func (s *GatewayMiddleware) FromRequest(r *http.Request) (*SessionJwt, error) {
+func (s *Middleware) FromRequest(r *http.Request) (*SessionJwt, error) {
 	authHeader, err := s.fromAuthHeader(r)
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func (s *GatewayMiddleware) FromRequest(r *http.Request) (*SessionJwt, error) {
 	return session, nil
 }
 
-func (s *GatewayMiddleware) fromAuthHeader(r *http.Request) (string, error) {
+func (s *Middleware) fromAuthHeader(r *http.Request) (string, error) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
 		return "", errors.New("Authorization header missing")
@@ -86,7 +86,7 @@ func (s *GatewayMiddleware) fromAuthHeader(r *http.Request) (string, error) {
 }
 
 // Parse - Parses the JWT token and verifies the signature came from AuthN via the public keys we obtain
-func (s *GatewayMiddleware) Parse(tokenString string) (*SessionJwt, error) {
+func (s *Middleware) Parse(tokenString string) (*SessionJwt, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &SessionJwt{}, func(token *jwt.Token) (interface{}, error) {
 
 		// get the key ID `kid` from the jwt.Token

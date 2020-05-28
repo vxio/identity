@@ -5,13 +5,13 @@ import (
 	"fmt"
 
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/zerotrust"
+	"github.com/moov-io/identity/pkg/gateway"
 )
 
 // Repository - Used for interacting identities on the data store
 type Repository interface {
-	list(tenantID zerotrust.TenantID) ([]api.Identity, error)
-	get(tenantID zerotrust.TenantID, identityID string) (*api.Identity, error)
+	list(tenantID gateway.TenantID) ([]api.Identity, error)
+	get(tenantID gateway.TenantID, identityID string) (*api.Identity, error)
 	update(updated api.Identity) (*api.Identity, error)
 	add(identity api.Identity) (*api.Identity, error)
 }
@@ -25,7 +25,7 @@ type sqlIdentityRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlIdentityRepo) list(tenantID zerotrust.TenantID) ([]api.Identity, error) {
+func (r *sqlIdentityRepo) list(tenantID gateway.TenantID) ([]api.Identity, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM identity
@@ -84,7 +84,7 @@ func (r *sqlIdentityRepo) list(tenantID zerotrust.TenantID) ([]api.Identity, err
 	return identities, nil
 }
 
-func (r *sqlIdentityRepo) get(tenantID zerotrust.TenantID, identityID string) (*api.Identity, error) {
+func (r *sqlIdentityRepo) get(tenantID gateway.TenantID, identityID string) (*api.Identity, error) {
 
 	qry := fmt.Sprintf(`
 		SELECT %s

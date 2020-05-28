@@ -9,13 +9,13 @@ import (
 	"github.com/google/go-cmp/cmp"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 type InvitesServiceScope struct {
-	session zerotrust.Session
+	session gateway.Session
 	service api.InvitesApiServicer
 	time    stime.StaticTimeService
 }
@@ -109,7 +109,7 @@ func TestExpiredInvite(t *testing.T) {
 }
 
 func NewInvitesScope(t *testing.T) InvitesServiceScope {
-	session := zerotrust.NewRandomSession()
+	session := gateway.NewRandomSession()
 
 	repository := NewInMemoryInvitesRepository(t)
 

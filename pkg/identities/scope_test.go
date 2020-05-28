@@ -11,15 +11,15 @@ import (
 	"github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
 	"github.com/moov-io/identity/pkg/database"
+	"github.com/moov-io/identity/pkg/gateway"
+	"github.com/moov-io/identity/pkg/gateway/gatewaytest"
 	. "github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/zerotrust"
-	"github.com/moov-io/identity/pkg/zerotrust/zerotrusttest"
 	"github.com/stretchr/testify/require"
 )
 
 type Scope struct {
-	session    zerotrust.Session
+	session    gateway.Session
 	time       stime.StaticTimeService
 	repository Repository
 	service    Service
@@ -27,7 +27,7 @@ type Scope struct {
 }
 
 func NewScope(t *testing.T) Scope {
-	session := zerotrust.NewRandomSession()
+	session := gateway.NewRandomSession()
 	times := stime.NewStaticTimeService()
 
 	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, nil, nil)
@@ -45,7 +45,7 @@ func NewScope(t *testing.T) Scope {
 	routes := mux.NewRouter()
 	api.AppendRouters(routes, controller)
 
-	testMiddleware := zerotrusttest.NewTestMiddleware(times, session)
+	testMiddleware := gatewaytest.NewTestMiddleware(times, session)
 	routes.Use(testMiddleware.Handler)
 
 	testAPI := clienttest.NewTestClient(routes)

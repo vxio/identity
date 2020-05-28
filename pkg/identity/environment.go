@@ -14,13 +14,13 @@ import (
 	configpkg "github.com/moov-io/identity/pkg/config"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
-	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 // Environment - Contains everything thats been instantiated for this service.
@@ -135,7 +135,7 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 	// authed server
 
 	// auth middleware for the tokens coming from the gateway
-	GatewayMiddleware, err := zerotrust.NewGatewayMiddleware(TimeService, GatewayPublicKeys)
+	GatewayMiddleware, err := gateway.NewMiddleware(TimeService, GatewayPublicKeys)
 	if err != nil {
 		logger.Log("main", fmt.Sprintf("Can't startup the Gateway middleware - %s", err))
 		return nil, err

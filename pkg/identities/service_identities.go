@@ -3,8 +3,8 @@ package identities
 import (
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 // Service - Service that implents the logic for the IdentitiesApiServicer
@@ -24,7 +24,7 @@ func NewIdentitiesService(time stime.TimeService, repository Repository) *Servic
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
-func (s *Service) DisableIdentity(session zerotrust.Session, identityID string) error {
+func (s *Service) DisableIdentity(session gateway.Session, identityID string) error {
 	identity, err := s.repository.get(session.TenantID, identityID)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func (s *Service) DisableIdentity(session zerotrust.Session, identityID string) 
 }
 
 // GetIdentity - List identities and associates userId
-func (s *Service) GetIdentity(session zerotrust.Session, identityID string) (*api.Identity, error) {
+func (s *Service) GetIdentity(session gateway.Session, identityID string) (*api.Identity, error) {
 	i, e := s.repository.get(session.TenantID, identityID)
 	if e != nil {
 		return nil, e
@@ -57,13 +57,13 @@ func (s *Service) GetIdentity(session zerotrust.Session, identityID string) (*ap
 }
 
 // ListIdentities - List identities and associates userId
-func (s *Service) ListIdentities(session zerotrust.Session, orgID string) ([]api.Identity, error) {
+func (s *Service) ListIdentities(session gateway.Session, orgID string) ([]api.Identity, error) {
 	identities, err := s.repository.list(session.TenantID)
 	return identities, err
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *Service) UpdateIdentity(session zerotrust.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
+func (s *Service) UpdateIdentity(session gateway.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
 	identity, err := s.repository.get(session.TenantID, identityID)
 	if err != nil {
 		return nil, err

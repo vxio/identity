@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/zerotrust"
+	"github.com/moov-io/identity/pkg/gateway"
 )
 
 // A Controller binds http requests to an api service and writes the service results to the http response
@@ -63,7 +63,7 @@ func errorHandling(w http.ResponseWriter, err error) {
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
 func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
-	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		err := c.service.DisableIdentity(session, identityID)
@@ -78,7 +78,7 @@ func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
 
 // GetIdentity - List identities and associates userId
 func (c *Controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
-	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		result, err := c.service.GetIdentity(session, identityID)
@@ -93,7 +93,7 @@ func (c *Controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
 
 // ListIdentities - List identities and associates userId
 func (c *Controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
-	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
 		query := r.URL.Query()
 		orgID := query.Get("orgID")
 		result, err := c.service.ListIdentities(session, orgID)
@@ -108,7 +108,7 @@ func (c *Controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
 
 // UpdateIdentity - Update a specific Identity
 func (c *Controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
-	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		identity := &api.UpdateIdentity{}

@@ -3,8 +3,8 @@ package credentials
 import (
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 // CredentialsService is a service that implents the logic for the CredentialsApiServicer
@@ -24,7 +24,7 @@ func NewCredentialsService(time stime.TimeService, repository CredentialReposito
 }
 
 // DisableCredentials - Disables a credential so it can&#39;t be used anymore to login
-func (s *CredentialsService) DisableCredentials(auth zerotrust.Session, identityID string, credentialID string) (*api.Credential, error) {
+func (s *CredentialsService) DisableCredentials(auth gateway.Session, identityID string, credentialID string) (*api.Credential, error) {
 	cred, err := s.repository.get(identityID, credentialID)
 	if err != nil {
 		return nil, err

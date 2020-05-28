@@ -1,4 +1,4 @@
-package zerotrust
+package gateway
 
 import (
 	"errors"

@@ -8,14 +8,14 @@ import (
 	api "github.com/moov-io/identity/pkg/api"
 	client "github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
+	"github.com/moov-io/identity/pkg/gateway"
+	"github.com/moov-io/identity/pkg/gateway/gatewaytest"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/zerotrust"
-	"github.com/moov-io/identity/pkg/zerotrust/zerotrusttest"
 )
 
 type Scope struct {
-	session       zerotrust.Session
+	session       gateway.Session
 	config        Config
 	time          stime.StaticTimeService
 	notifications notifications.NotificationsService
@@ -26,7 +26,7 @@ type Scope struct {
 }
 
 func NewScope(t *testing.T) Scope {
-	session := zerotrust.NewRandomSession()
+	session := gateway.NewRandomSession()
 
 	invitesConfig := Config{
 		Expiration: time.Hour,
@@ -50,7 +50,7 @@ func NewScope(t *testing.T) Scope {
 	routes := mux.NewRouter()
 	api.AppendRouters(routes, controller)
 
-	testMiddleware := zerotrusttest.NewTestMiddleware(times, session)
+	testMiddleware := gatewaytest.NewTestMiddleware(times, session)
 	routes.Use(testMiddleware.Handler)
 
 	testAPI := clienttest.NewTestClient(routes)

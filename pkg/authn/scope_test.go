@@ -19,13 +19,13 @@ import (
 	clienttest "github.com/moov-io/identity/pkg/client_test"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
 	sessionpkg "github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
-	"github.com/moov-io/identity/pkg/zerotrust"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,7 +37,7 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	a := require.New(t)
 
 	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
-	session := zerotrust.NewRandomSession()
+	session := gateway.NewRandomSession()
 
 	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, logger, nil)
 	t.Cleanup(close)
@@ -74,7 +74,7 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 
 			e.StandardClaims = jwt.StandardClaims{
 				ExpiresAt: stime.Now().Add(time.Hour).Unix(),
-				NotBefore: stime.Now().Add(time.Second * -5).Unix(),
+				NotBefore: stime.Now().Add(time.Hour * -1).Unix(),
 				IssuedAt:  stime.Now().Unix(),
 				Id:        uuid.New().String(),
 				Subject:   uuid.New().String(),
@@ -106,7 +106,7 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 type Scope struct {
 	sessionConfig sessionpkg.Config
 	authnConfig   Config
-	session       zerotrust.Session
+	session       gateway.Session
 	stime         stime.StaticTimeService
 	logger        log.Logger
 	service       api.InternalApiServicer

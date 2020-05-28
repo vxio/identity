@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/zerotrust"
 
 	api "github.com/moov-io/identity/pkg/api"
 )
@@ -41,13 +41,13 @@ func NewInvitesService(config Config, time stime.TimeService, repository Reposit
 }
 
 // ListInvites - List outstanding invites
-func (s *invitesService) ListInvites(session zerotrust.Session) ([]api.Invite, error) {
+func (s *invitesService) ListInvites(session gateway.Session) ([]api.Invite, error) {
 	invites, err := s.repository.list(session.TenantID)
 	return invites, err
 }
 
 // SendInvite - Send an email invite to a new user
-func (s *invitesService) SendInvite(session zerotrust.Session, send api.SendInvite) (*api.Invite, string, error) {
+func (s *invitesService) SendInvite(session gateway.Session, send api.SendInvite) (*api.Invite, string, error) {
 	invite := api.Invite{
 		InviteID:   uuid.New().String(),
 		TenantID:   session.TenantID.String(),
@@ -87,7 +87,7 @@ func (s *invitesService) SendInvite(session zerotrust.Session, send api.SendInvi
 }
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
-func (s *invitesService) DisableInvite(session zerotrust.Session, inviteID string) error {
+func (s *invitesService) DisableInvite(session gateway.Session, inviteID string) error {
 	invite, err := s.repository.get(session.TenantID, inviteID)
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
-package zerotrust_test
+package gateway_test
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	. "github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
-	. "github.com/moov-io/identity/pkg/zerotrust"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +16,7 @@ type Scope struct {
 	a          *assert.Assertions
 	time       stime.StaticTimeService
 	keys       webkeys.GenerateJwksService
-	mw         *GatewayMiddleware
+	mw         *Middleware
 	identityID IdentityID
 	tenantID   TenantID
 }
@@ -29,7 +29,7 @@ func NewScope(t *testing.T) Scope {
 	keys, err := webkeys.NewGenerateJwksService()
 	a.Nil(err)
 
-	gatewayMiddleware, err := NewGatewayMiddleware(stime, keys)
+	gatewayMiddleware, err := NewMiddleware(stime, keys)
 	a.Nil(err)
 
 	return Scope{

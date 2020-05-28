@@ -8,8 +8,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/identity"
-	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
 func sendInvite(env identity.Environment) error {
@@ -33,9 +33,9 @@ func sendInvite(env identity.Environment) error {
 		return errors.New("email is required and isn't valid")
 	}
 
-	session := zerotrust.Session{
-		CallerID: zerotrust.IdentityID(cID),
-		TenantID: zerotrust.TenantID(tID),
+	session := gateway.Session{
+		CallerID: gateway.IdentityID(cID),
+		TenantID: gateway.TenantID(tID),
 	}
 
 	invite := api.SendInvite{
