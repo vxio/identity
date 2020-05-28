@@ -3,17 +3,18 @@ package identity
 import (
 	"github.com/moov-io/identity/pkg/authn"
 	"github.com/moov-io/identity/pkg/database"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/session"
-	"github.com/moov-io/identity/pkg/webkeys"
 )
 
 // Config defines all the configuration for the app
 type Config struct {
-	Servers        ServerConfig
-	Database       database.DatabaseConfig
-	Keys           KeysConfig
+	Servers  ServerConfig
+	Database database.DatabaseConfig
+	//Keys           KeysConfig
+	Gateway        gateway.Config
 	Authentication authn.Config
 	Session        session.Config
 	Notifications  notifications.NotificationsConfig
@@ -34,12 +35,4 @@ type HTTPConfig struct {
 // BindAddress specifies where the http server should bind to.
 type BindAddress struct {
 	Address string
-}
-
-// KeysConfig - Contains the configuration on where to get all the public/private keys needed for the service to operate.
-type KeysConfig struct {
-	AuthnPublic    webkeys.WebKeysConfig
-	GatewayPublic  webkeys.WebKeysConfig
-	SessionPublic  webkeys.WebKeysConfig
-	SessionPrivate webkeys.WebKeysConfig
 }

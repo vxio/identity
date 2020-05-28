@@ -15,25 +15,26 @@ invites:
 notifications:
   Mock:
     from: noreply@moov.io
-authentication:
-  landingUrl: "/whoami"
-session:
-  expiration: 1h
-keys:
+gateway:
   # Examples of how to set up this config.
-  # authnPublic:
-  #   http:
-  #    url: http://authn:8202/.well-known/jwks.json
-  #   file:
-  #     path: ./configs/authn-jwks-sig-pub.json
-  # gatewayPublic:
+  # keys:
   #   http:
   #    url: http://oathkeeper:4456/.well-known/jwks.json
   #   file:
   #     path: ./configs/gateway-jwks-sig-pub.json
-  # sessionPublic:
+
+authentication:
+  landingUrl: "/whoami"
+  # keys:
+  #   http:
+  #    url: http://authn:8202/.well-known/jwks.json
+  #   file:
+  #     path: ./configs/authn-jwks-sig-pub.json
+session:
+  expiration: 1h
+  # publicKeys:
   #   file:
   #     path: ./configs/identity-jwks-sig-pub.json
-  # sessionPrivate:
+  # privateKeys:
   #   file:
   #     path: ./configs/identity-jwks-sig-priv.json

@@ -60,25 +60,25 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 
 	TimeService := stime.NewSystemTimeService()
 
-	AuthnPublicKeys, err := webkeys.NewWebKeysService(logger, config.Keys.AuthnPublic)
+	AuthnPublicKeys, err := webkeys.NewWebKeysService(logger, config.Authentication.Keys)
 	if err != nil {
 		logger.Log("main", "Unable to load up the Authentication JSON Web Key Set")
 		return nil, err
 	}
 
-	GatewayPublicKeys, err := webkeys.NewWebKeysService(logger, config.Keys.GatewayPublic)
+	GatewayPublicKeys, err := webkeys.NewWebKeysService(logger, config.Gateway.Keys)
 	if err != nil {
 		logger.Log("main", "Unable to load up the Gateway JSON Web Key Set")
 		return nil, err
 	}
 
-	SessionPublicKeys, err := webkeys.NewWebKeysService(logger, config.Keys.SessionPublic)
+	SessionPublicKeys, err := webkeys.NewWebKeysService(logger, config.Session.PublicKeys)
 	if err != nil {
 		logger.Log("main", "Unable to load up up the Session Public JSON Web Key Set")
 		return nil, err
 	}
 
-	SessionPrivateKeys, err := webkeys.NewWebKeysService(logger, config.Keys.SessionPrivate)
+	SessionPrivateKeys, err := webkeys.NewWebKeysService(logger, config.Session.PrivateKeys)
 	if err != nil {
 		logger.Log("main", "Unable to load up up the Session Private JSON Web Key Set")
 		return nil, err
