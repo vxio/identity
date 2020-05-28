@@ -43,7 +43,7 @@ func (s *Middleware) Handler(h http.Handler) http.Handler {
 		// Don't really like using this map of any objects in the context for this, but it seems how its done.
 		ctx := context.WithValue(r.Context(), LoginSessionContextKey, session)
 
-		h.ServeHTTP(w, r.WithContext(ctx))
+		h.ServeHTTP(w, r.Clone(ctx))
 	})
 }
 

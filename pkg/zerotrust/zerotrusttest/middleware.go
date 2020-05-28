@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/zerotrust"
 )
@@ -30,4 +31,11 @@ func (s *TestMiddleware) Handler(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, r.Clone(ctx))
 	})
+}
+
+func NewRandomSession() zerotrust.Session {
+	return zerotrust.Session{
+		CallerID: zerotrust.IdentityID(uuid.New()),
+		TenantID: zerotrust.TenantID(uuid.New()),
+	}
 }
