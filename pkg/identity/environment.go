@@ -72,19 +72,13 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 		return nil, err
 	}
 
-	SessionPublicKeys, err := webkeys.NewWebKeysService(logger, config.Session.PublicKeys)
+	SessionKeys, err := webkeys.NewWebKeysService(logger, config.Session.Keys)
 	if err != nil {
-		logger.Log("main", "Unable to load up up the Session Public JSON Web Key Set")
+		logger.Log("main", "Unable to load up up the Session JSON Web Key Set")
 		return nil, err
 	}
 
-	SessionPrivateKeys, err := webkeys.NewWebKeysService(logger, config.Session.PrivateKeys)
-	if err != nil {
-		logger.Log("main", "Unable to load up up the Session Private JSON Web Key Set")
-		return nil, err
-	}
-
-	SessionService := session.NewSessionService(TimeService, SessionPrivateKeys, config.Session)
+	SessionService := session.NewSessionService(TimeService, SessionKeys, config.Session)
 
 	templateService, err := notifications.NewTemplateRepository(logger)
 	if err != nil {
@@ -114,7 +108,7 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 	router := mux.NewRouter()
 
 	// public endpoint
-	jwksController := webkeys.NewJWKSController(SessionPublicKeys)
+	jwksController := webkeys.NewJWKSController(SessionKeys)
 	jwksRouter := router.NewRoute().Subrouter()
 	jwksRouter = jwksController.AppendRoutes(jwksRouter)
 
@@ -141,7 +135,7 @@ func NewEnvironment(logger log.Logger, configOverride *Config) (*Environment, er
 		return nil, err
 	}
 
-	WhoAmIController := session.NewWhoAmIController()
+	WhoAmIController := session.NewWhoAmIController(SessionService, *IdentitiesService)
 	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)

@@ -9,32 +9,63 @@ import (
 )
 
 type HTTPJwksService struct {
-	client  *http.Client
-	jwksURI string
+	config HttpConfig
+	client *http.Client
+	keys   jose.JSONWebKeySet
 }
 
-func NewHTTPJwksService(jwksURI string) WebKeysService {
-	return &HTTPJwksService{
-		client:  &http.Client{},
-		jwksURI: jwksURI,
+func NewHTTPJwksService(config HttpConfig, client *http.Client) (WebKeysService, error) {
+	if client == nil {
+		client = &http.Client{}
 	}
-}
 
-func (s *HTTPJwksService) FetchJwks() (*jose.JSONWebKeySet, error) {
-	resp, err := s.client.Get(s.jwksURI)
+	service := &HTTPJwksService{
+		client: &http.Client{},
+		config: config,
+		keys:   jose.JSONWebKeySet{},
+	}
+
+	keys, err := service.Load()
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Failed to load JWKS due to response code: %d", resp.StatusCode)
+	service.keys = *keys
+
+	return service, nil
+}
+
+func (s *HTTPJwksService) Load() (*jose.JSONWebKeySet, error) {
+
+	allKeys := []jose.JSONWebKey{}
+
+	for _, url := range s.config.URLs {
+
+		resp, err := s.client.Get(url)
+		if err != nil {
+			return nil, err
+		}
+
+		defer resp.Body.Close()
+		if resp.StatusCode != 200 {
+			return nil, fmt.Errorf("Failed to load JWKS due to response code: %d", resp.StatusCode)
+		}
+
+		jsonWebKeySet := jose.JSONWebKeySet{}
+		if err = json.NewDecoder(resp.Body).Decode(&jsonWebKeySet); err != nil {
+			return nil, err
+		}
+
+		allKeys = append(allKeys, jsonWebKeySet.Keys...)
 	}
 
-	jsonWebKeySet := new(jose.JSONWebKeySet)
-	if err = json.NewDecoder(resp.Body).Decode(jsonWebKeySet); err != nil {
-		return nil, err
+	allKeySet := jose.JSONWebKeySet{
+		Keys: allKeys,
 	}
 
-	return jsonWebKeySet, nil
+	return &allKeySet, nil
+}
+
+func (s *HTTPJwksService) Keys() (*jose.JSONWebKeySet, error) {
+	return &s.keys, nil
 }

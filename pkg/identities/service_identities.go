@@ -1,6 +1,8 @@
 package identities
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/gateway"
@@ -25,7 +27,7 @@ func NewIdentitiesService(time stime.TimeService, repository Repository) *Servic
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
 func (s *Service) DisableIdentity(session gateway.Session, identityID string) error {
-	identity, err := s.repository.get(session.TenantID, identityID)
+	identity, err := s.GetIdentity(session, identityID)
 	if err != nil {
 		return err
 	}
@@ -48,9 +50,13 @@ func (s *Service) DisableIdentity(session gateway.Session, identityID string) er
 
 // GetIdentity - List identities and associates userId
 func (s *Service) GetIdentity(session gateway.Session, identityID string) (*api.Identity, error) {
-	i, e := s.repository.get(session.TenantID, identityID)
+	i, e := s.GetIdentityByID(identityID)
 	if e != nil {
 		return nil, e
+	}
+
+	if i.TenantID != session.TenantID.String() {
+		return nil, errors.New("TenantID of session user doesn't match retrieved identity")
 	}
 
 	return i, nil
@@ -64,7 +70,7 @@ func (s *Service) ListIdentities(session gateway.Session, orgID string) ([]api.I
 
 // UpdateIdentity - Update a specific Identity
 func (s *Service) UpdateIdentity(session gateway.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
-	identity, err := s.repository.get(session.TenantID, identityID)
+	identity, err := s.GetIdentity(session, identityID)
 	if err != nil {
 		return nil, err
 	}
@@ -192,4 +198,14 @@ func (s *Service) Register(invite api.Invite, register api.Register) (*api.Ident
 	// @TODO send email notification to get registered email verified
 
 	return saved, nil
+}
+
+// GetIdentityByID - Returns the Identity specified by the ID. Used after a login session to get identity information
+func (s *Service) GetIdentityByID(identityID string) (*api.Identity, error) {
+	i, e := s.repository.get(identityID)
+	if e != nil {
+		return nil, e
+	}
+
+	return i, nil
 }

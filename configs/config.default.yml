@@ -19,22 +19,24 @@ gateway:
   # Examples of how to set up this config.
   # keys:
   #   http:
-  #    url: http://oathkeeper:4456/.well-known/jwks.json
+  #    urls:
+  #    - http://oathkeeper:4456/.well-known/jwks.json
   #   file:
-  #     path: ./configs/gateway-jwks-sig-pub.json
+  #     paths: 
+  #     - ./configs/gateway-jwks-sig-pub.json
 
 authentication:
   landingUrl: "/whoami"
   # keys:
   #   http:
-  #    url: http://authn:8202/.well-known/jwks.json
+  #    urls:
+  #    - http://authn:8202/.well-known/jwks.json
   #   file:
-  #     path: ./configs/authn-jwks-sig-pub.json
+  #     paths: 
+  #     - ./configs/authn-jwks-sig-pub.json
 session:
   expiration: 1h
-  # publicKeys:
-  #   file:
-  #     path: ./configs/identity-jwks-sig-pub.json
-  # privateKeys:
-  #   file:
-  #     path: ./configs/identity-jwks-sig-priv.json
+  # keys:
+  #   paths:
+  #   - ./configs/identity-jwks-sig-pub.json
+  #   - ./configs/identity-jwks-sig-priv.json

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/identities"
@@ -74,8 +75,18 @@ func (s *authnService) LoginWithCredentials(login api.Login, nonce string, ip st
 		return nil, errors.New("Unauthorized")
 	}
 
-	// @TODO generate token with the ID's
-	cookie, err := s.token.GenerateCookie(loggedIn.IdentityID)
+	identity, err := s.identities.GetIdentityByID(loggedIn.IdentityID)
+	if err != nil {
+		return nil, err
+	}
+
+	session := session.Session{
+		IdentityID:   uuid.MustParse(identity.IdentityID),
+		TenantID:     uuid.MustParse(identity.TenantID),
+		CredentialID: uuid.MustParse(loggedIn.CredentialID),
+	}
+
+	cookie, err := s.token.GenerateCookie(session)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,7 @@ func Test_GenerateKeys(t *testing.T) {
 	service, err := NewWebKeysService(s.logger, config)
 	a.Nil(err)
 
-	keys, err := service.FetchJwks()
+	keys, err := service.Keys()
 	a.Nil(err)
 	a.Len(keys.Keys, 2)
 
@@ -54,14 +54,16 @@ func Test_HttpKeys(t *testing.T) {
 	// testing...
 	config := WebKeysConfig{
 		HTTP: &HttpConfig{
-			URL: server.URL + controller.WellKnownJwksPath(),
+			URLs: []string{
+				server.URL + controller.WellKnownJwksPath(),
+			},
 		},
 	}
 
 	service, err := NewWebKeysService(s.logger, config)
 	a.Nil(err)
 
-	keys, err := service.FetchJwks()
+	keys, err := service.Keys()
 	a.Nil(err)
 	a.Len(keys.Keys, 1)
 
@@ -81,14 +83,13 @@ func Test_HttpKeys_NotFound(t *testing.T) {
 	// testing...
 	config := WebKeysConfig{
 		HTTP: &HttpConfig{
-			URL: server.URL + "/.well-known/jwks.json",
+			URLs: []string{
+				server.URL + "/.well-known/jwks.json",
+			},
 		},
 	}
 
-	service, err := NewWebKeysService(s.logger, config)
-	a.Nil(err)
-
-	_, err = service.FetchJwks()
+	_, err := NewWebKeysService(s.logger, config)
 	a.NotNil(err)
 }
 
@@ -109,17 +110,20 @@ func Test_FileKeys(t *testing.T) {
 	// testing...
 	config := WebKeysConfig{
 		File: &FileConfig{
-			Path: dir + "/jwk-sig-pub.json",
+			Paths: []string{
+				dir + "/jwk-sig-pub.json",
+				dir + "/jwk-sig-priv.json",
+			},
 		},
 	}
 
 	service, err := NewWebKeysService(s.logger, config)
 	a.Nil(err)
 
-	keys, err := service.FetchJwks()
+	keys, err := service.Keys()
 	a.Nil(err)
 
-	a.Len(keys.Keys, 1)
+	a.Len(keys.Keys, 2)
 }
 
 func Test_FileKeys_NotFound(t *testing.T) {
@@ -128,14 +132,14 @@ func Test_FileKeys_NotFound(t *testing.T) {
 	// testing...
 	config := WebKeysConfig{
 		File: &FileConfig{
-			Path: os.TempDir() + "/jwk-sig-pub.json",
+			Paths: []string{
+				os.TempDir() + "/jwk-sig-pub.json",
+				os.TempDir() + "/jwk-sig-priv.json",
+			},
 		},
 	}
 
-	service, err := NewWebKeysService(s.logger, config)
-	a.Nil(err)
-
-	_, err = service.FetchJwks()
+	_, err := NewWebKeysService(s.logger, config)
 	a.NotNil(err)
 }
 

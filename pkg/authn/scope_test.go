@@ -74,8 +74,8 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 
 			e.StandardClaims = jwt.StandardClaims{
 				ExpiresAt: stime.Now().Add(time.Hour).Unix(),
-				NotBefore: stime.Now().Add(time.Hour * -1).Unix(),
-				IssuedAt:  stime.Now().Unix(),
+				NotBefore: stime.Now().Add(time.Minute * -1).Unix(),
+				IssuedAt:  stime.Now().Add(time.Minute * -1).Unix(),
 				Id:        uuid.New().String(),
 				Subject:   uuid.New().String(),
 				Audience:  "moovauth",

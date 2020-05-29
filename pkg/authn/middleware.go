@@ -20,7 +20,7 @@ type Middleware struct {
 
 // NewMiddleware - Generates a default AuthnMiddleware for use with authenticating a request came from the authn services
 func NewMiddleware(time stime.TimeService, publicKeyLoader webkeys.WebKeysService) (*Middleware, error) {
-	publicKeys, err := publicKeyLoader.FetchJwks()
+	publicKeys, err := publicKeyLoader.Keys()
 	if err != nil {
 		return nil, err
 	}

@@ -67,9 +67,10 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 
 // Register - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
 func (c *authnAPIController) Register(w http.ResponseWriter, r *http.Request) {
-
 	// Show registration page but we don't really have one yet... so lets jut register with what we do have...
-	c.SubmitRegistration(w, r)
+	WithLoginSessionFromRequest(c.logger, w, r, func(session LoginSession) {
+		c.doRegistration(w, r, session, &session.Register)
+	})
 }
 
 // SubmitRegistration - Finalizes the registration and handles all the user creation and first login
@@ -81,14 +82,18 @@ func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 			return
 		}
 
-		result, err := c.service.RegisterWithCredentials(*registration, session.State, session.IP)
-		if err != nil {
-			c.logger.Log("level", "error", "msg", "Unable to RegisterWithCredentials", "error", err)
-			w.WriteHeader(400)
-			return
-		}
-
-		http.SetCookie(w, result)
-		http.Redirect(w, r, c.service.LandingURL(), http.StatusFound)
+		c.doRegistration(w, r, session, registration)
 	})
+}
+
+func (c *authnAPIController) doRegistration(w http.ResponseWriter, r *http.Request, session LoginSession, registration *api.Register) {
+	result, err := c.service.RegisterWithCredentials(*registration, session.State, session.IP)
+	if err != nil {
+		c.logger.Log("level", "error", "msg", "Unable to RegisterWithCredentials", "error", err)
+		w.WriteHeader(400)
+		return
+	}
+
+	http.SetCookie(w, result)
+	http.Redirect(w, r, c.service.LandingURL(), http.StatusFound)
 }

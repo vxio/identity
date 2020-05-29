@@ -5,15 +5,22 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dgrijalva/jwt-go"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/gateway"
+	"github.com/moov-io/identity/pkg/identities"
 )
 
-type whoAmIController struct{}
+type whoAmIController struct {
+	service    SessionService
+	identities identities.Service
+}
 
 // NewWhoAmIController - Router for the Who Am I api routes.
-func NewWhoAmIController() api.Router {
-	return &whoAmIController{}
+func NewWhoAmIController(service SessionService, identities identities.Service) api.Router {
+	return &whoAmIController{
+		service:    service,
+		identities: identities,
+	}
 }
 
 // Routes returns all of the api route for the InternalApiController
@@ -30,12 +37,42 @@ func (c *whoAmIController) Routes() api.Routes {
 
 // WhoAmI - Responds back with information about the authenticated session
 func (c *whoAmIController) WhoAmI(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value("user")
-	fmt.Fprintf(w, "This is an authenticated request")
-	fmt.Fprintf(w, "Claim content:\n")
-	for k, v := range user.(*jwt.Token).Claims.(jwt.MapClaims) {
-		fmt.Fprintf(w, "%s :\t%#v\n", k, v)
+	cookieSession, err := c.service.FromRequest(r)
+	if err != nil {
+		fmt.Println("Cookie session not found")
+		w.WriteHeader(404)
+		return
 	}
 
-	api.EncodeJSONResponse(user.(*jwt.Token).Claims.(jwt.MapClaims), nil, w)
+	gatewaySession, err := gateway.SessionFromRequest(r)
+	if err != nil {
+		fmt.Println("Gateway session not found")
+		w.WriteHeader(404)
+		return
+	}
+
+	identity, err := c.identities.GetIdentity(*gatewaySession, gatewaySession.CallerID.String())
+	if err != nil {
+		fmt.Println("Unable to lookup identity")
+		w.WriteHeader(404)
+		return
+	}
+
+	type Output struct {
+		Cookie   Session
+		Gateway  gateway.Session
+		Identity api.Identity
+		XUser    string
+		XTenant  string
+	}
+
+	output := Output{
+		Cookie:   *cookieSession,
+		Gateway:  *gatewaySession,
+		Identity: *identity,
+		XUser:    r.Header.Get("X-User"),
+		XTenant:  r.Header.Get("X-Tenant"),
+	}
+
+	api.EncodeJSONResponse(output, nil, w)
 }

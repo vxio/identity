@@ -26,7 +26,7 @@ func (c *JWKSController) WellKnownJwksPath() string {
 }
 
 func (c *JWKSController) WellKnownJwks(w http.ResponseWriter, r *http.Request) {
-	keys, err := c.keyService.FetchJwks()
+	keys, err := c.keyService.Keys()
 	if err != nil {
 		w.WriteHeader(500)
 		return

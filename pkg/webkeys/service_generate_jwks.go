@@ -55,7 +55,7 @@ func NewGenerateJwksService() (*GenerateJwksService, error) {
 	}, nil
 }
 
-func (s *GenerateJwksService) FetchJwks() (*jose.JSONWebKeySet, error) {
+func (s *GenerateJwksService) Keys() (*jose.JSONWebKeySet, error) {
 	jwks := jose.JSONWebKeySet{
 		Keys: []jose.JSONWebKey{s.Public, s.Private},
 	}

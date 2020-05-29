@@ -8,26 +8,48 @@ import (
 )
 
 type FileJwksService struct {
-	filePath string
+	config FileConfig
+	keys   jose.JSONWebKeySet
 }
 
-func NewFileJwksService(filePath string) WebKeysService {
-	return &FileJwksService{
-		filePath: filePath,
-	}
-}
+func NewFileJwksService(config FileConfig) (WebKeysService, error) {
+	service := &FileJwksService{config, jose.JSONWebKeySet{}}
 
-func (s *FileJwksService) FetchJwks() (*jose.JSONWebKeySet, error) {
-
-	contents, err := ioutil.ReadFile(s.filePath)
+	keys, err := service.Load()
 	if err != nil {
 		return nil, err
 	}
 
-	jsonWebKeySet := jose.JSONWebKeySet{}
-	if err = json.Unmarshal(contents, &jsonWebKeySet); err != nil {
-		return nil, err
+	service.keys = *keys
+
+	return service, nil
+}
+
+func (s *FileJwksService) Load() (*jose.JSONWebKeySet, error) {
+
+	allKeys := []jose.JSONWebKey{}
+
+	for _, path := range s.config.Paths {
+		contents, err := ioutil.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+
+		jsonWebKeySet := jose.JSONWebKeySet{}
+		if err = json.Unmarshal(contents, &jsonWebKeySet); err != nil {
+			return nil, err
+		}
+
+		allKeys = append(allKeys, jsonWebKeySet.Keys...)
 	}
 
-	return &jsonWebKeySet, nil
+	allKeySet := jose.JSONWebKeySet{
+		Keys: allKeys,
+	}
+
+	return &allKeySet, nil
+}
+
+func (s *FileJwksService) Keys() (*jose.JSONWebKeySet, error) {
+	return &s.keys, nil
 }

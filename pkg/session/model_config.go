@@ -8,7 +8,6 @@ import (
 
 // Config - Holds the configuration for the session cookie created after registration or logging in
 type Config struct {
-	Expiration  time.Duration
-	PublicKeys  webkeys.WebKeysConfig
-	PrivateKeys webkeys.WebKeysConfig
+	Expiration time.Duration
+	Keys       webkeys.WebKeysConfig
 }

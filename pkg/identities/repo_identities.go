@@ -11,7 +11,7 @@ import (
 // Repository - Used for interacting identities on the data store
 type Repository interface {
 	list(tenantID gateway.TenantID) ([]api.Identity, error)
-	get(tenantID gateway.TenantID, identityID string) (*api.Identity, error)
+	get(identityID string) (*api.Identity, error)
 	update(updated api.Identity) (*api.Identity, error)
 	add(identity api.Identity) (*api.Identity, error)
 }
@@ -84,16 +84,16 @@ func (r *sqlIdentityRepo) list(tenantID gateway.TenantID) ([]api.Identity, error
 	return identities, nil
 }
 
-func (r *sqlIdentityRepo) get(tenantID gateway.TenantID, identityID string) (*api.Identity, error) {
+func (r *sqlIdentityRepo) get(identityID string) (*api.Identity, error) {
 
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM identity
-		WHERE identity.tenant_id = ? AND identity.identity_id = ?
+		WHERE identity.identity_id = ?
 		LIMIT 1
 	`, identitySelect)
 
-	identities, err := r.queryScanIdentity(qry, tenantID.String(), identityID)
+	identities, err := r.queryScanIdentity(qry, identityID)
 	if err != nil {
 		return nil, err
 	}
@@ -106,10 +106,10 @@ func (r *sqlIdentityRepo) get(tenantID gateway.TenantID, identityID string) (*ap
 		SELECT %s
 		FROM identity_address
 		INNER JOIN identity ON identity_address.identity_id = identity.identity_id
-		WHERE identity.tenant_id = ? AND identity.identity_id = ?
+		WHERE identity.identity_id = ?
 	`, addressSelect)
 
-	addresses, err := r.queryScanAddresses(qry, tenantID.String(), identityID)
+	addresses, err := r.queryScanAddresses(qry, identityID)
 	if err != nil {
 		return nil, err
 	}
@@ -118,10 +118,10 @@ func (r *sqlIdentityRepo) get(tenantID gateway.TenantID, identityID string) (*ap
 		SELECT %s
 		FROM identity_phone
 		INNER JOIN identity ON identity_phone.identity_id = identity.identity_id
-		WHERE identity.tenant_id = ? AND identity.identity_id = ?
+		WHERE identity.identity_id = ?
 	`, phoneSelect)
 
-	phones, err := r.queryScanPhone(qry, tenantID.String(), identityID)
+	phones, err := r.queryScanPhone(qry, identityID)
 	if err != nil {
 		return nil, err
 	}

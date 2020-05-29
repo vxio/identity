@@ -8,18 +8,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type TenantID uuid.UUID
-
-func (id TenantID) String() string {
-	return uuid.UUID(id).String()
-}
-
-type IdentityID uuid.UUID
-
-func (id IdentityID) String() string {
-	return uuid.UUID(id).String()
-}
-
 type Session struct {
 	CallerID IdentityID `json:"iid"`
 	TenantID TenantID   `json:"tid"`
