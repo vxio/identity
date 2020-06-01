@@ -67,7 +67,7 @@ func (s *internalService) RegisterWithCredentials(register api.Register, nonce s
 	return s.LoginWithCredentials(login, nonce, ip)
 }
 
-// LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
+// LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service receives a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
 func (s *internalService) LoginWithCredentials(login api.Login, nonce string, ip string) (*http.Cookie, error) {
 	// check if they exist in the credentials service and if its enabled.
 	loggedIn, err := s.credentials.Login(login, nonce, ip)

@@ -43,7 +43,7 @@ func (c *AuthnAPIController) Routes() api.Routes {
 	}
 }
 
-// Authenticated - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service recieves a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
+// Authenticated - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service receives a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
 func (c *AuthnAPIController) Authenticated(w http.ResponseWriter, r *http.Request) {
 
 	session, ok := r.Context().Value("LoginSession").(*LoginSession)

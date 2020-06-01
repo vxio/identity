@@ -25,4 +25,8 @@ _testmain.go
 bin/
 *.db
 
+/lint-project.sh
+misspell*
+staticcheck*
+
 pkged.go
