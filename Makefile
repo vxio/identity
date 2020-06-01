@@ -25,6 +25,7 @@ migrate:
 install:
 	wget -O pkger.tar.gz https://github.com/markbates/pkger/releases/download/v0.16.0/pkger_0.16.0_$(shell uname -s)_x86_64.tar.gz
 	tar xf pkger.tar.gz
+	git checkout LICENSE
 
 .PHONY: check
 check:

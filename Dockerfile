@@ -3,6 +3,7 @@ WORKDIR /go/src/github.com/moov-io/identity
 RUN apt-get update && apt-get install make gcc g++
 COPY . .
 RUN go mod download
+RUN make install
 RUN make identity
 
 FROM debian:10
