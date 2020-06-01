@@ -139,7 +139,7 @@ var InMemorySqliteConfig = database.DatabaseConfig{
 func ForEachDatabase(t *testing.T, run func(t *testing.T, repository InvitesRepository)) {
 	cases := map[string]database.DatabaseConfig{
 		"sqlite": InMemorySqliteConfig,
-		"mysql": database.DatabaseConfig{
+		"mysql": {
 			DatabaseName: "identity",
 			MySql: &database.MySqlConfig{
 				Address:  "tcp(localhost:4306)",

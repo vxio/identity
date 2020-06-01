@@ -4,7 +4,6 @@ info:
   version: 0.0.1
   description: |
     Handles all identities for tracking the users of the Moov platform.
-
 servers:
   - url: https://local.moov.io/
     description: Local Testing
@@ -27,7 +26,7 @@ paths:
       - in: query
         name: orgID
         description: Filter in only for specific Organization
-        schema: 
+        schema:
           $ref: '#/components/schemas/UUID'
       responses:
         '200':
@@ -41,7 +40,7 @@ paths:
                   $ref: '#/components/schemas/Invite'
         default:
           $ref: '#/components/responses/Empty'
-                    
+
     post:
       operationId: SendInvite
       summary: Send an email invite to a new user
@@ -94,7 +93,7 @@ paths:
       operationId: Authenticated
       summary: |
         Complete a login via a OIDC.
-        Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.    
+        Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.
       security:
       - LoginAuth: []
       parameters:
@@ -164,7 +163,7 @@ paths:
       - in: query
         name: orgID
         description: Filter in only for specific Organization
-        schema: 
+        schema:
           $ref: '#/components/schemas/UUID'
       responses:
         '200':
@@ -260,7 +259,7 @@ paths:
           $ref: '#/components/responses/Empty'
         default:
           $ref: '#/components/responses/Empty'
-        
+
 
   /identities/{identityID}/credentials:
     get:
@@ -348,7 +347,7 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: JWT that comes from the gateway that validates against the gateways public RSA key
-      
+
     LoginAuth:
       type: apiKey
       in: cookie
@@ -490,7 +489,7 @@ components:
           format: date
           example: 2020-12-31
           maxLength: 10
-        status: 
+        status:
           type: string
           enum:
           - rejected
@@ -537,7 +536,7 @@ components:
           readOnly: true
           nullable: true
           $ref: '#/components/schemas/DateTime'
-        inviteID: 
+        inviteID:
           description: Invite ID that was used to register.
           readOnly: true
           nullable: false
@@ -547,7 +546,7 @@ components:
         - firstName
         - lastName
         - email
-    
+
     UpdateIdentity:
       description: |
         Properties of an Identity. These users will under-go KYC checks thus all the information
@@ -584,7 +583,7 @@ components:
           format: date
           example: 2020-12-31
           maxLength: 10
-        status: 
+        status:
           type: string
           enum:
           - rejected
@@ -677,7 +676,7 @@ components:
           type: string
           format: date-time
           example: '2016-08-29T09:12:33.001Z'
-    
+
     Phone:
       description: Phone number
       type: object
@@ -694,7 +693,7 @@ components:
           format: phone
           pattern: ^[0-9]+$
           maxLength: 15
-        validated: 
+        validated:
           type: boolean
         type:
           type: string
@@ -752,9 +751,9 @@ components:
           minLength: 2
           pattern: ^\w+$
           example: US
-        validated: 
+        validated:
           type: boolean
-          
+
     Login:
       description: |
         User has authenticated with an OIDC now to verify the system can find them. This verifies theirs stored credentials for a user that match the arguments
@@ -898,4 +897,3 @@ components:
           minLength: 2
           pattern: ^\w+$
           example: US
-              
