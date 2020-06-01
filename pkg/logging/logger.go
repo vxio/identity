@@ -12,6 +12,8 @@ type LogContext interface {
 
 type Logger interface {
 	With(ctxs ...LogContext) Logger
+	WithMap(mapCtx map[string]string) Logger
+	WithKeyValue(key, value string) Logger
 	Log(msg string)
 
 	Info(msg string)
@@ -51,6 +53,30 @@ func (l *logger) With(ctxs ...LogContext) Logger {
 		writer: l.writer,
 		ctx:    combined,
 	}
+}
+
+func (l *logger) WithMap(mapCtx map[string]string) Logger {
+	// Estimation assuming that for each ctxs has at least 1 value.
+	combined := make(map[string]string, len(l.ctx)+len(mapCtx))
+
+	for k, v := range l.ctx {
+		combined[k] = v
+	}
+
+	for k, v := range mapCtx {
+		combined[k] = v
+	}
+
+	return &logger{
+		writer: l.writer,
+		ctx:    combined,
+	}
+}
+
+func (l *logger) WithKeyValue(key, value string) Logger {
+	return l.WithMap(map[string]string{
+		key: value,
+	})
 }
 
 func (l *logger) Log(msg string) {

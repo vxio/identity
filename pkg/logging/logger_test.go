@@ -56,6 +56,40 @@ func Test_Fatal(t *testing.T) {
 	a.Contains(buffer.String(), "level=fatal")
 }
 
+func Test_CustomKeyValue(t *testing.T) {
+	a, buffer, log := Setup(t)
+
+	log.WithKeyValue("custom", "value").Log("test")
+
+	a.Contains(buffer.String(), "custom=value")
+}
+
+func Test_CustomMap(t *testing.T) {
+	a, buffer, log := Setup(t)
+
+	log.WithMap(map[string]string{
+		"custom1": "value1",
+		"custom2": "value2",
+	}).Log("test")
+
+	output := buffer.String()
+	a.Contains(output, "custom1=value1")
+	a.Contains(output, "custom2=value2")
+}
+
+func Test_MultipleContexts(t *testing.T) {
+	a, buffer, log := Setup(t)
+
+	log.
+		WithKeyValue("custom1", "value1").
+		WithKeyValue("custom2", "value2").
+		Log("test")
+
+	output := buffer.String()
+	a.Contains(output, "custom1=value1")
+	a.Contains(output, "custom2=value2")
+}
+
 func Setup(t *testing.T) (*assert.Assertions, *strings.Builder, Logger) {
 	a := assert.New(t)
 
