@@ -9,12 +9,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_LogImplementations(t *testing.T) {
+	NewDefaultLogger()
+	NewNopLogger()
+}
+
 func Test_Log(t *testing.T) {
 	a, buffer, log := Setup(t)
 
 	log.Log("my message")
 
 	a.Contains(buffer.String(), "my message")
+	a.Contains(buffer.String(), "level=info")
 }
 
 func Test_WithContext(t *testing.T) {
@@ -47,6 +53,15 @@ func Test_Error(t *testing.T) {
 	log.Error().Log("message")
 
 	a.Contains(buffer.String(), "level=error")
+}
+
+func Test_ErrorF(t *testing.T) {
+	a, buffer, log := Setup(t)
+
+	log.Error().LogErrorF("message %w", errors.New("error"))
+
+	a.Contains(buffer.String(), "msg=\"message error\"")
+	a.Contains(buffer.String(), "error=\"message error\"")
 }
 
 func Test_Fatal(t *testing.T) {

@@ -99,7 +99,7 @@ func NewEnvironment(logger logging.Logger, configOverride *Config) (*Environment
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService, InvitesService, config.Authentication.LandingURL)
+	AuthnService := authn.NewAuthnService(logger, *CredentialsService, *IdentitiesService, SessionService, InvitesService, config.Authentication.LandingURL)
 
 	// router
 	router := mux.NewRouter()
@@ -111,7 +111,7 @@ func NewEnvironment(logger logging.Logger, configOverride *Config) (*Environment
 
 	// authn endpoints
 
-	AuthnMiddleware, err := authn.NewMiddleware(TimeService, AuthnPublicKeys)
+	AuthnMiddleware, err := authn.NewMiddleware(logger, TimeService, AuthnPublicKeys)
 	if err != nil {
 		return nil, logger.Fatal().LogErrorF("Can't startup the Authn middleware - %w", err)
 	}

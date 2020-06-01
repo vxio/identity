@@ -11,6 +11,21 @@ package api
 
 import (
 	"github.com/moov-io/identity/pkg/client"
+	"github.com/moov-io/identity/pkg/logging"
 )
 
 type Credential = client.Credential
+
+type credentialLogContext struct {
+	credential *Credential
+}
+
+func NewCredentialLogContext(credential *Credential) logging.LogContext {
+	return &credentialLogContext{credential: credential}
+}
+
+func (i *credentialLogContext) LogContext() map[string]string {
+	return map[string]string{
+		"credential_id": i.credential.CredentialID,
+	}
+}

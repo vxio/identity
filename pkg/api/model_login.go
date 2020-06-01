@@ -11,6 +11,22 @@ package api
 
 import (
 	"github.com/moov-io/identity/pkg/client"
+	"github.com/moov-io/identity/pkg/logging"
 )
 
 type Login = client.Login
+
+type loginLogContext struct {
+	login *Login
+}
+
+func NewLoginLogContext(login *Login) logging.LogContext {
+	return &loginLogContext{login: login}
+}
+
+func (i *loginLogContext) LogContext() map[string]string {
+	return map[string]string{
+		"login_provider":      i.login.Provider,
+		"login_subject_trunc": i.login.SubjectID[0:5],
+	}
+}

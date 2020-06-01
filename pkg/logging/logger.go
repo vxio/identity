@@ -9,10 +9,6 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-type LogContext interface {
-	LogContext() map[string]string
-}
-
 type Logger interface {
 	With(ctxs ...LogContext) Logger
 	WithMap(mapCtx map[string]string) Logger
@@ -41,10 +37,13 @@ func NewNopLogger() Logger {
 }
 
 func NewLogger(writer log.Logger) Logger {
-	return &logger{
+	l := &logger{
 		writer: writer,
 		ctx:    map[string]string{},
 	}
+
+	// Default logs to be info until changed
+	return l.Info()
 }
 
 // With returns a new Logger with the contexts added to its own.

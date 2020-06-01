@@ -3,10 +3,10 @@ package authn
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
 	"gopkg.in/square/go-jose.v2"
@@ -14,18 +14,20 @@ import (
 
 // Middleware - Handles authenticating a request came from the authn services
 type Middleware struct {
+	log        logging.Logger
 	time       stime.TimeService
 	publicKeys jose.JSONWebKeySet
 }
 
 // NewMiddleware - Generates a default AuthnMiddleware for use with authenticating a request came from the authn services
-func NewMiddleware(time stime.TimeService, publicKeyLoader webkeys.WebKeysService) (*Middleware, error) {
+func NewMiddleware(log logging.Logger, time stime.TimeService, publicKeyLoader webkeys.WebKeysService) (*Middleware, error) {
 	publicKeys, err := publicKeyLoader.Keys()
 	if err != nil {
 		return nil, err
 	}
 
 	return &Middleware{
+		log:        log,
 		time:       time,
 		publicKeys: *publicKeys,
 	}, nil
@@ -36,6 +38,7 @@ func (s *Middleware) Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		session, err := s.FromRequest(r)
 		if err != nil {
+			s.log.Error().LogError("Session error", err)
 			w.WriteHeader(404)
 			return
 		}
@@ -51,12 +54,12 @@ func (s *Middleware) Handler(h http.Handler) http.Handler {
 func (s *Middleware) FromRequest(r *http.Request) (*LoginSession, error) {
 	cookie, err := r.Cookie("moov-authn")
 	if err != nil {
-		return nil, errors.New("No session found")
+		return nil, s.log.Error().LogError("No session cookie found", err)
 	}
 
 	session, err := s.Parse(cookie.Value)
 	if err != nil {
-		return nil, err
+		return nil, s.log.Error().LogErrorF("Session token parse failure - %w", err)
 	}
 
 	return session, nil
@@ -82,7 +85,6 @@ func (s *Middleware) Parse(tokenString string) (*LoginSession, error) {
 	})
 
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
