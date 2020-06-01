@@ -7,7 +7,7 @@ GROUPID:= $(shell id -g $$USER)
 build: identity
 
 identity:
-	pkger
+	./pkger
 	go build -o ${PWD}/bin/identity cmd/identity/*
 
 rotate:
@@ -18,12 +18,13 @@ run: identity
 	./bin/identity
 
 migrate:
-	pkger
+	./pkger
 	cd ./cmd/migrate && go build -o $(PWD)/bin/migrate
 	./bin/migrate
 
 install:
-	go get github.com/markbates/pkger/cmd/pkger
+	wget -O pkger.tar.gz https://github.com/markbates/pkger/releases/download/v0.16.0/pkger_0.16.0_$(shell uname -s)_x86_64.tar.gz
+	tar xf pkger.tar.gz
 
 .PHONY: check
 check:
@@ -36,12 +37,12 @@ else
 endif
 
 docker: install
-	pkger
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o ${PWD}/bin/.docker/identity cmd/identity/*
-	docker build -f Dockerfile -t moov/identity .
+	./pkger
+	docker build --pull -t moov/identity:$(VERSION) -f Dockerfile .
+	docker tag moov/identity:$(VERSION) moov/identity:latest
 
 docker-run:
-	docker run -v ${PWD}/data:/data -v ${PWD}/configs:/configs --env APP_CONFIG="/configs/config.yml" -it --rm moov/identity
+	docker run -v ${PWD}/data:/data -v ${PWD}/configs:/configs --env APP_CONFIG="/configs/config.yml" -it --rm moov/identity:$(VERSION)
 
 clean:
 	rm ./data/*

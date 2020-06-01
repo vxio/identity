@@ -29,4 +29,5 @@ bin/
 misspell*
 staticcheck*
 
+pkger*
 pkged.go
