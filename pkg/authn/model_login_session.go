@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-kit/kit/log"
 	api "github.com/moov-io/identity/pkg/api"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 // LoginSession is the values of the JWT coming in from the Authentication services.
@@ -42,7 +42,7 @@ func LoginSessionFromRequest(r *http.Request) (*LoginSession, error) {
 func WithLoginSessionFromRequest(l log.Logger, w http.ResponseWriter, r *http.Request, run func(LoginSession)) {
 	session, err := LoginSessionFromRequest(r)
 	if err != nil {
-		l.Log("level", "error", "msg", err.Error())
+		l.Error().LogError("LoginSessionFromRequest errored", err)
 		w.WriteHeader(404)
 		return
 	}

@@ -7,9 +7,9 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/go-kit/kit/log"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	log "github.com/moov-io/identity/pkg/logging"
 	. "github.com/moov-io/identity/pkg/webkeys"
 	"github.com/stretchr/testify/assert"
 )

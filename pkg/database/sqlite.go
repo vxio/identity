@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kit/kit/log"
 	kitprom "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/mattn/go-sqlite3"
+	log "github.com/moov-io/identity/pkg/logging"
 	stdprom "github.com/prometheus/client_golang/prometheus"
 )
 
@@ -43,7 +43,7 @@ func (s *sqlite) Connect(ctx context.Context) (*sql.DB, error) {
 
 	sqliteVersionLogOnce.Do(func() {
 		if v, _, _ := sqlite3.Version(); v != "" {
-			s.logger.Log("main", fmt.Sprintf("sqlite version %s", v))
+			s.logger.Info().Log(fmt.Sprintf("sqlite version %s", v))
 		}
 	})
 

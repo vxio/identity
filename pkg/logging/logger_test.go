@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -35,7 +36,7 @@ func Test_ReplaceContextValue(t *testing.T) {
 func Test_Info(t *testing.T) {
 	a, buffer, log := Setup(t)
 
-	log.Info("message")
+	log.Info().Log("message")
 
 	a.Contains(buffer.String(), "level=info")
 }
@@ -43,7 +44,7 @@ func Test_Info(t *testing.T) {
 func Test_Error(t *testing.T) {
 	a, buffer, log := Setup(t)
 
-	log.Error("message")
+	log.Error().Log("message")
 
 	a.Contains(buffer.String(), "level=error")
 }
@@ -51,7 +52,7 @@ func Test_Error(t *testing.T) {
 func Test_Fatal(t *testing.T) {
 	a, buffer, log := Setup(t)
 
-	log.Fatal("message")
+	log.Fatal().Log("message")
 
 	a.Contains(buffer.String(), "level=fatal")
 }
@@ -88,6 +89,37 @@ func Test_MultipleContexts(t *testing.T) {
 	output := buffer.String()
 	a.Contains(output, "custom1=value1")
 	a.Contains(output, "custom2=value2")
+}
+
+func Test_LogErrorNil(t *testing.T) {
+	a, buffer, log := Setup(t)
+
+	err := log.LogError("someerror", nil)
+	a.Equal("someerror", err.Error())
+
+	output := buffer.String()
+	a.Contains(output, "error=someerror")
+	a.Contains(output, "msg=someerror")
+}
+
+func Test_LogError(t *testing.T) {
+	a, buffer, log := Setup(t)
+
+	err := log.LogError("someerror", errors.New("othererror"))
+	a.Equal("othererror", err.Error())
+
+	output := buffer.String()
+	a.Contains(output, "error=othererror")
+	a.Contains(output, "msg=someerror")
+}
+
+func Test_Caller(t *testing.T) {
+	a, buffer, log := Setup(t)
+
+	log.Info().Log("message")
+
+	a.Contains(buffer.String(), "caller_0=")
+
 }
 
 func Setup(t *testing.T) (*assert.Assertions, *strings.Builder, Logger) {

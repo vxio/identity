@@ -1,7 +1,10 @@
 package logging
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"runtime"
 
 	"github.com/go-kit/kit/log"
 )
@@ -14,16 +17,27 @@ type Logger interface {
 	With(ctxs ...LogContext) Logger
 	WithMap(mapCtx map[string]string) Logger
 	WithKeyValue(key, value string) Logger
-	Log(msg string)
 
-	Info(msg string)
-	Error(msg string)
-	Fatal(msg string)
+	Info() Logger
+	Error() Logger
+	Fatal() Logger
+
+	Log(msg string)
+	LogError(msg string, err error) error
+	LogErrorF(format string, a ...interface{}) error
 }
 
 type logger struct {
 	writer log.Logger
 	ctx    map[string]string
+}
+
+func NewDefaultLogger() Logger {
+	return NewLogger(log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr)))
+}
+
+func NewNopLogger() Logger {
+	return NewLogger(log.NewNopLogger())
 }
 
 func NewLogger(writer log.Logger) Logger {
@@ -79,6 +93,18 @@ func (l *logger) WithKeyValue(key, value string) Logger {
 	})
 }
 
+func (l *logger) Info() Logger {
+	return l.With(Info)
+}
+
+func (l *logger) Error() Logger {
+	return l.With(Error)
+}
+
+func (l *logger) Fatal() Logger {
+	return l.With(Fatal)
+}
+
 func (l *logger) Log(msg string) {
 	i := 0
 	keyvals := make([]interface{}, (len(l.ctx)*2)+2)
@@ -91,19 +117,27 @@ func (l *logger) Log(msg string) {
 	keyvals[i] = "msg"
 	keyvals[i+1] = msg
 
-	fmt.Println(keyvals)
+	i = 0
+	_, file, line, ok := runtime.Caller(i + 1)
+	for ; ok; i++ {
+		keyvals = append(keyvals, fmt.Sprintf("caller_%d", i), fmt.Sprintf("%s:%d", file, line))
+		_, file, line, ok = runtime.Caller(i + 2)
+	}
 
 	l.writer.Log(keyvals...)
 }
 
-func (l *logger) Info(msg string) {
-	l.With(Info).Log(msg)
+// LogError logs the error or creates a new one using the msg if `err` is nil and returns it.
+func (l *logger) LogError(msg string, err error) error {
+	if err == nil {
+		err = errors.New(msg)
+	}
+
+	l.WithKeyValue("error", err.Error()).Log(msg)
+	return err
 }
 
-func (l *logger) Error(msg string) {
-	l.With(Error).Log(msg)
-}
-
-func (l *logger) Fatal(msg string) {
-	l.With(Fatal).Log(msg)
+func (l *logger) LogErrorF(format string, a ...interface{}) error {
+	err := fmt.Errorf(format, a...)
+	return l.LogError(err.Error(), err)
 }

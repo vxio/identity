@@ -3,14 +3,13 @@ package authn_test
 import (
 	"context"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
 	. "github.com/moov-io/identity/pkg/authn"
+	log "github.com/moov-io/identity/pkg/logging"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-kit/kit/log"
 	fuzz "github.com/google/gofuzz"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -36,7 +35,7 @@ var identityKeys, _ = webkeys.NewGenerateJwksService()
 func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	a := require.New(t)
 
-	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
+	logger := log.NewDefaultLogger()
 	session := gateway.NewRandomSession()
 
 	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, logger, nil)

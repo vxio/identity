@@ -5,13 +5,13 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/go-kit/kit/log"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 func TestMySQL__basic(t *testing.T) {
 	db := CreateTestMySQLDB(t)
 	defer db.Close()
- 
+
 	if err := db.DB.Ping(); err != nil {
 		t.Fatal(err)
 	}

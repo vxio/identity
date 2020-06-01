@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 
-	"github.com/go-kit/kit/log"
+	log "github.com/moov-io/identity/pkg/logging"
 	"gopkg.in/gomail.v2"
 )
 
@@ -53,10 +53,9 @@ func (s *smtpService) SendEmail(to string, email EmailTemplate) error {
 	}
 
 	if err := s.dailer.DialAndSend(m); err != nil {
-		s.logger.Log("level", "error", "msg", fmt.Sprintf("Failed to send email - %s\n", err))
-		return err
+		return s.logger.Error().LogError("Failed to send email", err)
 	}
 
-	s.logger.Log("level", "info", "msg", fmt.Sprintf("Successfully sent email to: %s", to))
+	s.logger.Info().WithKeyValue("email_to", to).Log(fmt.Sprintf("Successfully sent email to: %s", to))
 	return nil
 }

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-kit/kit/log"
 	api "github.com/moov-io/identity/pkg/api"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 // authnAPIController - Controller for the AuthN verification routes.
@@ -55,7 +55,7 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 
 		result, err := c.service.LoginWithCredentials(login, session.State, session.IP)
 		if err != nil {
-			c.logger.Log("level", "error", "msg", "Not able to exchange login token for session token", "error", err.Error())
+			c.logger.Error().LogError("Not able to exchange login token for session token", err)
 			w.WriteHeader(404)
 			return
 		}
@@ -89,7 +89,7 @@ func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 func (c *authnAPIController) doRegistration(w http.ResponseWriter, r *http.Request, session LoginSession, registration *api.Register) {
 	result, err := c.service.RegisterWithCredentials(*registration, session.State, session.IP)
 	if err != nil {
-		c.logger.Log("level", "error", "msg", "Unable to RegisterWithCredentials", "error", err)
+		c.logger.Error().LogError("Unable to RegisterWithCredentials", err)
 		w.WriteHeader(400)
 		return
 	}

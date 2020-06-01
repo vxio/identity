@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kit/kit/log"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/gateway"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 func TestGetById(t *testing.T) {

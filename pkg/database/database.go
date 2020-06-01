@@ -7,7 +7,7 @@ import (
 
 	//"github.com/moov-io/paygate/pkg/util"
 
-	"github.com/go-kit/kit/log"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 // New establishes a database connection according to the type and environmental
