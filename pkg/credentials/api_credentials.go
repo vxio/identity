@@ -14,7 +14,7 @@ import (
 type CredentialsApiController struct {
 	service api.CredentialsApiServicer
 }
-
+	
 // NewCredentialsApiController creates a default api controller
 func NewCredentialsApiController(s api.CredentialsApiServicer) api.Router {
 	return &CredentialsApiController{service: s}

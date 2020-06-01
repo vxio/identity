@@ -11,9 +11,8 @@ import (
 
 // Config defines all the configuration for the app
 type Config struct {
-	Servers  ServerConfig
-	Database database.DatabaseConfig
-	//Keys           KeysConfig
+	Servers        ServerConfig
+	Database       database.DatabaseConfig
 	Gateway        gateway.Config
 	Authentication authn.Config
 	Session        session.Config
