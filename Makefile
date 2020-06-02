@@ -16,9 +16,11 @@ rotate:
 run: identity
 	./bin/identity
 
-test: build
-	docker-compose up -d
+test: services build
 	go test -cover ./...
+
+services:
+	docker-compose up -d
 
 migrate:
 	pkger
@@ -30,7 +32,7 @@ install:
 	git checkout LICENSE
 
 .PHONY: check
-check:
+check: services
 ifeq ($(OS),Windows_NT)
 	@echo "Skipping checks on Windows, currently unsupported."
 else
