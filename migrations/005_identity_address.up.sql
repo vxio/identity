@@ -7,6 +7,7 @@ CREATE TABLE identity_address (
     address_2       VARCHAR(255),
     city            VARCHAR(255) NOT NULL,
     state           VARCHAR(2) NOT NULL,
+    postal_code     VARCHAR(10) NOT NULL,
     country         VARCHAR(2) NOT NULL,
     validated       BOOLEAN NOT NULL,
 

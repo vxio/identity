@@ -6,6 +6,7 @@ import (
 
 type StaticTimeService interface {
 	Change(update time.Time) time.Time
+	Add(d time.Duration) time.Time
 	TimeService
 }
 
@@ -26,5 +27,10 @@ func (s *staticTimeService) Now() time.Time {
 
 func (s *staticTimeService) Change(update time.Time) time.Time {
 	s.time = update
+	return s.time
+}
+
+func (s *staticTimeService) Add(d time.Duration) time.Time {
+	s.time = s.time.Add(d)
 	return s.time
 }

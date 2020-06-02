@@ -6,9 +6,9 @@ type WebKeysConfig struct {
 }
 
 type FileConfig struct {
-	Path string
+	Paths []string
 }
 
 type HttpConfig struct {
-	URL string
+	URLs []string
 }

@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/moov-io/identity/pkg/zerotrust"
+	"github.com/moov-io/identity/pkg/gateway"
 )
 
 // CredentialsApiRouter defines the required methods for binding the api requests to a responses for the CredentialsApi
@@ -46,7 +46,7 @@ type InvitesApiRouter interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type CredentialsApiServicer interface {
-	DisableCredentials(zerotrust.Session, string, string) (*Credential, error)
+	DisableCredentials(gateway.Session, string, string) (*Credential, error)
 	ListCredentials(string) ([]Credential, error)
 }
 
@@ -55,10 +55,10 @@ type CredentialsApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type IdentitiesApiServicer interface {
-	DisableIdentity(zerotrust.Session, string) error
-	GetIdentity(zerotrust.Session, string) (*Identity, error)
-	ListIdentities(zerotrust.Session, string) ([]Identity, error)
-	UpdateIdentity(zerotrust.Session, string, UpdateIdentity) (*Identity, error)
+	DisableIdentity(gateway.Session, string) error
+	GetIdentity(gateway.Session, string) (*Identity, error)
+	ListIdentities(gateway.Session, string) ([]Identity, error)
+	UpdateIdentity(gateway.Session, string, UpdateIdentity) (*Identity, error)
 }
 
 // InternalApiServicer defines the api actions for the InternalApi service
@@ -76,8 +76,8 @@ type InternalApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type InvitesApiServicer interface {
-	DisableInvite(zerotrust.Session, string) error
-	ListInvites(zerotrust.Session) ([]Invite, error)
-	SendInvite(zerotrust.Session, SendInvite) (*Invite, string, error)
+	DisableInvite(gateway.Session, string) error
+	ListInvites(gateway.Session) ([]Invite, error)
+	SendInvite(gateway.Session, SendInvite) (*Invite, string, error)
 	Redeem(code string) (*Invite, error)
 }

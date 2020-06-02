@@ -14,10 +14,11 @@ import (
 	"github.com/moov-io/base/admin"
 	_ "github.com/moov-io/identity" // need to import the embedded files
 
-	"github.com/go-kit/kit/log"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
-func (env *Environment) RunServers() func() {
+// RunServers - Boots up all the servers and awaits till they are stopped.
+func (env *Environment) RunServers(await bool) func() {
 
 	// Listen for application termination.
 	terminationListener := newTerminationListener()
@@ -26,7 +27,9 @@ func (env *Environment) RunServers() func() {
 
 	_, shutdownPublicServer := bootHTTPServer("public", &env.PublicRouter, terminationListener, env.Logger, env.Config.Servers.Public)
 
-	awaitTermination(env.Logger, terminationListener)
+	if await {
+		awaitTermination(env.Logger, terminationListener)
+	}
 
 	return func() {
 		adminServer.Shutdown()
@@ -47,7 +50,7 @@ func newTerminationListener() chan error {
 
 func awaitTermination(logger log.Logger, terminationListener chan error) {
 	if err := <-terminationListener; err != nil {
-		logger.Log("exit", err)
+		logger.Fatal().LogError("Terminated", err)
 	}
 }
 
@@ -69,17 +72,15 @@ func bootHTTPServer(name string, routes *mux.Router, errs chan<- error, logger l
 
 	// Start main HTTP server
 	go func() {
-		logger.Log(name, fmt.Sprintf("listening on %s", config.Bind.Address))
+		logger.Info().Log(fmt.Sprintf("%s listening on %s", name, config.Bind.Address))
 		if err := serve.ListenAndServe(); err != nil {
-			err = fmt.Errorf("problem starting http: %v", err)
-			logger.Log(name, err)
-			errs <- err // send err to shutdown channel
+			errs <- logger.Fatal().LogError("Problem starting http", fmt.Errorf("problem starting http: %v", err))
 		}
 	}()
 
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
-			logger.Log(name, err)
+			logger.Fatal().LogError(name, err)
 		}
 	}
 
@@ -90,11 +91,9 @@ func bootAdminServer(errs chan<- error, logger log.Logger, config HTTPConfig) *a
 	adminServer := admin.NewServer(config.Bind.Address)
 
 	go func() {
-		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
+		logger.Info().Log(fmt.Sprintf("listening on %s", adminServer.BindAddr()))
 		if err := adminServer.Listen(); err != nil {
-			err = fmt.Errorf("problem starting admin http: %v", err)
-			logger.Log("admin", err)
-			errs <- err // send err to shutdown channel
+			errs <- logger.Fatal().LogError("Problem starting admin http", fmt.Errorf("Problem starting admin http: %v", err))
 		}
 	}()
 

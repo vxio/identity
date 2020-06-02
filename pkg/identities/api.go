@@ -1,0 +1,128 @@
+package identities
+
+import (
+	"database/sql"
+	"encoding/json"
+	"net/http"
+	"strings"
+
+	"github.com/gorilla/mux"
+	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/gateway"
+)
+
+// A Controller binds http requests to an api service and writes the service results to the http response
+type Controller struct {
+	service api.IdentitiesApiServicer
+}
+
+// NewIdentitiesController creates a default api controller
+func NewIdentitiesController(s api.IdentitiesApiServicer) api.Router {
+	return &Controller{service: s}
+}
+
+// Routes returns all of the api route for the IdentitiesApiController
+func (c *Controller) Routes() api.Routes {
+	return api.Routes{
+		{
+			Name:        "DisableIdentity",
+			Method:      strings.ToUpper("Delete"),
+			Pattern:     "/identities/{identityID}",
+			HandlerFunc: c.DisableIdentity,
+		},
+		{
+			Name:        "GetIdentity",
+			Method:      strings.ToUpper("Get"),
+			Pattern:     "/identities/{identityID}",
+			HandlerFunc: c.GetIdentity,
+		},
+		{
+			Name:        "ListIdentities",
+			Method:      strings.ToUpper("Get"),
+			Pattern:     "/identities",
+			HandlerFunc: c.ListIdentities,
+		},
+		{
+			Name:        "UpdateIdentity",
+			Method:      strings.ToUpper("Put"),
+			Pattern:     "/identities/{identityID}",
+			HandlerFunc: c.UpdateIdentity,
+		},
+	}
+}
+
+func errorHandling(w http.ResponseWriter, err error) {
+	switch err {
+	case sql.ErrNoRows:
+		w.WriteHeader(404)
+	default:
+		w.WriteHeader(500)
+		return
+	}
+}
+
+// DisableIdentity - Disable an identity. Its left around for historical reporting
+func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
+		params := mux.Vars(r)
+		identityID := params["identityID"]
+		err := c.service.DisableIdentity(session, identityID)
+		if err != nil {
+			errorHandling(w, err)
+			return
+		}
+
+		w.WriteHeader(204)
+	})
+}
+
+// GetIdentity - List identities and associates userId
+func (c *Controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
+		params := mux.Vars(r)
+		identityID := params["identityID"]
+		result, err := c.service.GetIdentity(session, identityID)
+		if err != nil {
+			errorHandling(w, err)
+			return
+		}
+
+		api.EncodeJSONResponse(result, nil, w)
+	})
+}
+
+// ListIdentities - List identities and associates userId
+func (c *Controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
+		query := r.URL.Query()
+		orgID := query.Get("orgID")
+		result, err := c.service.ListIdentities(session, orgID)
+		if err != nil {
+			errorHandling(w, err)
+			return
+		}
+
+		api.EncodeJSONResponse(result, nil, w)
+	})
+}
+
+// UpdateIdentity - Update a specific Identity
+func (c *Controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
+		params := mux.Vars(r)
+		identityID := params["identityID"]
+		identity := &api.UpdateIdentity{}
+		if err := json.NewDecoder(r.Body).Decode(&identity); err != nil {
+			w.WriteHeader(400)
+			return
+		}
+
+		result, err := c.service.UpdateIdentity(session, identityID, *identity)
+		if err != nil {
+			errorHandling(w, err)
+			return
+		}
+
+		api.EncodeJSONResponse(result, nil, w)
+	})
+}

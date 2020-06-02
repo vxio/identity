@@ -25,15 +25,13 @@ var (
 type InternalApiService service
 
 /*
-Authenticated Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.     
+Authenticated Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint. 
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param moovLogin Encrypted and signed token that they authenticated via one of the approved services
- * @param login Arguments needed to match up the OIDC user data with a user in the system
 @return LoggedIn
 */
-func (a *InternalApiService) Authenticated(ctx _context.Context, moovLogin string, login Login) (LoggedIn, *_nethttp.Response, error) {
+func (a *InternalApiService) Authenticated(ctx _context.Context) (LoggedIn, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -48,7 +46,7 @@ func (a *InternalApiService) Authenticated(ctx _context.Context, moovLogin strin
 	localVarFormParams := _neturl.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -64,8 +62,6 @@ func (a *InternalApiService) Authenticated(ctx _context.Context, moovLogin strin
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = &login
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -120,13 +116,12 @@ func (a *InternalApiService) Authenticated(ctx _context.Context, moovLogin strin
 }
 
 /*
-RegisterWithCredentials If the OIDC client specified it got an invite code that token will be exchanged here to login 
+RegisterWithCredentials Called when the user is registering for the first time. It requires that they have authenticated with a  supported OIDC provider and recieved a valid invite code. 
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param moovLogin Encrypted and signed token that they authenticated via one of the approved services
  * @param register Arguments needed register a user with OIDC credentials.
 @return LoggedIn
 */
-func (a *InternalApiService) RegisterWithCredentials(ctx _context.Context, moovLogin string, register Register) (LoggedIn, *_nethttp.Response, error) {
+func (a *InternalApiService) RegisterWithCredentials(ctx _context.Context, register Register) (LoggedIn, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}

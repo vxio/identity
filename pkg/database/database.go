@@ -7,7 +7,7 @@ import (
 
 	//"github.com/moov-io/paygate/pkg/util"
 
-	"github.com/go-kit/kit/log"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 // New establishes a database connection according to the type and environmental
@@ -20,6 +20,32 @@ func New(ctx context.Context, logger log.Logger, config DatabaseConfig) (*sql.DB
 	}
 
 	return nil, fmt.Errorf("Database config not defined")
+}
+
+func NewAndMigrate(config DatabaseConfig, logger log.Logger, ctx context.Context) (*sql.DB, func(), error) {
+	if logger == nil {
+		logger = log.NewNopLogger()
+	}
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	db, err := New(ctx, logger, config)
+	if err != nil {
+		return nil, func() {}, err
+	}
+
+	shutdown := func() {
+		db.Close()
+	}
+
+	err = RunMigrations(logger, db, config)
+	if err != nil {
+		return nil, shutdown, err
+	}
+
+	return db, shutdown, nil
 }
 
 // UniqueViolation returns true when the provided error matches a database error

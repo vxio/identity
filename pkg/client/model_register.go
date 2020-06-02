@@ -8,6 +8,9 @@
  */
 
 package client
+import (
+	"time"
+)
 // Register Request to register a user in the system
 type Register struct {
 	// OIDC provider that was used to handle authentication of this user.
@@ -20,7 +23,7 @@ type Register struct {
 	LastName string `json:"lastName,omitempty"`
 	NickName *string `json:"nickName,omitempty"`
 	Suffix *string `json:"suffix,omitempty"`
-	BirthDate string `json:"birthDate,omitempty"`
+	BirthDate time.Time `json:"birthDate,omitempty"`
 	// Email Address
 	Email string `json:"email,omitempty"`
 	Phones []RegisterPhone `json:"phones,omitempty"`

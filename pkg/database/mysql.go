@@ -12,9 +12,9 @@ import (
 
 	"github.com/moov-io/base/docker"
 
-	"github.com/go-kit/kit/log"
 	kitprom "github.com/go-kit/kit/metrics/prometheus"
 	gomysql "github.com/go-sql-driver/mysql"
+	log "github.com/moov-io/identity/pkg/logging"
 	"github.com/ory/dockertest/v3"
 	stdprom "github.com/prometheus/client_golang/prometheus"
 )

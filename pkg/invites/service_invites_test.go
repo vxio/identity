@@ -2,21 +2,19 @@ package invites
 
 import (
 	"database/sql"
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/zerotrust"
-	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 )
 
 type InvitesServiceScope struct {
-	session zerotrust.Session
+	session gateway.Session
 	service api.InvitesApiServicer
 	time    stime.StaticTimeService
 }
@@ -85,7 +83,7 @@ func TestDisableInvite(t *testing.T) {
 	}
 
 	_, err = s.service.Redeem(code)
-	if err != ErrTokenDisabled {
+	if err != ErrInviteCodeDisabled {
 		t.Error("Disabled token didn't redeem will disabled failure")
 	}
 }
@@ -99,22 +97,20 @@ func TestExpiredInvite(t *testing.T) {
 		t.Error(err)
 	}
 
-	fmt.Println(s.time.Now())
 	s.time.Change(invite.ExpiresOn.Add(time.Millisecond))
-	fmt.Println(s.time.Now())
 
 	_, err = s.service.Redeem(code)
-	if err != ErrTokenExpired {
+	if err != ErrInviteCodeExpired {
 		t.Error("Expired token didn't redeem with expired failure")
 	}
 }
 
 func NewInvitesScope(t *testing.T) InvitesServiceScope {
-	session := NewSession()
+	session := gateway.NewRandomSession()
 
 	repository := NewInMemoryInvitesRepository(t)
 
-	config := InvitesConfig{
+	config := Config{
 		Expiration: time.Hour,
 		SendToURL:  "http://local.moov.io",
 	}
@@ -136,13 +132,4 @@ func NewInvitesScope(t *testing.T) InvitesServiceScope {
 	}
 
 	return scope
-}
-
-func NewSession() zerotrust.Session {
-	iid, _ := uuid.New()
-	tid, _ := uuid.New()
-	return zerotrust.Session{
-		CallerID: zerotrust.IdentityID(iid),
-		TenantID: zerotrust.TenantID(tid),
-	}
 }
