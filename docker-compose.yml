@@ -19,6 +19,7 @@ services:
         ports:
         - "4336:4436"
         - "4337:4437"
+        - "2025:1025"
         networks:
         - intranet
 

@@ -7,7 +7,7 @@ CREATE TABLE identity (
     last_name       VARCHAR(255) NOT NULL,
     nick_name       VARCHAR(255),
     suffix          VARCHAR(20),
-    birth_date      DATE NOT NULL,
+    birth_date      TIMESTAMP NOT NULL,
     status          VARCHAR(20) NOT NULL,
     email           VARCHAR(255) NOT NULL,
     email_verified  BOOLEAN DEFAULT false,

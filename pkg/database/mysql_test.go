@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/go-kit/kit/log"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 func TestMySQL__basic(t *testing.T) {

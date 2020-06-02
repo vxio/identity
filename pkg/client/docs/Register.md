@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **LastName** | **string** |  | [optional] 
 **NickName** | Pointer to **string** |  | [optional] 
 **Suffix** | Pointer to **string** |  | [optional] 
-**BirthDate** | **string** |  | [optional] 
+**BirthDate** | [**time.Time**](time.Time.md) |  | [optional] 
 **Email** | **string** | Email Address | [optional] 
 **Phones** | [**[]RegisterPhone**](RegisterPhone.md) |  | [optional] 
 **Addresses** | [**[]RegisterAddress**](RegisterAddress.md) |  | [optional] 

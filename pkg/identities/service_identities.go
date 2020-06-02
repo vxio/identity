@@ -5,29 +5,29 @@ import (
 
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
-// IdentitiesApiService is a service that implents the logic for the IdentitiesApiServicer
+// Service - Service that implents the logic for the IdentitiesApiServicer
 // This service should implement the business logic for every endpoint for the IdentitiesApi API.
 // Include any external packages or services that will be required by this service.
-type IdentitiesService struct {
+type Service struct {
 	time       stime.TimeService
-	repository IdentityRepository
+	repository Repository
 }
 
-// NewIdentitiesApiService creates a default api service
-func NewIdentitiesService(time stime.TimeService, repository IdentityRepository) *IdentitiesService {
-	return &IdentitiesService{
+// NewIdentitiesService creates a default service
+func NewIdentitiesService(time stime.TimeService, repository Repository) *Service {
+	return &Service{
 		time:       time,
 		repository: repository,
 	}
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
-func (s *IdentitiesService) DisableIdentity(session zerotrust.Session, identityID string) error {
-	identity, err := s.repository.get(session.TenantID, identityID)
+func (s *Service) DisableIdentity(session gateway.Session, identityID string) error {
+	identity, err := s.GetIdentity(session, identityID)
 	if err != nil {
 		return err
 	}
@@ -49,24 +49,28 @@ func (s *IdentitiesService) DisableIdentity(session zerotrust.Session, identityI
 }
 
 // GetIdentity - List identities and associates userId
-func (s *IdentitiesService) GetIdentity(session zerotrust.Session, identityID string) (*api.Identity, error) {
-	i, e := s.repository.get(session.TenantID, identityID)
+func (s *Service) GetIdentity(session gateway.Session, identityID string) (*api.Identity, error) {
+	i, e := s.GetIdentityByID(identityID)
 	if e != nil {
-		return nil, errors.New("Identity not found")
+		return nil, e
+	}
+
+	if i.TenantID != session.TenantID.String() {
+		return nil, errors.New("TenantID of session user doesn't match retrieved identity")
 	}
 
 	return i, nil
 }
 
 // ListIdentities - List identities and associates userId
-func (s *IdentitiesService) ListIdentities(session zerotrust.Session, orgID string) ([]api.Identity, error) {
+func (s *Service) ListIdentities(session gateway.Session, orgID string) ([]api.Identity, error) {
 	identities, err := s.repository.list(session.TenantID)
 	return identities, err
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *IdentitiesService) UpdateIdentity(session zerotrust.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
-	identity, err := s.repository.get(session.TenantID, identityID)
+func (s *Service) UpdateIdentity(session gateway.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
+	identity, err := s.GetIdentity(session, identityID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,9 +82,50 @@ func (s *IdentitiesService) UpdateIdentity(session zerotrust.Session, identityID
 	identity.Suffix = update.Suffix
 	identity.BirthDate = update.BirthDate
 	identity.Status = update.Status
-	identity.Phones = update.Phones
-	identity.Addresses = update.Addresses
 	identity.LastUpdatedOn = s.time.Now()
+
+	identity.Phones = []api.Phone{}
+	for _, p := range update.Phones {
+		_, err := uuid.Parse(p.PhoneID)
+		if err != nil {
+			p.PhoneID = uuid.New().String()
+		}
+
+		identity.Phones = append(
+			identity.Phones,
+			api.Phone{
+				IdentityID: identity.IdentityID,
+				PhoneID:    p.PhoneID,
+				Number:     p.Number,
+				Validated:  p.Validated,
+				Type:       p.Type,
+			},
+		)
+	}
+
+	identity.Addresses = []api.Address{}
+	for _, a := range update.Addresses {
+		_, err := uuid.Parse(a.AddressID)
+		if err != nil {
+			a.AddressID = uuid.New().String()
+		}
+
+		identity.Addresses = append(
+			identity.Addresses,
+			api.Address{
+				IdentityID: identity.IdentityID,
+				AddressID:  a.AddressID,
+				Type:       a.Type,
+				Address1:   a.Address1,
+				Address2:   a.Address2,
+				City:       a.City,
+				State:      a.State,
+				PostalCode: a.PostalCode,
+				Country:    a.Country,
+				Validated:  a.Validated,
+			},
+		)
+	}
 
 	updated, err := s.repository.update(*identity)
 	if err != nil {
@@ -92,7 +137,8 @@ func (s *IdentitiesService) UpdateIdentity(session zerotrust.Session, identityID
 	return updated, err
 }
 
-func (s *IdentitiesService) Register(invite api.Invite, register api.Register) (*api.Identity, error) {
+// Register - Takes an invite and the registration information and creates the new identity from it.
+func (s *Service) Register(invite api.Invite, register api.Register) (*api.Identity, error) {
 	identityID := uuid.New().String()
 
 	phones := []api.Phone{}
@@ -123,7 +169,9 @@ func (s *IdentitiesService) Register(invite api.Invite, register api.Register) (
 	}
 
 	identity := api.Identity{
-		IdentityID:    uuid.New().String(),
+		IdentityID:    identityID,
+		TenantID:      invite.TenantID,
+		InviteID:      invite.InviteID,
 		FirstName:     register.FirstName,
 		MiddleName:    register.MiddleName,
 		LastName:      register.LastName,
@@ -137,7 +185,6 @@ func (s *IdentitiesService) Register(invite api.Invite, register api.Register) (
 		Addresses:     addresses,
 		RegisteredOn:  s.time.Now(),
 		LastLogin:     api.LastLogin{},
-		InviteID:      invite.InviteID,
 		LastUpdatedOn: s.time.Now(),
 	}
 
@@ -151,4 +198,14 @@ func (s *IdentitiesService) Register(invite api.Invite, register api.Register) (
 	// @TODO send email notification to get registered email verified
 
 	return saved, nil
+}
+
+// GetIdentityByID - Returns the Identity specified by the ID. Used after a login session to get identity information
+func (s *Service) GetIdentityByID(identityID string) (*api.Identity, error) {
+	i, e := s.repository.get(identityID)
+	if e != nil {
+		return nil, e
+	}
+
+	return i, nil
 }

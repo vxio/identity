@@ -9,12 +9,24 @@
 
 package api
 
-// Login - User has authenticated with an OIDC now to verify the system can find them. This verifies theirs stored credentials for a user that match the arguments
-type Login struct {
+import (
+	"github.com/moov-io/identity/pkg/client"
+	"github.com/moov-io/identity/pkg/logging"
+)
 
-	// OIDC provider that was used to handle authentication of this user.
-	Provider string `json:"provider,omitempty"`
+type Login = client.Login
 
-	// ID of the remote OIDC server gives to this identity
-	SubjectID string `json:"subjectID,omitempty"`
+type loginLogContext struct {
+	login *Login
+}
+
+func NewLoginLogContext(login *Login) logging.LogContext {
+	return &loginLogContext{login: login}
+}
+
+func (i *loginLogContext) LogContext() map[string]string {
+	return map[string]string{
+		"login_provider":      i.login.Provider,
+		"login_subject_trunc": i.login.SubjectID[0:5],
+	}
 }

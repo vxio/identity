@@ -4,8 +4,8 @@ import (
 	"flag"
 	"os"
 
-	"github.com/go-kit/kit/log"
 	"github.com/moov-io/identity/pkg/identity"
+	"github.com/moov-io/identity/pkg/logging"
 )
 
 var (
@@ -17,34 +17,30 @@ var (
 )
 
 func main() {
-	logger := NewLogger()
+	logger := logging.NewDefaultLogger().WithKeyValue("app", "identity")
 
 	env, err := identity.NewEnvironment(logger, nil)
 	if err != nil {
-		logger.Log("level", "fatal", "msg", "Error loading up environment.", "error", err)
+		logger.Fatal().LogError("Error loading up environment.", err)
 		os.Exit(1)
 	}
 	defer env.Shutdown()
 
-	env.Logger.Log("level", "info", "msg", "Environment built")
+	env.Logger.Info().Log("Environment built")
 
 	flag.Parse()
 
 	if *fInvite {
-		env.Logger.Log("main", "Sending invite")
+		env.Logger.Info().Log("Sending invite")
 		if err := sendInvite(*env); err != nil {
-			env.Logger.Log("level", "fatal", "msg", "Unable to send invite", "error", err.Error)
+			env.Logger.Fatal().LogError("Unable to send invite", err)
 			os.Exit(1)
 		}
 	} else {
-		env.Logger.Log("main", "Starting services")
-		shutdown := env.RunServers()
+		env.Logger.Info().Log("Starting services")
+		shutdown := env.RunServers(true)
 		defer shutdown()
 	}
 
 	os.Exit(0)
-}
-
-func NewLogger() log.Logger {
-	return log.NewLogfmtLogger(log.NewSyncWriter(os.Stderr))
 }

@@ -116,7 +116,7 @@ paths:
       tags:
       - invites
   /authenticated:
-    post:
+    get:
       operationId: Authenticated
       parameters:
       - description: Encrypted and signed token that they authenticated via one of
@@ -128,14 +128,6 @@ paths:
         schema:
           type: string
         style: form
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Login'
-        description: Arguments needed to match up the OIDC user data with a user in
-          the system
-        required: true
       responses:
         "200":
           content:
@@ -417,7 +409,7 @@ paths:
       tags:
       - credentials
   /identities/{identityID}/credentials/{credentialID}:
-    get:
+    delete:
       operationId: DisableCredentials
       parameters:
       - description: ID of the Identity for the credential
@@ -437,15 +429,8 @@ paths:
           $ref: '#/components/schemas/UUID'
         style: simple
       responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/Credential'
-                maxItems: 300
-                type: array
-          description: List of credentials tied to this identity
+        "204":
+          description: Credential was disabled
         "404":
           content:
             text/plain:
@@ -692,7 +677,7 @@ components:
           phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         suffix: suffix
-        birthDate: 2020-12-31T00:00:00.000+0000
+        birthDate: 2000-01-23T04:56:07.000+00:00
         firstName: John
         emailVerified: true
         disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -743,9 +728,8 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          example: 2020-12-31
-          format: date
-          maxLength: 10
+          format: date-time
+          maxLength: 24
           type: string
         status:
           enum:
@@ -897,7 +881,7 @@ components:
           type: home
         middleName: Jimmy
         suffix: suffix
-        birthDate: 2020-12-31T00:00:00.000+0000
+        birthDate: 2000-01-23T04:56:07.000+00:00
         status: rejected
       properties:
         firstName:
@@ -926,9 +910,8 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          example: 2020-12-31
-          format: date
-          maxLength: 10
+          format: date-time
+          maxLength: 24
           type: string
         status:
           enum:
@@ -1166,9 +1149,6 @@ components:
       additionalProperties: false
       description: |
         User has authenticated with an OIDC now to verify the system can find them. This verifies theirs stored credentials for a user that match the arguments
-      example:
-        provider: google
-        subjectID: aSDDfasd23Dfasdf
       properties:
         provider:
           description: OIDC provider that was used to handle authentication of this
@@ -1256,7 +1236,7 @@ components:
           type: home
         middleName: Jimmy
         suffix: suffix
-        birthDate: 2020-12-31T00:00:00.000+0000
+        birthDate: 2000-01-23T04:56:07.000+00:00
         subjectID: aSDDfasd23Dfasdf
         email: john.doe@gmail.com
       properties:
@@ -1305,9 +1285,8 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          example: 2020-12-31
-          format: date
-          maxLength: 10
+          format: date-time
+          maxLength: 24
           type: string
         email:
           description: Email Address

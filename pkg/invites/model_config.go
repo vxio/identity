@@ -4,7 +4,8 @@ import (
 	"time"
 )
 
-type InvitesConfig struct {
+// Config holds the configuration for the Invites package
+type Config struct {
 	Expiration time.Duration
 	SendToURL  string
 }

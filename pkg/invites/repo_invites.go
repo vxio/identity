@@ -5,18 +5,20 @@ import (
 	"fmt"
 
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/zerotrust"
+	"github.com/moov-io/identity/pkg/gateway"
 )
 
-type InvitesRepository interface {
-	list(tenantID zerotrust.TenantID) ([]api.Invite, error)
-	get(tenantID zerotrust.TenantID, inviteID string) (*api.Invite, error)
+// Repository allows for interacting with the invites data store.
+type Repository interface {
+	list(tenantID gateway.TenantID) ([]api.Invite, error)
+	get(tenantID gateway.TenantID, inviteID string) (*api.Invite, error)
 	getByCode(code string) (*api.Invite, error)
 	add(invite api.Invite, secretCode string) (*api.Invite, error)
 	update(updated api.Invite) error
 }
 
-func NewInvitesRepository(db *sql.DB) InvitesRepository {
+// NewInvitesRepository instantiates a new InvitesRepository
+func NewInvitesRepository(db *sql.DB) Repository {
 	return &sqlInvitesRepo{db: db}
 }
 
@@ -24,7 +26,7 @@ type sqlInvitesRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlInvitesRepo) list(tenantID zerotrust.TenantID) ([]api.Invite, error) {
+func (r *sqlInvitesRepo) list(tenantID gateway.TenantID) ([]api.Invite, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s 
 		FROM invites 
@@ -36,7 +38,7 @@ func (r *sqlInvitesRepo) list(tenantID zerotrust.TenantID) ([]api.Invite, error)
 	return r.queryScan(qry, tenantID.String())
 }
 
-func (r *sqlInvitesRepo) get(tenantID zerotrust.TenantID, inviteID string) (*api.Invite, error) {
+func (r *sqlInvitesRepo) get(tenantID gateway.TenantID, inviteID string) (*api.Invite, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM invites

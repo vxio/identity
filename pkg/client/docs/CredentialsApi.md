@@ -4,14 +4,14 @@ All URIs are relative to *https://local.moov.io*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**DisableCredentials**](CredentialsApi.md#DisableCredentials) | **Get** /identities/{identityID}/credentials/{credentialID} | Disables a credential so it can&#39;t be used anymore to login
+[**DisableCredentials**](CredentialsApi.md#DisableCredentials) | **Delete** /identities/{identityID}/credentials/{credentialID} | Disables a credential so it can&#39;t be used anymore to login
 [**ListCredentials**](CredentialsApi.md#ListCredentials) | **Get** /identities/{identityID}/credentials | List the credentials this user has used.
 
 
 
 ## DisableCredentials
 
-> []Credential DisableCredentials(ctx, identityID, credentialID)
+> DisableCredentials(ctx, identityID, credentialID)
 
 Disables a credential so it can't be used anymore to login
 
@@ -26,7 +26,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**[]Credential**](Credential.md)
+ (empty response body)
 
 ### Authorization
 
@@ -35,7 +35,7 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: application/json, text/plain
+- **Accept**: text/plain
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
