@@ -20,7 +20,7 @@ test: services build
 	go test -cover ./...
 
 services:
-	docker-compose up -d
+	-docker-compose up -d
 
 migrate:
 	pkger

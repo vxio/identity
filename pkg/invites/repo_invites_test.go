@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/moov-io/base/docker"
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/gateway"
@@ -144,6 +145,10 @@ func ForEachDatabase(t *testing.T, run func(t *testing.T, repository Repository)
 
 	for k, tc := range cases {
 		t.Run(k, func(t *testing.T) {
+			if !docker.Enabled() && tc != database.InMemorySqliteConfig {
+				t.SkipNow()
+			}
+
 			db := LoadDatabase(t, tc)
 			repo := NewInvitesRepository(db)
 			run(t, repo)
