@@ -28,6 +28,7 @@ bin/
 /lint-project.sh
 misspell*
 staticcheck*
+coverage.txt
 
 pkger*
 pkged.go
