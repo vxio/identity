@@ -8,6 +8,9 @@
  */
 
 package client
+import (
+	"time"
+)
 // UpdateIdentity Properties of an Identity. These users will under-go KYC checks thus all the information 
 type UpdateIdentity struct {
 	FirstName string `json:"firstName"`
@@ -15,8 +18,8 @@ type UpdateIdentity struct {
 	LastName string `json:"lastName"`
 	NickName *string `json:"nickName,omitempty"`
 	Suffix *string `json:"suffix,omitempty"`
-	BirthDate string `json:"birthDate,omitempty"`
+	BirthDate time.Time `json:"birthDate,omitempty"`
 	Status string `json:"status,omitempty"`
-	Phones []Phone `json:"phones,omitempty"`
-	Addresses []Address `json:"addresses,omitempty"`
+	Phones []UpdatePhone `json:"phones,omitempty"`
+	Addresses []UpdateAddress `json:"addresses,omitempty"`
 }

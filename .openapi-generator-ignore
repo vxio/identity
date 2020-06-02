@@ -25,5 +25,6 @@
 
 /main.go
 /pkg/api/api*.go
+/pkg/api/routers.go
 /Dockerfile
 /go.mod

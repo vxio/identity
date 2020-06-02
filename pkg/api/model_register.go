@@ -9,33 +9,8 @@
 
 package api
 
-// Register - Request to register a user in the system
-type Register struct {
+import (
+	"github.com/moov-io/identity/pkg/client"
+)
 
-	// OIDC provider that was used to handle authentication of this user.
-	Provider string `json:"provider,omitempty"`
-
-	// ID of the remote OIDC server gives to this identity
-	SubjectID string `json:"subjectID,omitempty"`
-
-	InviteCode string `json:"inviteCode,omitempty"`
-
-	FirstName string `json:"firstName,omitempty"`
-
-	MiddleName string `json:"middleName,omitempty"`
-
-	LastName string `json:"lastName,omitempty"`
-
-	NickName *string `json:"nickName,omitempty"`
-
-	Suffix *string `json:"suffix,omitempty"`
-
-	BirthDate string `json:"birthDate,omitempty"`
-
-	// Email Address
-	Email string `json:"email,omitempty"`
-
-	Phones []RegisterPhone `json:"phones,omitempty"`
-
-	Addresses []RegisterAddress `json:"addresses,omitempty"`
-}
+type Register = client.Register

@@ -6,20 +6,20 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kit/kit/log"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/database"
-	"github.com/moov-io/identity/pkg/zerotrust"
+	"github.com/moov-io/identity/pkg/gateway"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 func TestGetById(t *testing.T) {
-	ForEachDatabase(t, func(t *testing.T, repository InvitesRepository) {
+	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, _ := AddTestingInvite(t, repository)
 
-		tenantID := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
+		tenantID := gateway.TenantID(uuid.MustParse(invite.TenantID))
 
 		found, err := repository.get(tenantID, invite.InviteID)
 		if err != nil {
@@ -30,7 +30,7 @@ func TestGetById(t *testing.T) {
 			t.Error("Found by ID doesn't match Invite", cmp.Diff(*found, invite))
 		}
 
-		badTenantID := zerotrust.TenantID(uuid.New())
+		badTenantID := gateway.TenantID(uuid.New())
 		found, err = repository.get(badTenantID, invite.InviteID)
 		if err != sql.ErrNoRows {
 			t.Error(err)
@@ -39,7 +39,7 @@ func TestGetById(t *testing.T) {
 }
 
 func TestGetByCode(t *testing.T) {
-	ForEachDatabase(t, func(t *testing.T, repository InvitesRepository) {
+	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, code := AddTestingInvite(t, repository)
 
 		found, err := repository.getByCode(code)
@@ -59,9 +59,9 @@ func TestGetByCode(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	ForEachDatabase(t, func(t *testing.T, repository InvitesRepository) {
+	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, _ := AddTestingInvite(t, repository)
-		tenantID1 := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
+		tenantID1 := gateway.TenantID(uuid.MustParse(invite.TenantID))
 
 		// Add noise and other invites on other tenants
 		AddTestingInvite(t, repository)
@@ -81,7 +81,7 @@ func TestList(t *testing.T) {
 			t.Error("Invite from first tenant doesn't match list of first tenant")
 		}
 
-		badTenantID := zerotrust.TenantID(uuid.New())
+		badTenantID := gateway.TenantID(uuid.New())
 		found, err = repository.list(badTenantID)
 		if err != nil {
 			t.Error(err)
@@ -94,9 +94,9 @@ func TestList(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	ForEachDatabase(t, func(t *testing.T, repository InvitesRepository) {
+	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, _ := AddTestingInvite(t, repository)
-		tenantID := zerotrust.TenantID(uuid.MustParse(invite.TenantID))
+		tenantID := gateway.TenantID(uuid.MustParse(invite.TenantID))
 
 		updated := invite
 		redeemedOn := time.Now().In(time.UTC).Round(time.Second)
@@ -129,16 +129,9 @@ func TestUpdate(t *testing.T) {
 	})
 }
 
-var InMemorySqliteConfig = database.DatabaseConfig{
-	DatabaseName: "sqlite",
-	SqlLite: &database.SqlLiteConfig{
-		Path: ":memory:",
-	},
-}
-
-func ForEachDatabase(t *testing.T, run func(t *testing.T, repository InvitesRepository)) {
+func ForEachDatabase(t *testing.T, run func(t *testing.T, repository Repository)) {
 	cases := map[string]database.DatabaseConfig{
-		"sqlite": InMemorySqliteConfig,
+		"sqlite": database.InMemorySqliteConfig,
 		"mysql": {
 			DatabaseName: "identity",
 			MySql: &database.MySqlConfig{
@@ -159,7 +152,8 @@ func ForEachDatabase(t *testing.T, run func(t *testing.T, repository InvitesRepo
 }
 
 func LoadDatabase(t *testing.T, config database.DatabaseConfig) *sql.DB {
-	db, err := database.New(context.Background(), log.NewNopLogger(), config)
+	l := log.NewNopLogger()
+	db, err := database.New(context.Background(), l, config)
 	if err != nil {
 		panic(err)
 	}
@@ -168,7 +162,7 @@ func LoadDatabase(t *testing.T, config database.DatabaseConfig) *sql.DB {
 		db.Close()
 	})
 
-	err = database.RunMigrations(db, config)
+	err = database.RunMigrations(l, db, config)
 	if err != nil {
 		panic(err)
 	}
@@ -176,15 +170,19 @@ func LoadDatabase(t *testing.T, config database.DatabaseConfig) *sql.DB {
 	return db
 }
 
-func NewInMemoryInvitesRepository(t *testing.T) InvitesRepository {
-	db := LoadDatabase(t, InMemorySqliteConfig)
+func NewInMemoryInvitesRepository(t *testing.T) Repository {
+	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, log.NewNopLogger(), context.Background())
+	t.Cleanup(close)
+	if err != nil {
+		t.Error(err)
+	}
 
 	repo := NewInvitesRepository(db)
 
 	return repo
 }
 
-func AddTestingInvite(t *testing.T, repository InvitesRepository) (api.Invite, string) {
+func AddTestingInvite(t *testing.T, repository Repository) (api.Invite, string) {
 	i := RandomInvite()
 	code, err := generateInviteCode()
 	if err != nil {

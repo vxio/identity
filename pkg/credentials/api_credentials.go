@@ -1,19 +1,20 @@
 package credentials
 
 import (
+	"database/sql"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/zerotrust"
+	"github.com/moov-io/identity/pkg/gateway"
 )
 
 // A CredentialsApiController binds http requests to an api service and writes the service results to the http response
 type CredentialsApiController struct {
 	service api.CredentialsApiServicer
 }
-
+	
 // NewCredentialsApiController creates a default api controller
 func NewCredentialsApiController(s api.CredentialsApiServicer) api.Router {
 	return &CredentialsApiController{service: s}
@@ -24,7 +25,7 @@ func (c *CredentialsApiController) Routes() api.Routes {
 	return api.Routes{
 		{
 			"DisableCredentials",
-			strings.ToUpper("Get"),
+			strings.ToUpper("Delete"),
 			"/identities/{identityID}/credentials/{credentialID}",
 			c.DisableCredentials,
 		},
@@ -39,23 +40,29 @@ func (c *CredentialsApiController) Routes() api.Routes {
 
 // DisableCredentials - Disables a credential so it can't be used anymore to login
 func (c *CredentialsApiController) DisableCredentials(w http.ResponseWriter, r *http.Request) {
-	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		credentialID := params["credentialID"]
-		result, err := c.service.DisableCredentials(session, identityID, credentialID)
+		_, err := c.service.DisableCredentials(session, identityID, credentialID)
 		if err != nil {
-			w.WriteHeader(500)
+			switch err {
+			case sql.ErrNoRows:
+				w.WriteHeader(404)
+			default:
+				w.WriteHeader(500)
+			}
+
 			return
 		}
 
-		api.EncodeJSONResponse(result, nil, w)
+		w.WriteHeader(204)
 	})
 }
 
 // ListCredentials - List the credentials this user has used.
 func (c *CredentialsApiController) ListCredentials(w http.ResponseWriter, r *http.Request) {
-	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		result, err := c.service.ListCredentials(identityID)

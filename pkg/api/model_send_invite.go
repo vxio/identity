@@ -9,9 +9,8 @@
 
 package api
 
-// SendInvite - Describes an invite that was sent to a user to join.
-type SendInvite struct {
+import (
+	"github.com/moov-io/identity/pkg/client"
+)
 
-	// Email Address
-	Email string `json:"email,omitempty"`
-}
+type SendInvite = client.SendInvite

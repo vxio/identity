@@ -31,3 +31,4 @@ staticcheck*
 
 pkger*
 pkged.go
+cover.out

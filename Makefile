@@ -4,27 +4,29 @@ VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+(-[a-zA-Z0-9]*)?)' vers
 USERID := $(shell id -u $$USER)
 GROUPID:= $(shell id -g $$USER)
 
-build: identity
+build: identity rotate
 
 identity:
-	./pkger
+	pkger
 	go build -o ${PWD}/bin/identity cmd/identity/*
 
 rotate:
 	go build -o ${PWD}/bin/rotate cmd/rotate/*
-	./bin/rotate
 
 run: identity
 	./bin/identity
 
+test: build
+	docker-compose up -d
+	go test -cover ./...
+
 migrate:
-	./pkger
+	pkger
 	cd ./cmd/migrate && go build -o $(PWD)/bin/migrate
 	./bin/migrate
 
 install:
-	wget -O pkger.tar.gz https://github.com/markbates/pkger/releases/download/v0.16.0/pkger_0.16.0_$(shell uname -s)_x86_64.tar.gz
-	tar xf pkger.tar.gz
+	go get github.com/markbates/pkger/cmd/pkger
 	git checkout LICENSE
 
 .PHONY: check
@@ -37,11 +39,12 @@ else
 	./lint-project.sh
 endif
 
-docker: install
-	./pkger
+docker: install test
+	pkger
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o ${PWD}/bin/.docker/identity cmd/identity/*
 	docker build --pull -t moov/identity:$(VERSION) -f Dockerfile .
 	docker tag moov/identity:$(VERSION) moov/identity:latest
-
+	
 docker-run:
 	docker run -v ${PWD}/data:/data -v ${PWD}/configs:/configs --env APP_CONFIG="/configs/config.yml" -it --rm moov/identity:$(VERSION)
 
@@ -53,4 +56,4 @@ openapitools:
 	docker run --rm \
 		-u $(USERID):$(GROUPID) \
 		-e OPENAPI_GENERATOR_VERSION='4.2.0' \
-		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/.openapi-generator/client-generator-config.yml /local/.openapi-generator/server-generator-config.yml
+		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/.openapi-generator/client-generator-config.yml

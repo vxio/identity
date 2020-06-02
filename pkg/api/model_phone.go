@@ -9,18 +9,8 @@
 
 package api
 
-// Phone - Phone number
-type Phone struct {
+import (
+	"github.com/moov-io/identity/pkg/client"
+)
 
-	// UUID v4
-	IdentityID string `json:"identityID,omitempty"`
-
-	// UUID v4
-	PhoneID string `json:"phoneID,omitempty"`
-
-	Number string `json:"number,omitempty"`
-
-	Validated bool `json:"validated,omitempty"`
-
-	Type string `json:"type,omitempty"`
-}
+type Phone = client.Phone

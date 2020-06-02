@@ -9,9 +9,8 @@
 
 package api
 
-// LoggedIn - User has logged in and is being given a token to proof identity
-type LoggedIn struct {
+import (
+	"github.com/moov-io/identity/pkg/client"
+)
 
-	// JWT token that provides authentication of identity
-	Jwt string `json:"jwt,omitempty"`
-}
+type LoggedIn = client.LoggedIn

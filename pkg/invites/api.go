@@ -7,46 +7,46 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/zerotrust"
+	"github.com/moov-io/identity/pkg/gateway"
 )
 
-// A InvitesController binds http requests to an api service and writes the service results to the http response
-type InvitesController struct {
+// A Controller binds http requests to an api service and writes the service results to the http response
+type Controller struct {
 	service api.InvitesApiServicer
 }
 
 // NewInvitesController creates a default api controller
 func NewInvitesController(s api.InvitesApiServicer) api.Router {
-	return &InvitesController{service: s}
+	return &Controller{service: s}
 }
 
 // Routes returns all of the api route for the InvitesApiController
-func (c *InvitesController) Routes() api.Routes {
+func (c *Controller) Routes() api.Routes {
 	return api.Routes{
 		{
-			"DeleteInvite",
-			strings.ToUpper("Delete"),
-			"/invites/{inviteID}",
-			c.DeleteInvite,
+			Name:        "DeleteInvite",
+			Method:      strings.ToUpper("Delete"),
+			Pattern:     "/invites/{inviteID}",
+			HandlerFunc: c.DeleteInvite,
 		},
 		{
-			"ListInvites",
-			strings.ToUpper("Get"),
-			"/invites",
-			c.ListInvites,
+			Name:        "ListInvites",
+			Method:      strings.ToUpper("Get"),
+			Pattern:     "/invites",
+			HandlerFunc: c.ListInvites,
 		},
 		{
-			"SendInvite",
-			strings.ToUpper("Post"),
-			"/invites",
-			c.SendInvite,
+			Name:        "SendInvite",
+			Method:      strings.ToUpper("Post"),
+			Pattern:     "/invites",
+			HandlerFunc: c.SendInvite,
 		},
 	}
 }
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
-func (c *InvitesController) DeleteInvite(w http.ResponseWriter, r *http.Request) {
-	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
+func (c *Controller) DeleteInvite(w http.ResponseWriter, r *http.Request) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
 		params := mux.Vars(r)
 		inviteID := params["inviteID"]
 		err := c.service.DisableInvite(session, inviteID)
@@ -60,8 +60,8 @@ func (c *InvitesController) DeleteInvite(w http.ResponseWriter, r *http.Request)
 }
 
 // ListInvites - List outstanding invites
-func (c *InvitesController) ListInvites(w http.ResponseWriter, r *http.Request) {
-	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
+func (c *Controller) ListInvites(w http.ResponseWriter, r *http.Request) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
 		//query := r.URL.Query()
 		//orgID := query.Get("orgID")
 		result, err := c.service.ListInvites(session)
@@ -75,8 +75,8 @@ func (c *InvitesController) ListInvites(w http.ResponseWriter, r *http.Request) 
 }
 
 // SendInvite - Send an email invite to a new user
-func (c *InvitesController) SendInvite(w http.ResponseWriter, r *http.Request) {
-	zerotrust.WithSession(w, r, func(session zerotrust.Session) {
+func (c *Controller) SendInvite(w http.ResponseWriter, r *http.Request) {
+	gateway.WithSession(w, r, func(session gateway.Session) {
 		invite := &api.SendInvite{}
 		if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
 			w.WriteHeader(500)

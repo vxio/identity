@@ -22,7 +22,7 @@ type Identity struct {
 	LastName string `json:"lastName"`
 	NickName *string `json:"nickName,omitempty"`
 	Suffix *string `json:"suffix,omitempty"`
-	BirthDate string `json:"birthDate,omitempty"`
+	BirthDate time.Time `json:"birthDate,omitempty"`
 	Status string `json:"status,omitempty"`
 	// Email Address
 	Email string `json:"email"`

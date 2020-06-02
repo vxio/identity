@@ -10,14 +10,8 @@
 package api
 
 import (
-	"time"
+	"github.com/moov-io/identity/pkg/client"
 )
 
 // LastLogin - Defines when and what credential was used for the last login
-type LastLogin struct {
-
-	// UUID v4
-	CredentialId string `json:"credentialId,omitempty"`
-
-	On time.Time `json:"on,omitempty"`
-}
+type LastLogin = client.LastLogin

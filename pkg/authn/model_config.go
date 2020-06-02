@@ -1,10 +1,8 @@
 package authn
 
-import (
-	"time"
-)
+import "github.com/moov-io/identity/pkg/webkeys"
 
-type SessionConfig struct {
-	Expiration time.Duration
+type Config struct {
 	LandingURL string
+	Keys webkeys.WebKeysConfig
 }

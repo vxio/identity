@@ -9,9 +9,9 @@
 
 package api
 
-// RegisterPhone - Phone number
-type RegisterPhone struct {
-	Number string `json:"number,omitempty"`
+import (
+	"github.com/moov-io/identity/pkg/client"
+)
 
-	Type string `json:"type,omitempty"`
-}
+// RegisterPhone - Phone number
+type RegisterPhone = client.RegisterPhone

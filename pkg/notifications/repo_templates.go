@@ -9,8 +9,8 @@ import (
 	"strings"
 	text "text/template"
 
-	"github.com/go-kit/kit/log"
 	"github.com/markbates/pkger"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 type TemplateRepository interface {
@@ -27,12 +27,17 @@ func NewTemplateRepository(logger log.Logger) (TemplateRepository, error) {
 	ht := html.New("notifications")
 	tt := text.New("notifications")
 
-	logger.Log("level", "info", "msg", "Loading templates")
+	logger.Info().Log("Loading templates")
 
 	err := pkger.Walk("/configs/notifications/", func(path string, info os.FileInfo, err error) error {
-		logger.Log("level", "info", "msg", "Walking", "name", info.Name(), "path", path, "ext", filepath.Ext(info.Name()))
 
 		ext := strings.ToLower(filepath.Ext(info.Name()))
+
+		logCtx := logger.Info().WithMap(map[string]string{
+			"name": info.Name(),
+			"path": path,
+			"ext":  ext,
+		})
 
 		switch ext {
 		case ".txt":
@@ -51,7 +56,7 @@ func NewTemplateRepository(logger log.Logger) (TemplateRepository, error) {
 				return err
 			}
 
-			logger.Log("level", "info", "msg", "Loaded template - "+info.Name())
+			logCtx.Log("Loaded template - " + info.Name())
 		case ".html":
 			f, err := pkger.Open(path)
 			if err != nil {
@@ -68,7 +73,7 @@ func NewTemplateRepository(logger log.Logger) (TemplateRepository, error) {
 				return err
 			}
 
-			logger.Log("level", "info", "msg", "Loaded template - "+info.Name())
+			logCtx.Log("Loaded template - " + info.Name())
 		}
 
 		return nil
@@ -78,7 +83,7 @@ func NewTemplateRepository(logger log.Logger) (TemplateRepository, error) {
 		return nil, err
 	}
 
-	logger.Log("level", "info", "msg", "Loaded templates")
+	logger.Info().Log("Loaded templates")
 
 	return &templateRepository{
 		textTemplates: *tt,

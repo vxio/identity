@@ -9,28 +9,8 @@
 
 package api
 
-// Address - Address of the Identity
-type Address struct {
+import (
+	"github.com/moov-io/identity/pkg/client"
+)
 
-	// UUID v4
-	IdentityID string `json:"identityID,omitempty"`
-
-	// UUID v4
-	AddressID string `json:"addressID,omitempty"`
-
-	Type string `json:"type,omitempty"`
-
-	Address1 string `json:"address1,omitempty"`
-
-	Address2 *string `json:"address2,omitempty"`
-
-	City string `json:"city,omitempty"`
-
-	State string `json:"state,omitempty"`
-
-	PostalCode string `json:"postalCode,omitempty"`
-
-	Country string `json:"country,omitempty"`
-
-	Validated bool `json:"validated,omitempty"`
-}
+type Address = client.Address

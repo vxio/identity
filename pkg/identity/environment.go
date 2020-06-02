@@ -3,31 +3,33 @@ package identity
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/gorilla/mux"
 	_ "github.com/moov-io/identity" // need to import the embedded files
 
-	"github.com/go-kit/kit/log"
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/authn"
 	configpkg "github.com/moov-io/identity/pkg/config"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
+	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
+	"github.com/moov-io/identity/pkg/logging"
+	log "github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/notifications"
+	"github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
-	"github.com/moov-io/identity/pkg/zerotrust"
 )
 
+// Environment - Contains everything thats been instantiated for this service.
 type Environment struct {
 	Logger log.Logger
-	Config IdentityConfig
+	Config Config
 
 	InviteService      api.InvitesApiServicer
-	IdentitiesService  identities.IdentitiesService
+	IdentitiesService  identities.Service
 	CredentialsService credentials.CredentialsService
 
 	PublicRouter mux.Router
@@ -35,14 +37,15 @@ type Environment struct {
 	Shutdown func()
 }
 
-func NewEnvironment(logger log.Logger, configOverride *IdentityConfig) (*Environment, error) {
-	var config *IdentityConfig
+// NewEnvironment - Generates a new default environment. Overrides can be specified via configs.
+func NewEnvironment(logger logging.Logger, configOverride *Config) (*Environment, error) {
+	var config *Config
 	if configOverride != nil {
 		config = configOverride
 	} else {
 		ConfigService := configpkg.NewConfigService(logger)
 
-		config = &IdentityConfig{}
+		config = &Config{}
 		if err := ConfigService.Load(config); err != nil {
 			return nil, err
 		}
@@ -57,31 +60,22 @@ func NewEnvironment(logger log.Logger, configOverride *IdentityConfig) (*Environ
 
 	TimeService := stime.NewSystemTimeService()
 
-	AuthnPublicKeys, err := webkeys.NewWebKeysService(logger, config.Keys.AuthnPublic)
+	AuthnPublicKeys, err := webkeys.NewWebKeysService(logger, config.Authentication.Keys)
 	if err != nil {
-		logger.Log("main", "Unable to load up the Authentication JSON Web Key Set")
-		return nil, err
+		return nil, logger.Fatal().LogErrorF("Unable to load up the Authentication JSON Web Key Set - %w", err)
 	}
 
-	GatewayPublicKeys, err := webkeys.NewWebKeysService(logger, config.Keys.GatewayPublic)
+	GatewayPublicKeys, err := webkeys.NewWebKeysService(logger, config.Gateway.Keys)
 	if err != nil {
-		logger.Log("main", "Unable to load up the Gateway JSON Web Key Set")
-		return nil, err
+		return nil, logger.Fatal().LogErrorF("Unable to load up the Gateway JSON Web Key Set - %w", err)
 	}
 
-	SessionPublicKeys, err := webkeys.NewWebKeysService(logger, config.Keys.SessionPublic)
+	SessionKeys, err := webkeys.NewWebKeysService(logger, config.Session.Keys)
 	if err != nil {
-		logger.Log("main", "Unable to load up up the Session Public JSON Web Key Set")
-		return nil, err
+		return nil, logger.Fatal().LogErrorF("Unable to load up up the Session JSON Web Key Set - %w", err)
 	}
 
-	SessionPrivateKeys, err := webkeys.NewWebKeysService(logger, config.Keys.SessionPrivate)
-	if err != nil {
-		logger.Log("main", "Unable to load up up the Session Private JSON Web Key Set")
-		return nil, err
-	}
-
-	SessionService := authn.NewSessionService(TimeService, SessionPrivateKeys, config.Session)
+	SessionService := session.NewSessionService(TimeService, SessionKeys, config.Session)
 
 	templateService, err := notifications.NewTemplateRepository(logger)
 	if err != nil {
@@ -105,22 +99,21 @@ func NewEnvironment(logger log.Logger, configOverride *IdentityConfig) (*Environ
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(*CredentialsService, *IdentitiesService, SessionService, InvitesService, config.Session.LandingURL)
+	AuthnService := authn.NewAuthnService(logger, *CredentialsService, *IdentitiesService, SessionService, InvitesService, config.Authentication.LandingURL)
 
 	// router
 	router := mux.NewRouter()
 
 	// public endpoint
-	jwksController := webkeys.NewJWKSController(SessionPublicKeys)
+	jwksController := webkeys.NewJWKSController(SessionKeys)
 	jwksRouter := router.NewRoute().Subrouter()
 	jwksRouter = jwksController.AppendRoutes(jwksRouter)
 
 	// authn endpoints
 
-	AuthnMiddleware, err := authn.NewAuthnMiddleware(TimeService, AuthnPublicKeys)
+	AuthnMiddleware, err := authn.NewMiddleware(logger, TimeService, AuthnPublicKeys)
 	if err != nil {
-		logger.Log("main", fmt.Sprintf("Can't startup the Authn middleware - %s", err))
-		return nil, err
+		return nil, logger.Fatal().LogErrorF("Can't startup the Authn middleware - %w", err)
 	}
 
 	AuthnController := authn.NewAuthnAPIController(logger, AuthnService)
@@ -132,14 +125,13 @@ func NewEnvironment(logger log.Logger, configOverride *IdentityConfig) (*Environ
 	// authed server
 
 	// auth middleware for the tokens coming from the gateway
-	GatewayMiddleware, err := zerotrust.NewJWTMiddleware(GatewayPublicKeys)
+	GatewayMiddleware, err := gateway.NewMiddleware(logger, TimeService, GatewayPublicKeys)
 	if err != nil {
-		logger.Log("main", fmt.Sprintf("Can't startup the Gateway middleware - %s", err))
-		return nil, err
+		return nil, logger.Fatal().LogErrorF("Can't startup the Gateway middleware - %w", err)
 	}
 
-	WhoAmIController := authn.NewWhoAmIController()
-	IdentitiesController := identities.NewIdentitiesApiController(IdentitiesService)
+	WhoAmIController := session.NewWhoAmIController(logger, SessionService, *IdentitiesService)
+	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
 
@@ -165,32 +157,28 @@ func NewEnvironment(logger log.Logger, configOverride *IdentityConfig) (*Environ
 	return &env, nil
 }
 
-func initializeDatabase(logger log.Logger, config database.DatabaseConfig) (*sql.DB, func(), error) {
+func initializeDatabase(logger logging.Logger, config database.DatabaseConfig) (*sql.DB, func(), error) {
 	ctx, cancelFunc := context.WithCancel(context.Background())
 
 	// migrate database
 	db, err := database.New(ctx, logger, config)
 	if err != nil {
-		msg := fmt.Sprintf("error creating database: %v", err)
-		logger.Log("msg", msg)
-		return nil, func() {}, err
+		return nil, cancelFunc, logger.Fatal().LogError("Error creating database", err)
 	}
 
 	shutdown := func() {
-		logger.Log("msg", "Shutting down the db")
+		logger.Info().Log("Shutting down the db")
 		cancelFunc()
 		if err := db.Close(); err != nil {
-			logger.Log("exit", err)
+			logger.Fatal().LogError("Error closing DB", err)
 		}
 	}
 
-	if err := database.RunMigrations(db, config); err != nil {
-		msg := fmt.Sprintf("Error running migrations: %s", err)
-		logger.Log("msg", msg)
-		return nil, shutdown, err
+	if err := database.RunMigrations(logger, db, config); err != nil {
+		return nil, shutdown, logger.Fatal().LogError("Error running migrations", err)
 	}
 
-	logger.Log("msg", "finished....")
+	logger.Info().Log("finished initializing db")
 
 	return db, shutdown, err
 }

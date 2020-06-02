@@ -18,7 +18,7 @@ type GenerateJwksService struct {
 	Public  jose.JSONWebKey
 }
 
-func NewGenerateJwksService() (WebKeysService, error) {
+func NewGenerateJwksService() (*GenerateJwksService, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
 		return nil, err
@@ -55,9 +55,9 @@ func NewGenerateJwksService() (WebKeysService, error) {
 	}, nil
 }
 
-func (s *GenerateJwksService) FetchJwks() (*jose.JSONWebKeySet, error) {
+func (s *GenerateJwksService) Keys() (*jose.JSONWebKeySet, error) {
 	jwks := jose.JSONWebKeySet{
-		Keys: []jose.JSONWebKey{s.Public},
+		Keys: []jose.JSONWebKey{s.Public, s.Private},
 	}
 
 	return &jwks, nil

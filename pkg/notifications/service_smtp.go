@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 
-	"github.com/go-kit/kit/log"
+	log "github.com/moov-io/identity/pkg/logging"
 	"gopkg.in/gomail.v2"
 )
 
@@ -29,6 +29,14 @@ func NewSmtpNotificationsService(logger log.Logger, config SMTPConfig, templates
 }
 
 func (s *smtpService) SendEmail(to string, email EmailTemplate) error {
+	// Never log the message because of security concerns.
+	logCtx := s.logger.WithMap(map[string]string{
+		"email_to":       to,
+		"email_from":     s.config.From,
+		"email_subject":  email.EmailSubject(),
+		"email_template": email.TemplateName(),
+	})
+
 	m := gomail.NewMessage()
 	m.SetHeader("From", s.config.From)
 	m.SetHeader("To", to)
@@ -36,7 +44,7 @@ func (s *smtpService) SendEmail(to string, email EmailTemplate) error {
 
 	txt, err := s.templates.Text(email)
 	if err != nil {
-		return err
+		return logCtx.Error().LogError("Unable to generate text template", err)
 	}
 
 	if txt != "" {
@@ -45,7 +53,7 @@ func (s *smtpService) SendEmail(to string, email EmailTemplate) error {
 
 	html, err := s.templates.HTML(email)
 	if err != nil {
-		return err
+		return logCtx.Error().LogError("Unable to generate html template", err)
 	}
 
 	if html != "" {
@@ -53,10 +61,9 @@ func (s *smtpService) SendEmail(to string, email EmailTemplate) error {
 	}
 
 	if err := s.dailer.DialAndSend(m); err != nil {
-		s.logger.Log("level", "error", "msg", fmt.Sprintf("Failed to send email - %s\n", err))
-		return err
+		return logCtx.Error().LogError("Failed to send email", err)
 	}
 
-	s.logger.Log("level", "info", "msg", fmt.Sprintf("Successfully sent email to: %s", to))
+	logCtx.Info().Log(fmt.Sprintf("Successfully sent email to: %s", to))
 	return nil
 }

@@ -9,23 +9,9 @@
 
 package api
 
+import (
+	"github.com/moov-io/identity/pkg/client"
+)
+
 // UpdateIdentity - Properties of an Identity. These users will under-go KYC checks thus all the information
-type UpdateIdentity struct {
-	FirstName string `json:"firstName"`
-
-	MiddleName string `json:"middleName,omitempty"`
-
-	LastName string `json:"lastName"`
-
-	NickName *string `json:"nickName,omitempty"`
-
-	Suffix *string `json:"suffix,omitempty"`
-
-	BirthDate string `json:"birthDate,omitempty"`
-
-	Status string `json:"status,omitempty"`
-
-	Phones []Phone `json:"phones,omitempty"`
-
-	Addresses []Address `json:"addresses,omitempty"`
-}
+type UpdateIdentity = client.UpdateIdentity

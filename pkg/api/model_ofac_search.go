@@ -10,22 +10,7 @@
 package api
 
 import (
-	"time"
+	"github.com/moov-io/identity/pkg/client"
 )
 
-type OfacSearch struct {
-
-	// SDN EntityID of the Entity
-	EntityId string `json:"entityId,omitempty"`
-
-	// Name of the SDN entity
-	SdnName string `json:"sdnName,omitempty"`
-
-	// SDN entity type
-	SdnType string `json:"sdnType,omitempty"`
-
-	// Percentage of similarity between the Customer name and this OFAC entity
-	Match float32 `json:"match,omitempty"`
-
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-}
+type OfacSearch = client.OfacSearch

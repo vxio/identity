@@ -10,53 +10,25 @@
 package api
 
 import (
-	"time"
+	"github.com/moov-io/identity/pkg/client"
+	"github.com/moov-io/identity/pkg/logging"
 )
 
 // Identity - Properties of an Identity. These users will under-go KYC checks thus all the information
-type Identity struct {
+type Identity = client.Identity
 
-	// UUID v4
-	IdentityID string `json:"identityID,omitempty"`
+type identityLogContext struct {
+	identity *Identity
+}
 
-	// UUID v4
-	TenantID string `json:"tenantID,omitempty"`
+func NewIdentityLogContext(identity *Identity) logging.LogContext {
+	return &identityLogContext{identity: identity}
+}
 
-	FirstName string `json:"firstName"`
-
-	MiddleName string `json:"middleName,omitempty"`
-
-	LastName string `json:"lastName"`
-
-	NickName *string `json:"nickName,omitempty"`
-
-	Suffix *string `json:"suffix,omitempty"`
-
-	BirthDate string `json:"birthDate,omitempty"`
-
-	Status string `json:"status,omitempty"`
-
-	// Email Address
-	Email string `json:"email"`
-
-	// The user has verified they have access to this email
-	EmailVerified bool `json:"emailVerified,omitempty"`
-
-	Phones []Phone `json:"phones,omitempty"`
-
-	Addresses []Address `json:"addresses,omitempty"`
-
-	RegisteredOn time.Time `json:"registeredOn,omitempty"`
-
-	LastLogin LastLogin `json:"lastLogin,omitempty"`
-
-	DisabledOn *time.Time `json:"disabledOn,omitempty"`
-
-	// UUID v4
-	DisabledBy *string `json:"disabledBy,omitempty"`
-
-	LastUpdatedOn time.Time `json:"lastUpdatedOn,omitempty"`
-
-	// UUID v4
-	InviteID string `json:"inviteID,omitempty"`
+func (i *identityLogContext) LogContext() map[string]string {
+	return map[string]string{
+		"identity_id":     i.identity.IdentityID,
+		"identity_tenant": i.identity.TenantID,
+		"identity_email":  i.identity.Email,
+	}
 }

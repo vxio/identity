@@ -3,7 +3,7 @@ package notifications
 import (
 	"errors"
 
-	"github.com/go-kit/kit/log"
+	log "github.com/moov-io/identity/pkg/logging"
 )
 
 type NotificationsService interface {

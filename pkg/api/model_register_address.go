@@ -9,19 +9,9 @@
 
 package api
 
+import (
+	"github.com/moov-io/identity/pkg/client"
+)
+
 // RegisterAddress - Address of the Identity
-type RegisterAddress struct {
-	Type string `json:"type,omitempty"`
-
-	Address1 string `json:"address1,omitempty"`
-
-	Address2 *string `json:"address2,omitempty"`
-
-	City string `json:"city,omitempty"`
-
-	State string `json:"state,omitempty"`
-
-	PostalCode string `json:"postalCode,omitempty"`
-
-	Country string `json:"country,omitempty"`
-}
+type RegisterAddress = client.RegisterAddress

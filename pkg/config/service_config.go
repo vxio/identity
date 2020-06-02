@@ -1,51 +1,46 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/identity/pkg/logging"
 
 	"github.com/markbates/pkger"
 	"github.com/spf13/viper"
 )
 
 type ConfigService struct {
-	logger log.Logger
+	logger logging.Logger
 	path   string
 }
 
-func NewConfigService(logger log.Logger) ConfigService {
+func NewConfigService(logger logging.Logger) ConfigService {
 	return ConfigService{
-		logger: logger,
+		logger: logger.WithKeyValue("component", "ConfigService"),
 	}
 }
 
 func (s *ConfigService) Load(config interface{}) error {
-	s.logger.Log("config", "Loading config")
-
 	err := s.LoadFile(pkger.Include("/configs/config.default.yml"), config)
 	if err != nil {
 		return err
 	}
 
 	if file, ok := os.LookupEnv("APP_CONFIG"); ok && strings.TrimSpace(file) != "" {
-		s.logger.Log("config", fmt.Sprintf("Loading config - %s", file))
+		log := s.logger.WithKeyValue("app_config", file)
+		log.Info().Log("Loading APP_CONFIG config file")
+
 		overrides := viper.New()
 		overrides.SetConfigFile(file)
 
 		if err := overrides.ReadInConfig(); err != nil {
-			msg := fmt.Sprintf("Failed loading the specific app config - %s", err)
-			s.logger.Log("config", msg)
-			return err
+			return log.LogError(fmt.Sprintf("Failed loading the specific app config - %s", err), err)
 		}
 
 		if err := overrides.Unmarshal(config); err != nil {
-			msg := fmt.Sprintf("Unable to unmarshal the specific app config - %s", err)
-			s.logger.Log("config", msg)
-			return err
+			return log.LogError(fmt.Sprintf("Unable to unmarshal the specific app config - %s", err), err)
 		}
 	}
 
@@ -53,26 +48,22 @@ func (s *ConfigService) Load(config interface{}) error {
 }
 
 func (s *ConfigService) LoadFile(file string, config interface{}) error {
-	s.logger.Log("config", "Loading config", "file", file)
+	log := s.logger.WithKeyValue("file", file)
+	log.Info().Log("Loading config file")
 
 	f, err := pkger.Open(file)
 	if err != nil {
-		s.logger.Log("config", fmt.Sprintf("Pkger unable to load %s - cause: %s", file, err.Error()))
-		return err
+		return log.LogError("Pkger unable to load", err)
 	}
 
 	deflt := viper.New()
 	deflt.SetConfigType("yaml")
 	if err := deflt.ReadConfig(f); err != nil {
-		msg := "Unable to load the defaults"
-		s.logger.Log("config", msg)
-		return errors.New(msg)
+		return log.LogError("Unable to load the defaults", err)
 	}
 
 	if err := deflt.Unmarshal(config); err != nil {
-		msg := fmt.Sprintf("Unable to unmarshal the defaults - %v", err)
-		s.logger.Log("config", msg)
-		return errors.New(msg)
+		return log.LogError(fmt.Sprintf("Unable to unmarshal the defaults"), err)
 	}
 
 	return nil
