@@ -13,7 +13,6 @@ import (
 
 type ConfigService struct {
 	logger logging.Logger
-	path   string
 }
 
 func NewConfigService(logger logging.Logger) ConfigService {
@@ -49,21 +48,21 @@ func (s *ConfigService) Load(config interface{}) error {
 
 func (s *ConfigService) LoadFile(file string, config interface{}) error {
 	log := s.logger.WithKeyValue("file", file)
-	log.Info().Log("Loading config file")
+	log.Info().Log("loading config file")
 
 	f, err := pkger.Open(file)
 	if err != nil {
-		return log.LogError("Pkger unable to load", err)
+		return log.LogError("pkger unable to load", err)
 	}
 
 	deflt := viper.New()
 	deflt.SetConfigType("yaml")
 	if err := deflt.ReadConfig(f); err != nil {
-		return log.LogError("Unable to load the defaults", err)
+		return log.LogError("unable to load the defaults", err)
 	}
 
 	if err := deflt.Unmarshal(config); err != nil {
-		return log.LogError(fmt.Sprintf("Unable to unmarshal the defaults"), err)
+		return log.LogError("unable to unmarshal the defaults", err)
 	}
 
 	return nil

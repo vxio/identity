@@ -74,7 +74,7 @@ func bootHTTPServer(name string, routes *mux.Router, errs chan<- error, logger l
 	go func() {
 		logger.Info().Log(fmt.Sprintf("%s listening on %s", name, config.Bind.Address))
 		if err := serve.ListenAndServe(); err != nil {
-			errs <- logger.Fatal().LogError("Problem starting http", fmt.Errorf("problem starting http: %v", err))
+			errs <- logger.Fatal().LogErrorF("problem starting http: %w", err)
 		}
 	}()
 
@@ -93,7 +93,7 @@ func bootAdminServer(errs chan<- error, logger log.Logger, config HTTPConfig) *a
 	go func() {
 		logger.Info().Log(fmt.Sprintf("listening on %s", adminServer.BindAddr()))
 		if err := adminServer.Listen(); err != nil {
-			errs <- logger.Fatal().LogError("Problem starting admin http", fmt.Errorf("Problem starting admin http: %v", err))
+			errs <- logger.Fatal().LogErrorF("problem starting admin http: %w", err)
 		}
 	}()
 

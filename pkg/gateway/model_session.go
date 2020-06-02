@@ -15,7 +15,7 @@ type Session struct {
 func SessionFromRequest(r *http.Request) (*Session, error) {
 	session, ok := r.Context().Value(SessionContextKey).(*Session)
 	if !ok || session == nil {
-		return nil, errors.New("Unable to find Session in context")
+		return nil, errors.New("unable to find Session in context")
 	}
 	return session, nil
 }

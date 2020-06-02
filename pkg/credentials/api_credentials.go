@@ -14,7 +14,7 @@ import (
 type CredentialsApiController struct {
 	service api.CredentialsApiServicer
 }
-	
+
 // NewCredentialsApiController creates a default api controller
 func NewCredentialsApiController(s api.CredentialsApiServicer) api.Router {
 	return &CredentialsApiController{service: s}
@@ -24,16 +24,16 @@ func NewCredentialsApiController(s api.CredentialsApiServicer) api.Router {
 func (c *CredentialsApiController) Routes() api.Routes {
 	return api.Routes{
 		{
-			"DisableCredentials",
-			strings.ToUpper("Delete"),
-			"/identities/{identityID}/credentials/{credentialID}",
-			c.DisableCredentials,
+			Name:        "DisableCredentials",
+			Method:      strings.ToUpper("Delete"),
+			Pattern:     "/identities/{identityID}/credentials/{credentialID}",
+			HandlerFunc: c.DisableCredentials,
 		},
 		{
-			"ListCredentials",
-			strings.ToUpper("Get"),
-			"/identities/{identityID}/credentials",
-			c.ListCredentials,
+			Name:        "ListCredentials",
+			Method:      strings.ToUpper("Get"),
+			Pattern:     "/identities/{identityID}/credentials",
+			HandlerFunc: c.ListCredentials,
 		},
 	}
 }

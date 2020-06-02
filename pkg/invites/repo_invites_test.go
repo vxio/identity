@@ -27,11 +27,11 @@ func TestGetById(t *testing.T) {
 		}
 
 		if *found != invite {
-			t.Error("Found by ID doesn't match Invite", cmp.Diff(*found, invite))
+			t.Error("found by ID doesn't match Invite", cmp.Diff(*found, invite))
 		}
 
 		badTenantID := gateway.TenantID(uuid.New())
-		found, err = repository.get(badTenantID, invite.InviteID)
+		_, err = repository.get(badTenantID, invite.InviteID)
 		if err != sql.ErrNoRows {
 			t.Error(err)
 		}
@@ -48,7 +48,7 @@ func TestGetByCode(t *testing.T) {
 		}
 
 		if *found != invite {
-			t.Error("Found by code doesn't match invite", found, invite)
+			t.Error("found by code doesn't match invite", found, invite)
 		}
 
 		_, err = repository.getByCode("doesnotexist")

@@ -16,7 +16,7 @@ import (
 func RunMigrations(log logging.Logger, db *sql.DB, config DatabaseConfig) error {
 	log.Info().Log("Running Migrations")
 
-	pkger.Include("/migrations/")
+	_ = pkger.Include("/migrations/")
 
 	driver, err := GetDriver(db, config)
 	if err != nil {
@@ -53,7 +53,7 @@ func GetDriver(db *sql.DB, config DatabaseConfig) (database.Driver, error) {
 		return Sqlite3Driver(db)
 	}
 
-	return nil, fmt.Errorf("Database config not defined")
+	return nil, fmt.Errorf("database config not defined")
 }
 
 func MySqlDriver(db *sql.DB) (database.Driver, error) {

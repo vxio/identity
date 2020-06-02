@@ -79,14 +79,14 @@ func (s *Middleware) FromRequest(r *http.Request) (*Session, error) {
 }
 
 func (s *Middleware) fromAuthHeader(r *http.Request) (string, error) {
-	authHeader := r.Header.Get("Authorization")
+	authHeader := r.Header.Get("authorization")
 	if authHeader == "" {
-		return "", errors.New("Authorization header missing")
+		return "", errors.New("authorization header missing")
 	}
 
 	authHeaderParts := strings.Fields(authHeader)
 	if len(authHeaderParts) != 2 || strings.ToLower(authHeaderParts[0]) != "bearer" {
-		return "", errors.New("Authorization header format must be Bearer {token}")
+		return "", errors.New("authorization header format must be Bearer {token}")
 	}
 
 	return authHeaderParts[1], nil
@@ -105,19 +105,19 @@ func (s *Middleware) Parse(tokenString string) (*SessionClaims, error) {
 		// search the returned keys from the JWKS
 		k := s.publicKeys.Key(kid)
 		if len(k) == 0 {
-			return nil, errors.New("Could not find the kid in the public web key set")
+			return nil, errors.New("could not find the kid in the public web key set")
 		}
 
 		return k[0].Key, nil
 	})
 
 	if err != nil {
-		return nil, s.log.Error().LogErrorF("Unable to parse gateway token - %w", err)
+		return nil, s.log.Error().LogErrorF("unable to parse gateway token - %w", err)
 	}
 
 	claims, ok := token.Claims.(*SessionClaims)
 	if !ok || !token.Valid {
-		return nil, errors.New("Token is invalid")
+		return nil, errors.New("token is invalid")
 	}
 
 	return claims, nil

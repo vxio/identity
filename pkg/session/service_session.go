@@ -45,7 +45,7 @@ func (s *sessionService) Generate(session Session) (string, error) {
 
 	privateKey := getPrivateKey(keys)
 	if privateKey == nil {
-		return "", errors.New("Unable to find a private key to use")
+		return "", errors.New("unable to find a private key to use")
 	}
 
 	signingMethod := jwt.GetSigningMethod(privateKey.Algorithm)
@@ -98,7 +98,7 @@ func (s *sessionService) GenerateCookie(session Session) (*http.Cookie, error) {
 func (s *sessionService) FromRequest(r *http.Request) (*Session, error) {
 	cookie, err := r.Cookie("moov")
 	if err != nil {
-		return nil, errors.New("No session found")
+		return nil, errors.New("no session found")
 	}
 
 	session, err := s.Parse(cookie.Value)
@@ -133,7 +133,7 @@ func (s *sessionService) Parse(tokenString string) (*Session, error) {
 			}
 		}
 
-		return nil, errors.New("Could not find the kid in the public web key set")
+		return nil, errors.New("could not find the kid in the public web key set")
 	})
 
 	if err != nil {
@@ -144,7 +144,7 @@ func (s *sessionService) Parse(tokenString string) (*Session, error) {
 		return &claims.Session, nil
 	}
 
-	return nil, errors.New("Token is invalid")
+	return nil, errors.New("token is invalid")
 }
 
 func (s *sessionService) calculateExpiration() time.Time {
@@ -154,16 +154,6 @@ func (s *sessionService) calculateExpiration() time.Time {
 func getPrivateKey(keys *jose.JSONWebKeySet) *jose.JSONWebKey {
 	for _, k := range keys.Keys {
 		if !k.IsPublic() {
-			return &k
-		}
-	}
-
-	return nil
-}
-
-func getPublicKey(keys *jose.JSONWebKeySet) *jose.JSONWebKey {
-	for _, k := range keys.Keys {
-		if k.IsPublic() {
 			return &k
 		}
 	}
