@@ -7,6 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	. "github.com/moov-io/identity/pkg/gateway"
+	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/identity/pkg/webkeys"
 	"github.com/stretchr/testify/assert"
@@ -22,14 +23,17 @@ type Scope struct {
 }
 
 func NewScope(t *testing.T) Scope {
+	l := logging.NewDefaultLogger()
 	a := assert.New(t)
+
+	s := NewRandomSession()
 
 	stime := stime.NewStaticTimeService()
 
 	keys, err := webkeys.NewGenerateJwksService()
 	a.Nil(err)
 
-	gatewayMiddleware, err := NewMiddleware(stime, keys)
+	gatewayMiddleware, err := NewMiddleware(l, stime, keys)
 	a.Nil(err)
 
 	return Scope{
@@ -37,12 +41,12 @@ func NewScope(t *testing.T) Scope {
 		time:       stime,
 		keys:       *keys,
 		mw:         gatewayMiddleware,
-		identityID: IdentityID(uuid.New()),
-		tenantID:   TenantID(uuid.New()),
+		identityID: s.CallerID,
+		tenantID:   s.TenantID,
 	}
 }
 
-func (s *Scope) SignedString(sessionJwt SessionJwt) string {
+func (s *Scope) SignedString(sessionJwt SessionClaims) string {
 	signingMethod := jwt.GetSigningMethod(s.keys.Private.Algorithm)
 
 	token := jwt.NewWithClaims(signingMethod, sessionJwt)
@@ -54,8 +58,8 @@ func (s *Scope) SignedString(sessionJwt SessionJwt) string {
 	return tokenString
 }
 
-func (s *Scope) NewSessionJwt() SessionJwt {
-	return SessionJwt{
+func (s *Scope) NewSessionJwt() SessionClaims {
+	return SessionClaims{
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: s.time.Now().Add(time.Hour).Unix(),
 			NotBefore: s.time.Now().Add(time.Minute * -1).Unix(),
@@ -66,9 +70,7 @@ func (s *Scope) NewSessionJwt() SessionJwt {
 			Audience: "moov",
 			Issuer:   "moov",
 		},
-		Session: Session{
-			CallerID: s.identityID,
-			TenantID: s.tenantID,
-		},
+		CallerID: uuid.UUID(s.identityID),
+		TenantID: uuid.UUID(s.tenantID),
 	}
 }

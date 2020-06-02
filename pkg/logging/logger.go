@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/go-kit/kit/log"
 )
@@ -34,6 +35,13 @@ func NewDefaultLogger() Logger {
 
 func NewNopLogger() Logger {
 	return NewLogger(log.NewNopLogger())
+}
+
+func NewBufferLogger() (*strings.Builder, Logger) {
+	buffer := strings.Builder{}
+	writer := log.NewLogfmtLogger(log.NewSyncWriter(&buffer))
+	log := NewLogger(writer)
+	return &buffer, log
 }
 
 func NewLogger(writer log.Logger) Logger {
@@ -117,10 +125,14 @@ func (l *logger) Log(msg string) {
 	keyvals[i+1] = msg
 
 	i = 0
-	_, file, line, ok := runtime.Caller(i + 1)
+	c := 0
+	_, file, line, ok := runtime.Caller(i)
 	for ; ok; i++ {
-		keyvals = append(keyvals, fmt.Sprintf("caller_%d", i), fmt.Sprintf("%s:%d", file, line))
-		_, file, line, ok = runtime.Caller(i + 2)
+		if c > 0 || !strings.HasSuffix(file, "logger.go") {
+			keyvals = append(keyvals, fmt.Sprintf("caller_%d", c), fmt.Sprintf("%s:%d", file, line))
+			c++
+		}
+		_, file, line, ok = runtime.Caller(i + 1)
 	}
 
 	l.writer.Log(keyvals...)

@@ -152,7 +152,8 @@ func ForEachDatabase(t *testing.T, run func(t *testing.T, repository Repository)
 }
 
 func LoadDatabase(t *testing.T, config database.DatabaseConfig) *sql.DB {
-	db, err := database.New(context.Background(), log.NewNopLogger(), config)
+	l := log.NewNopLogger()
+	db, err := database.New(context.Background(), l, config)
 	if err != nil {
 		panic(err)
 	}
@@ -161,7 +162,7 @@ func LoadDatabase(t *testing.T, config database.DatabaseConfig) *sql.DB {
 		db.Close()
 	})
 
-	err = database.RunMigrations(db, config)
+	err = database.RunMigrations(l, db, config)
 	if err != nil {
 		panic(err)
 	}

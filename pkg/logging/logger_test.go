@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-kit/kit/log"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -139,10 +138,6 @@ func Test_Caller(t *testing.T) {
 
 func Setup(t *testing.T) (*assert.Assertions, *strings.Builder, Logger) {
 	a := assert.New(t)
-
-	buffer := strings.Builder{}
-	writer := log.NewLogfmtLogger(log.NewSyncWriter(&buffer))
-	log := NewLogger(writer)
-
-	return a, &buffer, log
+	buffer, log := NewBufferLogger()
+	return a, buffer, log
 }

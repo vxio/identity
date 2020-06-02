@@ -2,7 +2,6 @@ package invites
 
 import (
 	"database/sql"
-	"fmt"
 	"testing"
 	"time"
 
@@ -98,9 +97,7 @@ func TestExpiredInvite(t *testing.T) {
 		t.Error(err)
 	}
 
-	fmt.Println(s.time.Now())
 	s.time.Change(invite.ExpiresOn.Add(time.Millisecond))
-	fmt.Println(s.time.Now())
 
 	_, err = s.service.Redeem(code)
 	if err != ErrInviteCodeExpired {

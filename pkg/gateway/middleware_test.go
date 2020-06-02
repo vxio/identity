@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	. "github.com/moov-io/identity/pkg/gateway"
-	"gotest.tools/v3/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_TenantID(t *testing.T) {
@@ -43,6 +43,8 @@ func Test_Handler(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	endpoint.ServeHTTP(recorder, req)
+
+	s.a.Equal(200, recorder.Code)
 }
 
 func Test_NoAuthorizationHeader(t *testing.T) {
@@ -59,6 +61,8 @@ func Test_NoAuthorizationHeader(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	endpoint.ServeHTTP(recorder, req)
+
+	s.a.Equal(404, recorder.Code)
 }
 
 func Test_NonBearerAuthorizationHeader(t *testing.T) {

@@ -89,7 +89,7 @@ func Test_NotBefore(t *testing.T) {
 }
 
 func newEndpoint(s Scope, run func(loginSession authn.LoginSession)) http.Handler {
-	mw, err := authn.NewMiddleware(s.stime, s.authnKeys)
+	mw, err := authn.NewMiddleware(s.logger, s.stime, s.authnKeys)
 	if err != nil {
 		panic(err)
 	}

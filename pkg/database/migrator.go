@@ -10,10 +10,11 @@ import (
 	migsqlite3 "github.com/golang-migrate/migrate/v4/database/sqlite3"
 	_ "github.com/golang-migrate/migrate/v4/source/pkger"
 	"github.com/markbates/pkger"
+	"github.com/moov-io/identity/pkg/logging"
 )
 
-func RunMigrations(db *sql.DB, config DatabaseConfig) error {
-	fmt.Println("Running Migrations")
+func RunMigrations(log logging.Logger, db *sql.DB, config DatabaseConfig) error {
+	log.Info().Log("Running Migrations")
 
 	pkger.Include("/migrations/")
 
@@ -28,21 +29,19 @@ func RunMigrations(db *sql.DB, config DatabaseConfig) error {
 		driver,
 	)
 	if err != nil {
-		fmt.Printf("Error running migration - %s", err.Error())
-		return err
+		return log.Fatal().LogErrorF("Error running migration - %w", err)
 	}
 
 	err = m.Up()
 	switch err {
 	case nil:
 	case migrate.ErrNoChange:
-		fmt.Println("Database already at version")
+		log.Info().Log("Database already at version")
 	default:
-		fmt.Printf("Error running migrations - %s\n", err.Error())
-		return err
+		return log.Fatal().LogErrorF("Error running migrations - %w", err)
 	}
 
-	fmt.Println("Migrations complete")
+	log.Info().Log("Migrations complete")
 
 	return nil
 }

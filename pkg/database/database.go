@@ -40,7 +40,7 @@ func NewAndMigrate(config DatabaseConfig, logger log.Logger, ctx context.Context
 		db.Close()
 	}
 
-	err = RunMigrations(db, config)
+	err = RunMigrations(logger, db, config)
 	if err != nil {
 		return nil, shutdown, err
 	}

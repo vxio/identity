@@ -2,7 +2,6 @@ package credentials
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 
 	api "github.com/moov-io/identity/pkg/api"
@@ -131,7 +130,6 @@ func (r *sqlCredsRepo) record(credentialID string, nonce string, ip string, at t
 	}
 
 	if cnt, err := res.RowsAffected(); cnt != 1 || err != nil {
-		fmt.Println("No rows recorded")
 		return sql.ErrNoRows
 	}
 

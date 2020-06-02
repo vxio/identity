@@ -2,7 +2,6 @@ package identities_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -227,7 +226,6 @@ func RegisterIdentity(s Scope, f *fuzz.Fuzzer) api.Identity {
 
 	register := api.Register{}
 	f.Fuzz(&register)
-	fmt.Printf("%+v", register)
 
 	identity, err := s.service.Register(invite, register)
 	if err != nil {

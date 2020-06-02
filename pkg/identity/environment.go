@@ -125,12 +125,12 @@ func NewEnvironment(logger logging.Logger, configOverride *Config) (*Environment
 	// authed server
 
 	// auth middleware for the tokens coming from the gateway
-	GatewayMiddleware, err := gateway.NewMiddleware(TimeService, GatewayPublicKeys)
+	GatewayMiddleware, err := gateway.NewMiddleware(logger, TimeService, GatewayPublicKeys)
 	if err != nil {
 		return nil, logger.Fatal().LogErrorF("Can't startup the Gateway middleware - %w", err)
 	}
 
-	WhoAmIController := session.NewWhoAmIController(SessionService, *IdentitiesService)
+	WhoAmIController := session.NewWhoAmIController(logger, SessionService, *IdentitiesService)
 	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
@@ -174,7 +174,7 @@ func initializeDatabase(logger logging.Logger, config database.DatabaseConfig) (
 		}
 	}
 
-	if err := database.RunMigrations(db, config); err != nil {
+	if err := database.RunMigrations(logger, db, config); err != nil {
 		return nil, shutdown, logger.Fatal().LogError("Error running migrations", err)
 	}
 

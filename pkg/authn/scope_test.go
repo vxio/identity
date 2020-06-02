@@ -64,7 +64,7 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	token := sessionpkg.NewSessionService(stime, identityKeys, sessionConfig)
 
 	authnConfig := Config{LandingURL: "https://localhost/whoami"}
-	service := NewAuthnService(*creds, *identities, token, invites, authnConfig.LandingURL)
+	service := NewAuthnService(logger, *creds, *identities, token, invites, authnConfig.LandingURL)
 
 	f := fuzz.New().Funcs(
 		func(e *LoginSession, c fuzz.Continue) {

@@ -4,19 +4,12 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 )
 
 type Session struct {
-	CallerID IdentityID `json:"iid"`
-	TenantID TenantID   `json:"tid"`
-}
-
-type SessionJwt struct {
-	jwt.StandardClaims
-
-	Session
+	CallerID IdentityID
+	TenantID TenantID
 }
 
 func SessionFromRequest(r *http.Request) (*Session, error) {
@@ -41,5 +34,12 @@ func NewRandomSession() Session {
 	return Session{
 		CallerID: IdentityID(uuid.New()),
 		TenantID: TenantID(uuid.New()),
+	}
+}
+
+func (s *Session) LogContext() map[string]string {
+	return map[string]string{
+		"identity_id": s.CallerID.String(),
+		"tenant_id":   s.TenantID.String(),
 	}
 }
