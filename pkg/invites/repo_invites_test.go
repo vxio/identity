@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/moov-io/base/docker"
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/gateway"
@@ -27,11 +28,11 @@ func TestGetById(t *testing.T) {
 		}
 
 		if *found != invite {
-			t.Error("Found by ID doesn't match Invite", cmp.Diff(*found, invite))
+			t.Error("found by ID doesn't match Invite", cmp.Diff(*found, invite))
 		}
 
 		badTenantID := gateway.TenantID(uuid.New())
-		found, err = repository.get(badTenantID, invite.InviteID)
+		_, err = repository.get(badTenantID, invite.InviteID)
 		if err != sql.ErrNoRows {
 			t.Error(err)
 		}
@@ -48,7 +49,7 @@ func TestGetByCode(t *testing.T) {
 		}
 
 		if *found != invite {
-			t.Error("Found by code doesn't match invite", found, invite)
+			t.Error("found by code doesn't match invite", found, invite)
 		}
 
 		_, err = repository.getByCode("doesnotexist")
@@ -144,6 +145,10 @@ func ForEachDatabase(t *testing.T, run func(t *testing.T, repository Repository)
 
 	for k, tc := range cases {
 		t.Run(k, func(t *testing.T) {
+			if !docker.Enabled() && tc != database.InMemorySqliteConfig {
+				t.SkipNow()
+			}
+
 			db := LoadDatabase(t, tc)
 			repo := NewInvitesRepository(db)
 			run(t, repo)

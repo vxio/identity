@@ -32,7 +32,7 @@ func NewGenerateJwksService() (*GenerateJwksService, error) {
 
 	thumb, err := priv.Thumbprint(crypto.SHA256)
 	if err != nil {
-		return nil, errors.New("Unable to generate fingerprint")
+		return nil, errors.New("unable to generate fingerprint")
 	}
 
 	kid := base64.URLEncoding.EncodeToString(thumb)[0:10]
@@ -46,7 +46,7 @@ func NewGenerateJwksService() (*GenerateJwksService, error) {
 	}
 
 	if priv.IsPublic() || !pub.IsPublic() || !priv.Valid() || !pub.Valid() {
-		return nil, errors.New("Generated keys are invalid")
+		return nil, errors.New("generated keys are invalid")
 	}
 
 	return &GenerateJwksService{

@@ -14,6 +14,7 @@ import (
 	"github.com/moov-io/identity/pkg/logging"
 )
 
+// Credential - Description of a successful OpenID connect credential
 type Credential = client.Credential
 
 type credentialLogContext struct {

@@ -78,7 +78,7 @@ func (s *Middleware) Parse(tokenString string) (*LoginSession, error) {
 		// search the returned keys from the JWKS
 		k := s.publicKeys.Key(kid)
 		if len(k) == 0 {
-			return nil, errors.New("Could not find the kid in the public web key set")
+			return nil, errors.New("could not find the kid in the public web key set")
 		}
 
 		return k[0].Key, nil
@@ -92,5 +92,5 @@ func (s *Middleware) Parse(tokenString string) (*LoginSession, error) {
 		return claims, nil
 	}
 
-	return nil, errors.New("Token is invalid")
+	return nil, errors.New("token is invalid")
 }

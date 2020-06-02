@@ -16,7 +16,6 @@ import (
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/logging"
-	log "github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/stime"
@@ -25,7 +24,7 @@ import (
 
 // Environment - Contains everything thats been instantiated for this service.
 type Environment struct {
-	Logger log.Logger
+	Logger logging.Logger
 	Config Config
 
 	InviteService      api.InvitesApiServicer
@@ -107,7 +106,7 @@ func NewEnvironment(logger logging.Logger, configOverride *Config) (*Environment
 	// public endpoint
 	jwksController := webkeys.NewJWKSController(SessionKeys)
 	jwksRouter := router.NewRoute().Subrouter()
-	jwksRouter = jwksController.AppendRoutes(jwksRouter)
+	jwksController.AppendRoutes(jwksRouter)
 
 	// authn endpoints
 

@@ -13,4 +13,5 @@ import (
 	"github.com/moov-io/identity/pkg/client"
 )
 
+// LastLogin - Defines when and what credential was used for the last login
 type LastLogin = client.LastLogin

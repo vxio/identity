@@ -13,4 +13,5 @@ import (
 	"github.com/moov-io/identity/pkg/client"
 )
 
+// RegisterPhone - Phone number
 type RegisterPhone = client.RegisterPhone

@@ -14,7 +14,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -91,9 +90,4 @@ func ReadFormFileToTempFile(r *http.Request, key string) (*os.File, error) {
 
 	file.Write(fileBytes)
 	return file, nil
-}
-
-// parseIntParameter parses a sting parameter to an int64
-func parseIntParameter(param string) (int64, error) {
-	return strconv.ParseInt(param, 10, 64)
 }

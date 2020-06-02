@@ -29,7 +29,7 @@ func Test_Register(t *testing.T) {
 	a.Nil(cred.DisabledOn)
 
 	// register again should fail.
-	cred, err = s.service.Register(identityID, provider, subjectID)
+	_, err = s.service.Register(identityID, provider, subjectID)
 	a.NotNil(err)
 
 }
@@ -108,12 +108,12 @@ func Test_Login(t *testing.T) {
 	a.Equal(cred, loggedIn)
 
 	// Can't login twice with the same nonce
-	loggedIn, err = s.service.Login(login, nonce, ip)
+	_, err = s.service.Login(login, nonce, ip)
 	a.NotNil(err)
 
 	// Difference nonce and works again
 	nonce = uuid.New().String()
-	loggedIn, err = s.service.Login(login, nonce, ip)
+	_, err = s.service.Login(login, nonce, ip)
 	a.Nil(err)
 }
 

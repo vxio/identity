@@ -17,5 +17,5 @@ func NewNotificationsService(logger log.Logger, config NotificationsConfig, temp
 		return NewMockNotificationsService(*config.Mock), nil
 	}
 
-	return nil, errors.New("No notifications method specified. Check config.")
+	return nil, errors.New("no notifications method specified check config")
 }

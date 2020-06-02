@@ -20,7 +20,7 @@ func NewHTTPJwksService(config HttpConfig, client *http.Client) (WebKeysService,
 	}
 
 	service := &HTTPJwksService{
-		client: &http.Client{},
+		client: client,
 		config: config,
 		keys:   jose.JSONWebKeySet{},
 	}
@@ -48,7 +48,7 @@ func (s *HTTPJwksService) Load() (*jose.JSONWebKeySet, error) {
 
 		defer resp.Body.Close()
 		if resp.StatusCode != 200 {
-			return nil, fmt.Errorf("Failed to load JWKS due to response code: %d", resp.StatusCode)
+			return nil, fmt.Errorf("failed to load JWKS due to response code: %d", resp.StatusCode)
 		}
 
 		jsonWebKeySet := jose.JSONWebKeySet{}

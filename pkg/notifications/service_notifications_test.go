@@ -3,11 +3,16 @@ package notifications
 import (
 	"testing"
 
+	"github.com/moov-io/base/docker"
 	log "github.com/moov-io/identity/pkg/logging"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_SMTP_SendInvite(t *testing.T) {
+	if !docker.Enabled() {
+		t.SkipNow()
+	}
+
 	a, s := Setup(t)
 
 	config := NotificationsConfig{

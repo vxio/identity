@@ -13,4 +13,5 @@ import (
 	"github.com/moov-io/identity/pkg/client"
 )
 
+// UpdateIdentity - Properties of an Identity. These users will under-go KYC checks thus all the information
 type UpdateIdentity = client.UpdateIdentity

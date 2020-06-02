@@ -19,7 +19,7 @@ func New(ctx context.Context, logger log.Logger, config DatabaseConfig) (*sql.DB
 		return sqliteConnection(logger, config.SqlLite.Path).Connect(ctx)
 	}
 
-	return nil, fmt.Errorf("Database config not defined")
+	return nil, fmt.Errorf("database config not defined")
 }
 
 func NewAndMigrate(config DatabaseConfig, logger log.Logger, ctx context.Context) (*sql.DB, func(), error) {

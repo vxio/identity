@@ -20,7 +20,7 @@ func Test_Register(t *testing.T) {
 	ls.InviteCode = code
 
 	c := s.NewClient(ls)
-	_, resp, err := c.InternalApi.RegisterWithCredentials(context.Background(), ls.Register)
+	_, resp, _ := c.InternalApi.RegisterWithCredentials(context.Background(), ls.Register)
 	a.Equal(302, resp.StatusCode)
 
 	redirectTo, err := resp.Location()
