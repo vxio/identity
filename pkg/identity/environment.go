@@ -118,7 +118,7 @@ func NewEnvironment(logger logging.Logger, configOverride *Config) (*Environment
 	AuthnController := authn.NewAuthnAPIController(logger, AuthnService)
 
 	authnRouter := router.NewRoute().Subrouter()
-	authnRouter = api.AppendRouters(authnRouter, AuthnController)
+	authnRouter = api.AppendRouters(logger, authnRouter, AuthnController)
 	authnRouter.Use(AuthnMiddleware.Handler)
 
 	// authed server
@@ -135,7 +135,7 @@ func NewEnvironment(logger logging.Logger, configOverride *Config) (*Environment
 	InvitesController := invites.NewInvitesController(InvitesService)
 
 	authedRouter := router.NewRoute().Subrouter()
-	authedRouter = api.AppendRouters(authedRouter, IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
+	authedRouter = api.AppendRouters(logger, authedRouter, IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
 	authedRouter.Use(GatewayMiddleware.Handler)
 
 	env := Environment{

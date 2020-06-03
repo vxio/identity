@@ -10,23 +10,24 @@
 package api
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/moov-io/identity/pkg/logging"
 )
 
-func Logger(inner http.Handler, name string) http.Handler {
+func Logger(log logging.Logger, inner http.Handler, name string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
 		inner.ServeHTTP(w, r)
 
-		log.Printf(
-			"%s %s %s %s",
-			r.Method,
-			r.RequestURI,
-			name,
-			time.Since(start),
-		)
+		log.WithMap(map[string]string{
+			"request_method": r.Method,
+			"require_uri":    r.RequestURI,
+			"route_name":     name,
+			"response_time":  time.Since(start).String(),
+		}).Info().Log(fmt.Sprintf("%s %s %s", r.Method, r.RequestURI, name))
 	})
 }
