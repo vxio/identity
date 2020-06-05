@@ -16,6 +16,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/moov-io/identity/pkg/logging"
 )
 
 // A Route defines the parameters for an api endpoint
@@ -35,13 +36,13 @@ type Router interface {
 }
 
 // AppendRouters creates a new router for any number of api routers
-func AppendRouters(appendTo *mux.Router, routers ...Router) *mux.Router {
+func AppendRouters(log logging.Logger, appendTo *mux.Router, routers ...Router) *mux.Router {
 	router := appendTo.StrictSlash(true)
 	for _, api := range routers {
 		for _, route := range api.Routes() {
 			var handler http.Handler
 			handler = route.HandlerFunc
-			handler = Logger(handler, route.Name)
+			handler = Logger(log, handler, route.Name)
 
 			router.
 				Methods(route.Method).

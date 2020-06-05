@@ -10,6 +10,7 @@ import (
 	clienttest "github.com/moov-io/identity/pkg/client_test"
 	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/gateway/gatewaytest"
+	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
 )
@@ -26,6 +27,7 @@ type Scope struct {
 }
 
 func NewScope(t *testing.T) Scope {
+	logging := logging.NewDefaultLogger()
 	session := gateway.NewRandomSession()
 
 	invitesConfig := Config{
@@ -48,7 +50,7 @@ func NewScope(t *testing.T) Scope {
 	controller := NewInvitesController(service)
 
 	routes := mux.NewRouter()
-	api.AppendRouters(routes, controller)
+	api.AppendRouters(logging, routes, controller)
 
 	testMiddleware := gatewaytest.NewTestMiddleware(times, session)
 	routes.Use(testMiddleware.Handler)

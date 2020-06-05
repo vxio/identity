@@ -14,6 +14,7 @@ import (
 	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/gateway/gatewaytest"
 	. "github.com/moov-io/identity/pkg/identities"
+	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/stretchr/testify/require"
 )
@@ -27,6 +28,7 @@ type Scope struct {
 }
 
 func NewScope(t *testing.T) Scope {
+	logging := logging.NewDefaultLogger()
 	session := gateway.NewRandomSession()
 	times := stime.NewStaticTimeService()
 
@@ -43,7 +45,7 @@ func NewScope(t *testing.T) Scope {
 	controller := NewIdentitiesController(service)
 
 	routes := mux.NewRouter()
-	api.AppendRouters(routes, controller)
+	api.AppendRouters(logging, routes, controller)
 
 	testMiddleware := gatewaytest.NewTestMiddleware(times, session)
 	routes.Use(testMiddleware.Handler)

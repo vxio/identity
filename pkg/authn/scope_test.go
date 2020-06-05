@@ -119,7 +119,7 @@ func (s *Scope) NewClient(loginSession LoginSession) *client.APIClient {
 	controller := NewAuthnAPIController(s.logger, s.service)
 
 	routes := mux.NewRouter()
-	api.AppendRouters(routes, controller)
+	api.AppendRouters(s.logger, routes, controller)
 	routes.Use(testAuthnMiddleware.Handler)
 
 	testAPI := clienttest.NewTestClient(routes)
