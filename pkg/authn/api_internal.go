@@ -51,6 +51,7 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 		login := api.Login{
 			Provider:  session.Provider,
 			SubjectID: session.SubjectID,
+			TenantID:  session.TenantID,
 		}
 
 		result, err := c.service.LoginWithCredentials(login, session.State, session.IP)

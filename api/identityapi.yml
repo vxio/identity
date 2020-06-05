@@ -683,6 +683,8 @@ components:
         identityID:
           $ref: '#/components/schemas/UUID'
           readOnly: true
+        tenantID:
+          $ref: '#/components/schemas/UUID'
         createdOn:
           $ref: '#/components/schemas/DateTime'
           readOnly: true
@@ -811,6 +813,8 @@ components:
         subjectID:
           $ref: '#/components/schemas/SubjectID'
           writeOnly: true
+        tenantID:
+          $ref: '#/components/schemas/UUID'
 
     LoggedIn:
       description: User has logged in and is being given a token to proof identity
@@ -834,6 +838,8 @@ components:
         subjectID:
           $ref: '#/components/schemas/SubjectID'
           writeOnly: true
+        tenantID:
+          $ref: '#/components/schemas/UUID'
         inviteCode:
           type: string
           maxLength: 60

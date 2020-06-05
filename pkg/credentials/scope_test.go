@@ -70,5 +70,5 @@ func (s *Scope) RegisterRandom() (*api.Credential, error) {
 	provider := "moovtest"
 	subjectID := uuid.New().String()
 
-	return s.service.Register(identityID, provider, subjectID)
+	return s.service.Register(identityID, provider, subjectID, s.session.TenantID.String())
 }
