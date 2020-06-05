@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Provider** | **string** | OIDC provider that was used to handle authentication of this user. | [optional] [readonly] 
 **SubjectID** | **string** | ID of the remote OIDC server gives to this identity | [optional] [readonly] 
+**TenantID** | **string** | UUID v4 | [optional] 
 **InviteCode** | **string** |  | [optional] 
 **FirstName** | **string** |  | [optional] 
 **MiddleName** | **string** |  | [optional] 

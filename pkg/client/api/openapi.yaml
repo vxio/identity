@@ -1026,6 +1026,7 @@ components:
         disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         provider: google
         identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         disabledOn: 2000-01-23T04:56:07.000+00:00
         createdOn: 2000-01-23T04:56:07.000+00:00
@@ -1053,6 +1054,12 @@ components:
           readOnly: true
           type: string
         identityID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        tenantID:
           description: UUID v4
           format: uuid
           maxLength: 36
@@ -1227,6 +1234,12 @@ components:
           pattern: ^[0-9a-zA-Z_-]+$
           readOnly: true
           type: string
+        tenantID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
       type: object
     LoggedIn:
       additionalProperties: false
@@ -1244,7 +1257,6 @@ components:
       additionalProperties: false
       description: Request to register a user in the system
       example:
-        firstName: John
         lastName: Doe
         addresses:
         - country: US
@@ -1282,9 +1294,7 @@ components:
           postalCode: "50613"
           state: IA
           type: primary
-        provider: google
         nickName: nickName
-        inviteCode: inviteCode
         phones:
         - number: number
           type: home
@@ -1296,10 +1306,14 @@ components:
           type: home
         - number: number
           type: home
-        middleName: Jimmy
         suffix: suffix
         birthDate: 2000-01-23T04:56:07.000+00:00
         subjectID: aSDDfasd23Dfasdf
+        firstName: John
+        provider: google
+        inviteCode: inviteCode
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        middleName: Jimmy
         email: john.doe@gmail.com
       properties:
         provider:
@@ -1316,6 +1330,12 @@ components:
           maxLength: 255
           pattern: ^[0-9a-zA-Z_-]+$
           readOnly: true
+          type: string
+        tenantID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
         inviteCode:
           maxLength: 60

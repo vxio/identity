@@ -13,7 +13,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/gorilla/mux v1.7.4
-	github.com/markbates/pkger v0.16.0
+	github.com/markbates/pkger v0.17.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/moov-io/base v0.11.0
 	github.com/ory/dockertest/v3 v3.6.0

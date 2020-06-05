@@ -3,6 +3,7 @@ package invites
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"html/template"
 	"net/url"
 	"strings"
 	"time"
@@ -16,7 +17,7 @@ import (
 )
 
 type invitesService struct {
-	sendToURL     url.URL
+	sendToURL     *template.Template
 	expiration    time.Duration
 	time          stime.TimeService
 	repository    Repository
@@ -26,13 +27,13 @@ type invitesService struct {
 // NewInvitesService instantiates a new invitesService for interacting with Invites from outside of the package.
 func NewInvitesService(config Config, time stime.TimeService, repository Repository, notifications notifications.NotificationsService) (api.InvitesApiServicer, error) {
 
-	url, err := url.Parse(config.SendToURL)
+	urlTemplate, err := template.New("send").Parse(config.SendToURL)
 	if err != nil {
 		return nil, err
 	}
 
 	return &invitesService{
-		sendToURL:     *url,
+		sendToURL:     urlTemplate,
 		expiration:    config.Expiration,
 		time:          time,
 		repository:    repository,
@@ -65,13 +66,12 @@ func (s *invitesService) SendInvite(session gateway.Session, send api.SendInvite
 		return nil, "", err1
 	}
 
-	// duplicate it so we can append the invite code to the mutable value
-	sendTo, _ := url.Parse(s.sendToURL.String())
-	qry := sendTo.Query()
-	qry.Add("invite_code", *code)
-	sendTo.RawQuery = qry.Encode()
+	redeemURL, err := generateRedeemURL(*s.sendToURL, invite, code)
+	if err != nil {
+		return nil, "", err
+	}
 
-	notification := notifications.NewInviteEmail(sendTo.String())
+	notification := notifications.NewInviteEmail(redeemURL.String())
 
 	if err := s.notifications.SendEmail(invite.Email, &notification); err != nil {
 		return nil, "", err
@@ -135,4 +135,27 @@ func generateInviteCode() (*string, error) {
 
 	code := base64.RawURLEncoding.EncodeToString(b)
 	return &code, nil
+}
+
+func generateRedeemURL(sendToURL template.Template, invite api.Invite, code *string) (*url.URL, error) {
+	data := struct {
+		TenantID string
+	}{invite.TenantID}
+
+	urlString := strings.Builder{}
+	err := sendToURL.Execute(&urlString, data)
+	if err != nil {
+		return nil, err
+	}
+
+	// duplicate it so we can append the invite code to the mutable value
+	sendTo, err := url.Parse(urlString.String())
+	if err != nil {
+		return nil, err
+	}
+	qry := sendTo.Query()
+	qry.Add("invite_code", *code)
+	sendTo.RawQuery = qry.Encode()
+
+	return sendTo, nil
 }

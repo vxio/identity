@@ -42,6 +42,7 @@ func NewAuthnService(
 // RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
 func (s *authnService) RegisterWithCredentials(register api.Register, nonce string, ip string) (*http.Cookie, error) {
 	logCtx := s.log.WithMap(map[string]string{
+		"tenant_id":         register.TenantID,
 		"email":             register.Email,
 		"invite_code_trunc": register.InviteCode[0:5],
 		"ip":                ip,
@@ -53,6 +54,11 @@ func (s *authnService) RegisterWithCredentials(register api.Register, nonce stri
 		return nil, logCtx.Error().LogErrorF("Unable to redeem token", err)
 	}
 
+	// Guard against possible inconsistencies in the tenantID
+	if register.TenantID != invite.TenantID {
+		return nil, logCtx.Error().LogErrorF("register TenantID and Invite TenantID don't match")
+	}
+
 	// Create the identity so we can login with it and give the user access.
 	identity, err := s.identities.Register(*invite, register)
 	if err != nil {
@@ -60,7 +66,7 @@ func (s *authnService) RegisterWithCredentials(register api.Register, nonce stri
 	}
 
 	// Register the credentials with the new Identity created.
-	creds, err := s.credentials.Register(identity.IdentityID, register.Provider, register.SubjectID)
+	creds, err := s.credentials.Register(identity.IdentityID, register.Provider, register.SubjectID, register.TenantID)
 	if err != nil {
 		return nil, logCtx.Error().LogErrorF("Unable to register credential", err)
 	}
@@ -69,6 +75,7 @@ func (s *authnService) RegisterWithCredentials(register api.Register, nonce stri
 	login := api.Login{
 		Provider:  creds.Provider,
 		SubjectID: creds.SubjectID,
+		TenantID:  identity.TenantID,
 	}
 
 	return s.LoginWithCredentials(login, nonce, ip)
@@ -91,6 +98,10 @@ func (s *authnService) LoginWithCredentials(login api.Login, nonce string, ip st
 	identity, err := s.identities.GetIdentityByID(loggedIn.IdentityID)
 	if err != nil {
 		return nil, logCtx.Error().LogError("Could not find identity", err)
+	}
+
+	if identity.TenantID != loggedIn.TenantID {
+		return nil, logCtx.LogErrorF("guard triggered - identity and credential tenantID's don't match")
 	}
 
 	logCtx = logCtx.With(api.NewIdentityLogContext(identity))

@@ -12,11 +12,12 @@ import (
 func Test_Register(t *testing.T) {
 	a, s, f := Setup(t)
 
-	_, code, err := s.invites.SendInvite(s.session, client.SendInvite{Email: "test@moovtest.io"})
+	invite, code, err := s.invites.SendInvite(s.session, client.SendInvite{Email: "test@moovtest.io"})
 	a.Nil(err)
 
 	ls := LoginSession{}
 	f.Fuzz(&ls)
+	ls.TenantID = invite.TenantID
 	ls.InviteCode = code
 
 	c := s.NewClient(ls)
@@ -33,6 +34,7 @@ func Test_Register_InvalidInviteCode(t *testing.T) {
 
 	ls := LoginSession{}
 	f.Fuzz(&ls)
+	ls.TenantID = s.session.TenantID.String()
 	ls.InviteCode = "doesnotexist"
 
 	c := s.NewClient(ls)
@@ -64,6 +66,7 @@ func Test_Login_Success(t *testing.T) {
 	// These are the values that have to match up to what was registered.
 	loginSession.Provider = registerSession.Provider
 	loginSession.SubjectID = registerSession.SubjectID
+	loginSession.TenantID = registerSession.TenantID
 
 	// Test if we can login with it.
 	c := s.NewClient(loginSession)
@@ -75,7 +78,7 @@ func Test_Login_Success(t *testing.T) {
 func RegisterRandomIdentity(f *fuzz.Fuzzer, s Scope) LoginSession {
 
 	// First need to invite the user
-	_, code, err := s.invites.SendInvite(s.session, client.SendInvite{Email: "test@moovtest.io"})
+	invite, code, err := s.invites.SendInvite(s.session, client.SendInvite{Email: "test@moovtest.io"})
 	if err != nil {
 		panic(err)
 	}
@@ -83,6 +86,7 @@ func RegisterRandomIdentity(f *fuzz.Fuzzer, s Scope) LoginSession {
 	// Register the user with the code.
 	registerSession := LoginSession{}
 	f.Fuzz(&registerSession)
+	registerSession.TenantID = invite.TenantID
 	registerSession.InviteCode = code
 
 	_, err = s.service.RegisterWithCredentials(registerSession.Register, registerSession.State, registerSession.IP)

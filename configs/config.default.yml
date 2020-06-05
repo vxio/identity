@@ -11,7 +11,7 @@ database:
     path: ":memory:"
 invites:
   expiration: 48h
-  sendToURL: https://api.moov.io
+  sendToURL: https://api.moov.io/authentication/{{.TenantID}}/
 notifications:
   Mock:
     from: noreply@moov.io

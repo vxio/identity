@@ -25,7 +25,7 @@ func NewCredentialsService(time stime.TimeService, repository CredentialReposito
 
 // DisableCredentials - Disables a credential so it can&#39;t be used anymore to login
 func (s *CredentialsService) DisableCredentials(auth gateway.Session, identityID string, credentialID string) (*api.Credential, error) {
-	cred, err := s.repository.get(identityID, credentialID)
+	cred, err := s.repository.get(identityID, credentialID, auth.TenantID.String())
 	if err != nil {
 		return nil, err
 	}
@@ -46,13 +46,13 @@ func (s *CredentialsService) DisableCredentials(auth gateway.Session, identityID
 }
 
 // ListCredentials - List the credentials this user has used.
-func (s *CredentialsService) ListCredentials(identityID string) ([]api.Credential, error) {
-	return s.repository.list(identityID)
+func (s *CredentialsService) ListCredentials(auth gateway.Session, identityID string) ([]api.Credential, error) {
+	return s.repository.list(identityID, auth.TenantID.String())
 }
 
 func (s *CredentialsService) Login(login api.Login, nonce string, ip string) (*api.Credential, error) {
 	// look into the repo for any matches
-	cred, err := s.repository.lookup(login.Provider, login.SubjectID)
+	cred, err := s.repository.lookup(login.Provider, login.SubjectID, login.TenantID)
 	if err != nil {
 		return nil, err
 	}
@@ -75,12 +75,13 @@ func (s *CredentialsService) Login(login api.Login, nonce string, ip string) (*a
 	return saved, nil
 }
 
-func (s *CredentialsService) Register(identityID string, provider string, subjectID string) (*api.Credential, error) {
+func (s *CredentialsService) Register(identityID string, provider string, subjectID string, tenantID string) (*api.Credential, error) {
 	cred := api.Credential{
 		CredentialID: uuid.New().String(),
 		Provider:     provider,
 		SubjectID:    subjectID,
 		IdentityID:   identityID,
+		TenantID:     tenantID,
 		CreatedOn:    s.time.Now(),
 		LastUsedOn:   s.time.Now(),
 		DisabledBy:   nil,

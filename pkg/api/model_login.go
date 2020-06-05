@@ -28,5 +28,6 @@ func (i *loginLogContext) LogContext() map[string]string {
 	return map[string]string{
 		"login_provider":      i.login.Provider,
 		"login_subject_trunc": i.login.SubjectID[0:5],
+		"login_tenant_id":     i.login.TenantID,
 	}
 }

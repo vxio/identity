@@ -21,6 +21,8 @@ type Credential struct {
 	SubjectID string `json:"subjectID,omitempty"`
 	// UUID v4
 	IdentityID string `json:"identityID,omitempty"`
+	// UUID v4
+	TenantID string `json:"tenantID,omitempty"`
 	CreatedOn time.Time `json:"createdOn,omitempty"`
 	LastUsedOn time.Time `json:"lastUsedOn,omitempty"`
 	DisabledOn *time.Time `json:"disabledOn,omitempty"`

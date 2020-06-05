@@ -14,8 +14,9 @@ func Test_Register(t *testing.T) {
 	identityID := uuid.New().String()
 	provider := "moovtest"
 	subjectID := uuid.New().String()
+	tenantID := uuid.New().String()
 
-	cred, err := s.service.Register(identityID, provider, subjectID)
+	cred, err := s.service.Register(identityID, provider, subjectID, tenantID)
 	a.Nil(err)
 
 	a.Equal(identityID, cred.IdentityID)
@@ -29,9 +30,8 @@ func Test_Register(t *testing.T) {
 	a.Nil(cred.DisabledOn)
 
 	// register again should fail.
-	_, err = s.service.Register(identityID, provider, subjectID)
+	_, err = s.service.Register(identityID, provider, subjectID, tenantID)
 	a.NotNil(err)
-
 }
 
 func Test_List(t *testing.T) {
@@ -46,7 +46,7 @@ func Test_List(t *testing.T) {
 	_, _ = s.RegisterRandom()
 	_, _ = s.RegisterRandom()
 
-	found, err := s.service.ListCredentials(cred.IdentityID)
+	found, err := s.service.ListCredentials(s.session, cred.IdentityID)
 	a.Nil(err)
 	a.Len(found, 1)
 	a.Contains(found, *cred)
@@ -79,7 +79,7 @@ func Test_Disable(t *testing.T) {
 	a.Equal(s.session.CallerID.String(), *disabled.DisabledBy)
 	a.Equal(s.time.Now(), *disabled.DisabledOn)
 
-	found, err := s.service.ListCredentials(cred.IdentityID)
+	found, err := s.service.ListCredentials(s.session, cred.IdentityID)
 	a.Nil(err)
 	a.Len(found, 1)
 	a.Contains(found, *disabled)
@@ -97,7 +97,7 @@ func Test_Login(t *testing.T) {
 	_, _ = s.RegisterRandom()
 	_, _ = s.RegisterRandom()
 
-	login := api.Login{Provider: cred.Provider, SubjectID: cred.SubjectID}
+	login := api.Login{Provider: cred.Provider, SubjectID: cred.SubjectID, TenantID: cred.TenantID}
 	nonce := uuid.New().String()
 	ip := "1.2.3.4"
 

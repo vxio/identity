@@ -47,7 +47,7 @@ type InvitesApiRouter interface {
 // and updated with the logic required for the API.
 type CredentialsApiServicer interface {
 	DisableCredentials(gateway.Session, string, string) (*Credential, error)
-	ListCredentials(string) ([]Credential, error)
+	ListCredentials(gateway.Session, string) ([]Credential, error)
 }
 
 // IdentitiesApiServicer defines the api actions for the IdentitiesApi service

@@ -65,7 +65,7 @@ func (c *CredentialsApiController) ListCredentials(w http.ResponseWriter, r *htt
 	gateway.WithSession(w, r, func(session gateway.Session) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
-		result, err := c.service.ListCredentials(identityID)
+		result, err := c.service.ListCredentials(session, identityID)
 		if err != nil {
 			w.WriteHeader(500)
 			return
