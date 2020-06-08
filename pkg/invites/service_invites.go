@@ -27,7 +27,7 @@ type invitesService struct {
 // NewInvitesService instantiates a new invitesService for interacting with Invites from outside of the package.
 func NewInvitesService(config Config, time stime.TimeService, repository Repository, notifications notifications.NotificationsService) (api.InvitesApiServicer, error) {
 
-	urlTemplate, err := template.New("send").Parse(config.SendToURL)
+	urlTemplate, err := template.New("send").Parse(config.SendToHost + config.SendToPath)
 	if err != nil {
 		return nil, err
 	}

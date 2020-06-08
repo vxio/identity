@@ -52,7 +52,7 @@ func (s *Middleware) Handler(h http.Handler) http.Handler {
 
 // FromRequest - Pulls out authenticationd details from the Request and calls Parse.
 func (s *Middleware) FromRequest(r *http.Request) (*LoginSession, error) {
-	cookie, err := r.Cookie("moov-authn")
+	cookie, err := GetAuthnCookie(r)
 	if err != nil {
 		return nil, s.log.Error().LogError("No session cookie found", err)
 	}
