@@ -12,7 +12,7 @@ database:
 invites:
   expiration: 48h
   sendToHost: https://api.moov.io 
-  sendToPath: /authentication/{{.TenantID}}/
+  sendToPath: /authentication/tenants/{{.TenantID}}
 notifications:
   Mock:
     from: noreply@moov.io
