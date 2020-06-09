@@ -11,6 +11,15 @@ servers:
   url: https://api.moov.io/
 - description: Internal address of service
   url: https://identity.srvs.moov.local/
+tags:
+  - name: Invites
+    description: 'Add users to manage your API resources'
+  - name: Internal
+    description: 'OIDC login and user registration'
+  - name: Identities
+    description: 'Identity management, deletion, and listing for users'
+  - name: Credentials
+    description: 'Management for identity credentials'
 paths:
   /invites:
     get:
@@ -46,8 +55,7 @@ paths:
       security:
       - GatewayAuth: []
       summary: List outstanding invites
-      tags:
-      - invites
+      tags: [Invites]
     post:
       operationId: SendInvite
       requestBody:
@@ -75,8 +83,7 @@ paths:
       security:
       - GatewayAuth: []
       summary: Send an email invite to a new user
-      tags:
-      - invites
+      tags: [Invites]
   /invites/{inviteID}:
     delete:
       operationId: DisableInvite
@@ -113,8 +120,7 @@ paths:
       security:
       - GatewayAuth: []
       summary: Delete an invite that was sent and invalidate the token.
-      tags:
-      - invites
+      tags: [Invites]
   /authenticated:
     get:
       operationId: Authenticated
@@ -157,8 +163,7 @@ paths:
       - LoginAuth: []
       summary: "Complete a login via a OIDC.\nOnce the OIDC client service has authenticated\
         \ their identity the client service redirect to this endpoint.    \n"
-      tags:
-      - internal
+      tags: [Internal]
   /register:
     post:
       operationId: RegisterWithCredentials
@@ -199,8 +204,7 @@ paths:
       - LoginAuth: []
       summary: |
         If the OIDC client specified it got an invite code that token will be exchanged here to login
-      tags:
-      - internal
+      tags: [Internal]
   /identities:
     get:
       operationId: ListIdentities
@@ -235,8 +239,7 @@ paths:
       security:
       - GatewayAuth: []
       summary: List identities and associates userId
-      tags:
-      - identities
+      tags: [Identities]
   /identities/{identityID}:
     delete:
       operationId: DisableIdentity
@@ -273,8 +276,7 @@ paths:
       security:
       - GatewayAuth: []
       summary: Disable an identity. Its left around for historical reporting
-      tags:
-      - identities
+      tags: [Identities]
     get:
       operationId: GetIdentity
       parameters:
@@ -314,8 +316,7 @@ paths:
       security:
       - GatewayAuth: []
       summary: List identities and associates userId
-      tags:
-      - identities
+      tags: [Identities]
     put:
       operationId: UpdateIdentity
       parameters:
@@ -361,8 +362,7 @@ paths:
       security:
       - GatewayAuth: []
       summary: Update a specific Identity
-      tags:
-      - identities
+      tags: [Identities]
   /identities/{identityID}/credentials:
     get:
       operationId: ListCredentials
@@ -406,8 +406,7 @@ paths:
       security:
       - GatewayAuth: []
       summary: List the credentials this user has used.
-      tags:
-      - credentials
+      tags: [Credentials]
   /identities/{identityID}/credentials/{credentialID}:
     delete:
       operationId: DisableCredentials
@@ -452,8 +451,7 @@ paths:
       security:
       - GatewayAuth: []
       summary: Disables a credential so it can't be used anymore to login
-      tags:
-      - credentials
+      tags: [Credentials]
 components:
   responses:
     Empty:
