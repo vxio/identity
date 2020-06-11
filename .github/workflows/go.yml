@@ -33,7 +33,7 @@ jobs:
     - name: Install
       run: make install
 
-    - name: Lint
+    - name: Check
       run: make check
     
     - name: Docker
