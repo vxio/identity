@@ -48,7 +48,8 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 
 	invitesConfig := invites.Config{
 		Expiration: time.Hour,
-		SendToURL:  "https://localhost/register",
+		SendToHost: "https://localhost",
+		SendToPath: "/register",
 	}
 	invitesRepo := invites.NewInvitesRepository(db)
 	invites, err := invites.NewInvitesService(invitesConfig, stime, invitesRepo, notifications)

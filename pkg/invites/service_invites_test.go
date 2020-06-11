@@ -112,7 +112,8 @@ func NewInvitesScope(t *testing.T) InvitesServiceScope {
 
 	config := Config{
 		Expiration: time.Hour,
-		SendToURL:  "http://local.moov.io",
+		SendToHost: "http://local.moov.io",
+		SendToPath: "/",
 	}
 
 	times := stime.NewStaticTimeService()

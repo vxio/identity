@@ -32,7 +32,8 @@ func NewScope(t *testing.T) Scope {
 
 	invitesConfig := Config{
 		Expiration: time.Hour,
-		SendToURL:  "http://local.moov.io",
+		SendToHost: "http://local.moov.io",
+		SendToPath: "http://local.moov.io",
 	}
 
 	times := stime.NewStaticTimeService()
