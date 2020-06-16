@@ -79,7 +79,7 @@ func (s *Middleware) FromRequest(r *http.Request) (*Session, error) {
 }
 
 func (s *Middleware) fromAuthHeader(r *http.Request) (string, error) {
-	authHeader := r.Header.Get("authorization")
+	authHeader := r.Header.Get("X-Auth-Token")
 	if authHeader == "" {
 		return "", errors.New("authorization header missing")
 	}
