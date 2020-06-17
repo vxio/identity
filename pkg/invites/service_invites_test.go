@@ -8,13 +8,14 @@ import (
 	"github.com/google/go-cmp/cmp"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
+	tmwt "github.com/moov-io/tumbler/pkg/middleware/middlewaretest"
 )
 
 type InvitesServiceScope struct {
-	session gateway.Session
+	session tmw.TumblerClaims
 	service api.InvitesApiServicer
 	time    stime.StaticTimeService
 }
@@ -106,13 +107,14 @@ func TestExpiredInvite(t *testing.T) {
 }
 
 func NewInvitesScope(t *testing.T) InvitesServiceScope {
-	session := gateway.NewRandomSession()
+	session := tmwt.NewRandomClaims()
 
 	repository := NewInMemoryInvitesRepository(t)
 
 	config := Config{
 		Expiration: time.Hour,
-		SendToURL:  "http://local.moov.io",
+		SendToHost: "http://local.moov.io",
+		SendToPath: "/",
 	}
 
 	times := stime.NewStaticTimeService()

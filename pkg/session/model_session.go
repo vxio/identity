@@ -1,8 +1,8 @@
 package session
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"github.com/moov-io/tumbler/pkg/jwe"
 )
 
 type Session struct {
@@ -12,7 +12,7 @@ type Session struct {
 }
 
 type SessionJwt struct {
-	jwt.StandardClaims
+	jwe.Claims
 
 	Session
 }

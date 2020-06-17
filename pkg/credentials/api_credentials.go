@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/gateway"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
 // A CredentialsApiController binds http requests to an api service and writes the service results to the http response
@@ -40,11 +40,11 @@ func (c *CredentialsApiController) Routes() api.Routes {
 
 // DisableCredentials - Disables a credential so it can't be used anymore to login
 func (c *CredentialsApiController) DisableCredentials(w http.ResponseWriter, r *http.Request) {
-	gateway.WithSession(w, r, func(session gateway.Session) {
+	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		credentialID := params["credentialID"]
-		_, err := c.service.DisableCredentials(session, identityID, credentialID)
+		_, err := c.service.DisableCredentials(claims, identityID, credentialID)
 		if err != nil {
 			switch err {
 			case sql.ErrNoRows:
@@ -62,10 +62,10 @@ func (c *CredentialsApiController) DisableCredentials(w http.ResponseWriter, r *
 
 // ListCredentials - List the credentials this user has used.
 func (c *CredentialsApiController) ListCredentials(w http.ResponseWriter, r *http.Request) {
-	gateway.WithSession(w, r, func(session gateway.Session) {
+	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
-		result, err := c.service.ListCredentials(session, identityID)
+		result, err := c.service.ListCredentials(claims, identityID)
 		if err != nil {
 			w.WriteHeader(500)
 			return

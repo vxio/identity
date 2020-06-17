@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/gateway"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
 // A Controller binds http requests to an api service and writes the service results to the http response
@@ -63,10 +63,10 @@ func errorHandling(w http.ResponseWriter, err error) {
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
 func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
-	gateway.WithSession(w, r, func(session gateway.Session) {
+	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
-		err := c.service.DisableIdentity(session, identityID)
+		err := c.service.DisableIdentity(claims, identityID)
 		if err != nil {
 			errorHandling(w, err)
 			return
@@ -78,10 +78,10 @@ func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
 
 // GetIdentity - List identities and associates userId
 func (c *Controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
-	gateway.WithSession(w, r, func(session gateway.Session) {
+	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
-		result, err := c.service.GetIdentity(session, identityID)
+		result, err := c.service.GetIdentity(claims, identityID)
 		if err != nil {
 			errorHandling(w, err)
 			return
@@ -93,10 +93,10 @@ func (c *Controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
 
 // ListIdentities - List identities and associates userId
 func (c *Controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
-	gateway.WithSession(w, r, func(session gateway.Session) {
+	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		query := r.URL.Query()
 		orgID := query.Get("orgID")
-		result, err := c.service.ListIdentities(session, orgID)
+		result, err := c.service.ListIdentities(claims, orgID)
 		if err != nil {
 			errorHandling(w, err)
 			return
@@ -108,7 +108,7 @@ func (c *Controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
 
 // UpdateIdentity - Update a specific Identity
 func (c *Controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
-	gateway.WithSession(w, r, func(session gateway.Session) {
+	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
 		identity := &api.UpdateIdentity{}
@@ -117,7 +117,7 @@ func (c *Controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		result, err := c.service.UpdateIdentity(session, identityID, *identity)
+		result, err := c.service.UpdateIdentity(claims, identityID, *identity)
 		if err != nil {
 			errorHandling(w, err)
 			return

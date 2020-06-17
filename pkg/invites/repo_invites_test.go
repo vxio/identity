@@ -12,7 +12,6 @@ import (
 	"github.com/moov-io/base/docker"
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/database"
-	"github.com/moov-io/identity/pkg/gateway"
 	log "github.com/moov-io/identity/pkg/logging"
 )
 
@@ -20,7 +19,7 @@ func TestGetById(t *testing.T) {
 	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, _ := AddTestingInvite(t, repository)
 
-		tenantID := gateway.TenantID(uuid.MustParse(invite.TenantID))
+		tenantID := api.TenantID(uuid.MustParse(invite.TenantID))
 
 		found, err := repository.get(tenantID, invite.InviteID)
 		if err != nil {
@@ -31,7 +30,7 @@ func TestGetById(t *testing.T) {
 			t.Error("found by ID doesn't match Invite", cmp.Diff(*found, invite))
 		}
 
-		badTenantID := gateway.TenantID(uuid.New())
+		badTenantID := api.TenantID(uuid.New())
 		_, err = repository.get(badTenantID, invite.InviteID)
 		if err != sql.ErrNoRows {
 			t.Error(err)
@@ -62,7 +61,7 @@ func TestGetByCode(t *testing.T) {
 func TestList(t *testing.T) {
 	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, _ := AddTestingInvite(t, repository)
-		tenantID1 := gateway.TenantID(uuid.MustParse(invite.TenantID))
+		tenantID1 := api.TenantID(uuid.MustParse(invite.TenantID))
 
 		// Add noise and other invites on other tenants
 		AddTestingInvite(t, repository)
@@ -82,7 +81,7 @@ func TestList(t *testing.T) {
 			t.Error("Invite from first tenant doesn't match list of first tenant")
 		}
 
-		badTenantID := gateway.TenantID(uuid.New())
+		badTenantID := api.TenantID(uuid.New())
 		found, err = repository.list(badTenantID)
 		if err != nil {
 			t.Error(err)
@@ -97,7 +96,7 @@ func TestList(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	ForEachDatabase(t, func(t *testing.T, repository Repository) {
 		invite, _ := AddTestingInvite(t, repository)
-		tenantID := gateway.TenantID(uuid.MustParse(invite.TenantID))
+		tenantID := api.TenantID(uuid.MustParse(invite.TenantID))
 
 		updated := invite
 		redeemedOn := time.Now().In(time.UTC).Round(time.Second)

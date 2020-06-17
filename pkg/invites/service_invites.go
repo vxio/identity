@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
 
 	api "github.com/moov-io/identity/pkg/api"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
 type invitesService struct {
@@ -27,7 +27,7 @@ type invitesService struct {
 // NewInvitesService instantiates a new invitesService for interacting with Invites from outside of the package.
 func NewInvitesService(config Config, time stime.TimeService, repository Repository, notifications notifications.NotificationsService) (api.InvitesApiServicer, error) {
 
-	urlTemplate, err := template.New("send").Parse(config.SendToURL)
+	urlTemplate, err := template.New("send").Parse(config.SendToHost + config.SendToPath)
 	if err != nil {
 		return nil, err
 	}
@@ -42,18 +42,18 @@ func NewInvitesService(config Config, time stime.TimeService, repository Reposit
 }
 
 // ListInvites - List outstanding invites
-func (s *invitesService) ListInvites(session gateway.Session) ([]api.Invite, error) {
-	invites, err := s.repository.list(session.TenantID)
+func (s *invitesService) ListInvites(claims tmw.TumblerClaims) ([]api.Invite, error) {
+	invites, err := s.repository.list(api.TenantID(claims.TenantID))
 	return invites, err
 }
 
 // SendInvite - Send an email invite to a new user
-func (s *invitesService) SendInvite(session gateway.Session, send api.SendInvite) (*api.Invite, string, error) {
+func (s *invitesService) SendInvite(claims tmw.TumblerClaims, send api.SendInvite) (*api.Invite, string, error) {
 	invite := api.Invite{
 		InviteID:   uuid.New().String(),
-		TenantID:   session.TenantID.String(),
+		TenantID:   claims.TenantID.String(),
 		Email:      send.Email,
-		InvitedBy:  session.CallerID.String(),
+		InvitedBy:  claims.IdentityID.String(),
 		InvitedOn:  s.time.Now(),
 		RedeemedOn: nil,
 		ExpiresOn:  s.time.Now().Add(s.expiration),
@@ -87,13 +87,13 @@ func (s *invitesService) SendInvite(session gateway.Session, send api.SendInvite
 }
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
-func (s *invitesService) DisableInvite(session gateway.Session, inviteID string) error {
-	invite, err := s.repository.get(session.TenantID, inviteID)
+func (s *invitesService) DisableInvite(claims tmw.TumblerClaims, inviteID string) error {
+	invite, err := s.repository.get(api.TenantID(claims.TenantID), inviteID)
 	if err != nil {
 		return err
 	}
 
-	disabledBy := session.CallerID.String()
+	disabledBy := claims.IdentityID.String()
 	disabledOn := s.time.Now()
 	invite.DisabledBy = &disabledBy
 	invite.DisabledOn = &disabledOn

@@ -15,7 +15,7 @@ func TestAPIInvite(t *testing.T) {
 
 	invite := sendInvite(a, s, "newinvite@moov.io")
 
-	a.Equal(s.session.CallerID.String(), invite.InvitedBy, "Invited By doesn't match session caller")
+	a.Equal(s.session.IdentityID.String(), invite.InvitedBy, "Invited By doesn't match session caller")
 	a.Equal(s.time.Now(), invite.InvitedOn)
 	a.Equal(s.session.TenantID.String(), invite.TenantID, "TenantID doesn't match session tenantID")
 
@@ -37,7 +37,7 @@ func TestAPIList(t *testing.T) {
 
 	a.Len(invites, 1)
 	a.Equal(sent.InviteID, invites[0].InviteID, "InviteID's dont match")
-	a.Equal(s.session.CallerID.String(), invites[0].InvitedBy, "Invited By doesn't match session caller")
+	a.Equal(s.session.IdentityID.String(), invites[0].InvitedBy, "Invited By doesn't match session caller")
 	a.Equal(s.session.TenantID.String(), invites[0].TenantID, "TenantID doesn't match session tenantID")
 }
 
@@ -59,7 +59,7 @@ func TestAPIDeactivate(t *testing.T) {
 	deactivated := list[0]
 	a.NotNil(deactivated.DisabledBy)
 	a.NotNil(deactivated.DisabledOn)
-	a.Equal(s.session.CallerID.String(), *deactivated.DisabledBy)
+	a.Equal(s.session.IdentityID.String(), *deactivated.DisabledBy)
 	a.Equal(s.time.Now(), *deactivated.DisabledOn)
 	a.Equal(sent.InviteID, deactivated.InviteID)
 }

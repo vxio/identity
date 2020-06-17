@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/stime"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
 // Service - Service that implents the logic for the IdentitiesApiServicer
@@ -26,14 +26,14 @@ func NewIdentitiesService(time stime.TimeService, repository Repository) *Servic
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
-func (s *Service) DisableIdentity(session gateway.Session, identityID string) error {
-	identity, err := s.GetIdentity(session, identityID)
+func (s *Service) DisableIdentity(claims tmw.TumblerClaims, identityID string) error {
+	identity, err := s.GetIdentity(claims, identityID)
 	if err != nil {
 		return err
 	}
 
 	now := s.time.Now()
-	callerIdentityID := session.CallerID.String()
+	callerIdentityID := claims.IdentityID.String()
 
 	identity.DisabledOn = &now
 	identity.DisabledBy = &callerIdentityID
@@ -49,13 +49,13 @@ func (s *Service) DisableIdentity(session gateway.Session, identityID string) er
 }
 
 // GetIdentity - List identities and associates userId
-func (s *Service) GetIdentity(session gateway.Session, identityID string) (*api.Identity, error) {
+func (s *Service) GetIdentity(claims tmw.TumblerClaims, identityID string) (*api.Identity, error) {
 	i, e := s.GetIdentityByID(identityID)
 	if e != nil {
 		return nil, e
 	}
 
-	if i.TenantID != session.TenantID.String() {
+	if i.TenantID != claims.TenantID.String() {
 		return nil, errors.New("TenantID of session user doesn't match retrieved identity")
 	}
 
@@ -63,14 +63,14 @@ func (s *Service) GetIdentity(session gateway.Session, identityID string) (*api.
 }
 
 // ListIdentities - List identities and associates userId
-func (s *Service) ListIdentities(session gateway.Session, orgID string) ([]api.Identity, error) {
-	identities, err := s.repository.list(session.TenantID)
+func (s *Service) ListIdentities(claims tmw.TumblerClaims, orgID string) ([]api.Identity, error) {
+	identities, err := s.repository.list(api.TenantID(claims.TenantID))
 	return identities, err
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *Service) UpdateIdentity(session gateway.Session, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
-	identity, err := s.GetIdentity(session, identityID)
+func (s *Service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
+	identity, err := s.GetIdentity(claims, identityID)
 	if err != nil {
 		return nil, err
 	}

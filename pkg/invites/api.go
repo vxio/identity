@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/gateway"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
 // A Controller binds http requests to an api service and writes the service results to the http response
@@ -46,10 +46,10 @@ func (c *Controller) Routes() api.Routes {
 
 // DeleteInvite - Delete an invite that was sent and invalidate the token.
 func (c *Controller) DeleteInvite(w http.ResponseWriter, r *http.Request) {
-	gateway.WithSession(w, r, func(session gateway.Session) {
+	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		inviteID := params["inviteID"]
-		err := c.service.DisableInvite(session, inviteID)
+		err := c.service.DisableInvite(claims, inviteID)
 		if err != nil {
 			w.WriteHeader(500)
 			return
@@ -61,10 +61,10 @@ func (c *Controller) DeleteInvite(w http.ResponseWriter, r *http.Request) {
 
 // ListInvites - List outstanding invites
 func (c *Controller) ListInvites(w http.ResponseWriter, r *http.Request) {
-	gateway.WithSession(w, r, func(session gateway.Session) {
+	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		//query := r.URL.Query()
 		//orgID := query.Get("orgID")
-		result, err := c.service.ListInvites(session)
+		result, err := c.service.ListInvites(claims)
 		if err != nil {
 			w.WriteHeader(500)
 			return
@@ -76,14 +76,14 @@ func (c *Controller) ListInvites(w http.ResponseWriter, r *http.Request) {
 
 // SendInvite - Send an email invite to a new user
 func (c *Controller) SendInvite(w http.ResponseWriter, r *http.Request) {
-	gateway.WithSession(w, r, func(session gateway.Session) {
+	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		invite := &api.SendInvite{}
 		if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
 			w.WriteHeader(500)
 			return
 		}
 
-		result, _, err := c.service.SendInvite(session, *invite)
+		result, _, err := c.service.SendInvite(claims, *invite)
 		if err != nil {
 			w.WriteHeader(500)
 			return

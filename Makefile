@@ -32,7 +32,7 @@ install:
 	git checkout LICENSE
 
 .PHONY: check
-check: services
+check: build services
 ifeq ($(OS),Windows_NT)
 	@echo "Skipping checks on Windows, currently unsupported."
 else
@@ -41,7 +41,7 @@ else
 	./lint-project.sh
 endif
 
-docker: install test
+docker: install
 	pkger
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o ${PWD}/bin/.docker/identity cmd/identity/*
 	docker build --pull -t moov/identity:$(VERSION) -f Dockerfile .

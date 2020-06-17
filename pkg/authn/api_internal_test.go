@@ -2,6 +2,8 @@ package authn_test
 
 import (
 	"context"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	fuzz "github.com/google/gofuzz"
@@ -76,6 +78,9 @@ func Test_Login_Success(t *testing.T) {
 }
 
 func RegisterRandomIdentity(f *fuzz.Fuzzer, s Scope) LoginSession {
+	req := httptest.NewRequest("GET", "https://local.moov.io", strings.NewReader(""))
+	req.Header.Add("X-Forwarded-For", "1.2.3.4")
+	req.Header.Add("Origin", Host)
 
 	// First need to invite the user
 	invite, code, err := s.invites.SendInvite(s.session, client.SendInvite{Email: "test@moovtest.io"})
@@ -89,7 +94,7 @@ func RegisterRandomIdentity(f *fuzz.Fuzzer, s Scope) LoginSession {
 	registerSession.TenantID = invite.TenantID
 	registerSession.InviteCode = code
 
-	_, err = s.service.RegisterWithCredentials(registerSession.Register, registerSession.State, registerSession.IP)
+	_, err = s.service.RegisterWithCredentials(req, registerSession.Register, registerSession.State, registerSession.IP)
 	if err != nil {
 		panic(err)
 	}

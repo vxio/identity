@@ -7,5 +7,6 @@ import (
 // Config holds the configuration for the Invites package
 type Config struct {
 	Expiration time.Duration
-	SendToURL  string
+	SendToHost string
+	SendToPath string
 }

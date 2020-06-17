@@ -8,15 +8,15 @@ import (
 	api "github.com/moov-io/identity/pkg/api"
 	client "github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
-	"github.com/moov-io/identity/pkg/gateway"
-	"github.com/moov-io/identity/pkg/gateway/gatewaytest"
 	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
+	tmwt "github.com/moov-io/tumbler/pkg/middleware/middlewaretest"
 )
 
 type Scope struct {
-	session       gateway.Session
+	session       tmw.TumblerClaims
 	config        Config
 	time          stime.StaticTimeService
 	notifications notifications.NotificationsService
@@ -28,11 +28,12 @@ type Scope struct {
 
 func NewScope(t *testing.T) Scope {
 	logging := logging.NewDefaultLogger()
-	session := gateway.NewRandomSession()
+	session := tmwt.NewRandomClaims()
 
 	invitesConfig := Config{
 		Expiration: time.Hour,
-		SendToURL:  "http://local.moov.io",
+		SendToHost: "http://local.moov.io",
+		SendToPath: "http://local.moov.io",
 	}
 
 	times := stime.NewStaticTimeService()
@@ -52,7 +53,7 @@ func NewScope(t *testing.T) Scope {
 	routes := mux.NewRouter()
 	api.AppendRouters(logging, routes, controller)
 
-	testMiddleware := gatewaytest.NewTestMiddleware(times, session)
+	testMiddleware := tmwt.NewTestMiddleware(times, session)
 	routes.Use(testMiddleware.Handler)
 
 	testAPI := clienttest.NewTestClient(routes)

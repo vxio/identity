@@ -47,6 +47,7 @@ func (c *authnAPIController) Routes() api.Routes {
 // Authenticated - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service receives a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
 func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Request) {
 	WithLoginSessionFromRequest(c.logger, w, r, func(session LoginSession) {
+		DeleteAuthnCookie(w)
 
 		login := api.Login{
 			Provider:  session.Provider,
@@ -54,7 +55,7 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 			TenantID:  session.TenantID,
 		}
 
-		result, err := c.service.LoginWithCredentials(login, session.State, session.IP)
+		result, err := c.service.LoginWithCredentials(r, login, session.State, session.IP)
 		if err != nil {
 			c.logger.Error().LogError("Not able to exchange login token for session token", err)
 			w.WriteHeader(404)
@@ -88,7 +89,9 @@ func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 }
 
 func (c *authnAPIController) doRegistration(w http.ResponseWriter, r *http.Request, session LoginSession, registration *api.Register) {
-	result, err := c.service.RegisterWithCredentials(*registration, session.State, session.IP)
+	DeleteAuthnCookie(w)
+
+	result, err := c.service.RegisterWithCredentials(r, *registration, session.State, session.IP)
 	if err != nil {
 		c.logger.Error().LogError("Unable to RegisterWithCredentials", err)
 		w.WriteHeader(400)
