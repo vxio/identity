@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/moov-io/authn/pkg/jwe"
 	. "github.com/moov-io/identity/pkg/authn"
 	log "github.com/moov-io/identity/pkg/logging"
+	"github.com/moov-io/tumbler/pkg/jwe"
 	"github.com/square/go-jose/jwt"
 
 	fuzz "github.com/google/gofuzz"
@@ -24,9 +24,9 @@ import (
 	"github.com/moov-io/identity/pkg/notifications"
 	sessionpkg "github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/webkeys"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 	tmwt "github.com/moov-io/tumbler/pkg/middleware/middlewaretest"
+	"github.com/moov-io/tumbler/pkg/webkeys"
 	"github.com/stretchr/testify/require"
 )
 

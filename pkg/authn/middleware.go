@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/moov-io/authn/pkg/jwe"
+	"github.com/moov-io/tumbler/pkg/jwe"
 	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/stime"
 )

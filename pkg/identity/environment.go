@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/moov-io/authn/pkg/jwe"
 	_ "github.com/moov-io/identity" // need to import the embedded files
+	"github.com/moov-io/tumbler/pkg/jwe"
 
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/authn"
@@ -20,8 +20,8 @@ import (
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/webkeys"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
+	"github.com/moov-io/tumbler/pkg/webkeys"
 )
 
 // Environment - Contains everything thats been instantiated for this service.

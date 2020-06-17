@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/moov-io/authn/pkg/jwe"
+	"github.com/moov-io/tumbler/pkg/jwe"
 	api "github.com/moov-io/identity/pkg/api"
 	log "github.com/moov-io/identity/pkg/logging"
 )

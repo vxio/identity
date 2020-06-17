@@ -2,7 +2,7 @@ package session
 
 import (
 	"github.com/google/uuid"
-	"github.com/moov-io/authn/pkg/jwe"
+	"github.com/moov-io/tumbler/pkg/jwe"
 )
 
 type Session struct {

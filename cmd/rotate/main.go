@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/moov-io/identity/pkg/webkeys"
+	"github.com/moov-io/tumbler/pkg/webkeys"
 )
 
 /*

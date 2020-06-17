@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/moov-io/authn/pkg/jwe"
 	"github.com/moov-io/identity/pkg/stime"
+	"github.com/moov-io/tumbler/pkg/jwe"
 )
 
 // SessionService - Generates the tokens for their fully logged in session.
