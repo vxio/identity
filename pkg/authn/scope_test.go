@@ -14,6 +14,7 @@ import (
 	fuzz "github.com/google/gofuzz"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/authn/pkg/keygen"
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
@@ -31,7 +32,7 @@ import (
 )
 
 // pull these out so it speeds up testing
-var authnKeys, _ = webkeys.NewGenerateJwksService()
+var authnKeys, _ = keygen.GenerateKeys()
 var identityKeys, _ = webkeys.NewGenerateJwksService()
 
 func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
@@ -70,7 +71,7 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	authnConfig := Config{LandingURL: "https://localhost/whoami"}
 	service := NewAuthnService(logger, *creds, *identities, token, invites, authnConfig.LandingURL)
 
-	authnJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, authnKeys)
+	authnJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, webkeys.NewStaticJwksService(authnKeys))
 
 	f := fuzz.New().Funcs(
 		func(e *LoginSession, c fuzz.Continue) {
@@ -104,7 +105,6 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 		logger:        logger,
 		service:       service,
 		invites:       invites,
-		authnKeys:     authnKeys,
 		authnJwe:      authnJwe,
 	}, f
 }
@@ -117,7 +117,6 @@ type Scope struct {
 	logger        log.Logger
 	service       api.InternalApiServicer
 	invites       api.InvitesApiServicer
-	authnKeys     *webkeys.GenerateJwksService
 	authnJwe      jwe.JWEService
 }
 
@@ -160,7 +159,7 @@ func (s *TestMiddleware) Handler(h http.Handler) http.Handler {
 }
 
 func (s *Scope) Cookie(session LoginSession) *http.Cookie {
-	tokenString, err := s.authnJwe.Serialize(&session.Claims, &session)
+	tokenString, err := s.authnJwe.SerializeEncrypted(&session.Claims, &session)
 	if err != nil {
 		panic(err)
 	}
