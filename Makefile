@@ -32,7 +32,7 @@ install:
 	git checkout LICENSE
 
 .PHONY: check
-check: services
+check: build services
 ifeq ($(OS),Windows_NT)
 	@echo "Skipping checks on Windows, currently unsupported."
 else

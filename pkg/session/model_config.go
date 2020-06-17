@@ -3,7 +3,7 @@ package session
 import (
 	"time"
 
-	"github.com/moov-io/identity/pkg/webkeys"
+	"github.com/moov-io/tumbler/pkg/webkeys"
 )
 
 // Config - Holds the configuration for the session cookie created after registration or logging in

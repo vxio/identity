@@ -5,12 +5,11 @@ import (
 	"fmt"
 
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/gateway"
 )
 
 // Repository - Used for interacting identities on the data store
 type Repository interface {
-	list(tenantID gateway.TenantID) ([]api.Identity, error)
+	list(tenantID api.TenantID) ([]api.Identity, error)
 	get(identityID string) (*api.Identity, error)
 	update(updated api.Identity) (*api.Identity, error)
 	add(identity api.Identity) (*api.Identity, error)
@@ -25,7 +24,7 @@ type sqlIdentityRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlIdentityRepo) list(tenantID gateway.TenantID) ([]api.Identity, error) {
+func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]api.Identity, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM identity

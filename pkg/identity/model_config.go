@@ -3,17 +3,21 @@ package identity
 import (
 	"github.com/moov-io/identity/pkg/authn"
 	"github.com/moov-io/identity/pkg/database"
-	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/session"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
+
+type GlobalConfig struct {
+	Identity Config
+}
 
 // Config defines all the configuration for the app
 type Config struct {
 	Servers        ServerConfig
 	Database       database.DatabaseConfig
-	Gateway        gateway.Config
+	Gateway        tmw.TumblerConfig
 	Authentication authn.Config
 	Session        session.Config
 	Notifications  notifications.NotificationsConfig

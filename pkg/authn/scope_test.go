@@ -8,8 +8,9 @@ import (
 
 	. "github.com/moov-io/identity/pkg/authn"
 	log "github.com/moov-io/identity/pkg/logging"
+	"github.com/moov-io/tumbler/pkg/jwe"
+	"github.com/square/go-jose/jwt"
 
-	"github.com/dgrijalva/jwt-go"
 	fuzz "github.com/google/gofuzz"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -18,13 +19,14 @@ import (
 	clienttest "github.com/moov-io/identity/pkg/client_test"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
-	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
 	sessionpkg "github.com/moov-io/identity/pkg/session"
 	"github.com/moov-io/identity/pkg/stime"
-	"github.com/moov-io/identity/pkg/webkeys"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
+	tmwt "github.com/moov-io/tumbler/pkg/middleware/middlewaretest"
+	"github.com/moov-io/tumbler/pkg/webkeys"
 	"github.com/stretchr/testify/require"
 )
 
@@ -36,7 +38,7 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	a := require.New(t)
 
 	logger := log.NewDefaultLogger()
-	session := gateway.NewRandomSession()
+	session := tmwt.NewRandomClaims()
 
 	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, logger, nil)
 	t.Cleanup(close)
@@ -62,24 +64,27 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	creds := credentials.NewCredentialsService(stime, credsRepo)
 
 	sessionConfig := sessionpkg.Config{Expiration: time.Hour}
-	token := sessionpkg.NewSessionService(stime, identityKeys, sessionConfig)
+	sessionJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, identityKeys)
+	token := sessionpkg.NewSessionService(stime, sessionJwe, sessionConfig)
 
 	authnConfig := Config{LandingURL: "https://localhost/whoami"}
 	service := NewAuthnService(logger, *creds, *identities, token, invites, authnConfig.LandingURL)
+
+	authnJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, authnKeys)
 
 	f := fuzz.New().Funcs(
 		func(e *LoginSession, c fuzz.Continue) {
 			e.IP = "1.2.3.4"
 			e.State = c.RandString()
 
-			e.StandardClaims = jwt.StandardClaims{
-				ExpiresAt: stime.Now().Add(time.Hour).Unix(),
-				NotBefore: stime.Now().Add(time.Minute * -1).Unix(),
-				IssuedAt:  stime.Now().Add(time.Minute * -1).Unix(),
-				Id:        uuid.New().String(),
+			e.Claims = jwe.Claims{
+				Expiry:    jwt.NewNumericDate(stime.Now().Add(time.Hour)),
+				NotBefore: jwt.NewNumericDate(stime.Now().Add(time.Minute * -1)),
+				IssuedAt:  jwt.NewNumericDate(stime.Now().Add(time.Minute * -1)),
+				ID:        uuid.New().String(),
 				Subject:   uuid.New().String(),
-				Audience:  "moovauth",
-				Issuer:    "moovauth",
+				Audience:  jwt.Audience{e.IP},
+				Issuer:    "http://local.moov.io/",
 			}
 
 			e.Register = client.Register{
@@ -100,18 +105,20 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 		service:       service,
 		invites:       invites,
 		authnKeys:     authnKeys,
+		authnJwe:      authnJwe,
 	}, f
 }
 
 type Scope struct {
 	sessionConfig sessionpkg.Config
 	authnConfig   Config
-	session       gateway.Session
+	session       tmw.TumblerClaims
 	stime         stime.StaticTimeService
 	logger        log.Logger
 	service       api.InternalApiServicer
 	invites       api.InvitesApiServicer
 	authnKeys     *webkeys.GenerateJwksService
+	authnJwe      jwe.JWEService
 }
 
 func (s *Scope) NewClient(loginSession LoginSession) *client.APIClient {
@@ -153,13 +160,7 @@ func (s *TestMiddleware) Handler(h http.Handler) http.Handler {
 }
 
 func (s *Scope) Cookie(session LoginSession) *http.Cookie {
-	privateKey := s.authnKeys.Private
-	signingMethod := jwt.GetSigningMethod(privateKey.Algorithm)
-
-	token := jwt.NewWithClaims(signingMethod, session)
-	token.Header["kid"] = privateKey.KeyID
-
-	tokenString, err := token.SignedString(privateKey.Key)
+	tokenString, err := s.authnJwe.Serialize(&session.Claims, &session)
 	if err != nil {
 		panic(err)
 	}
@@ -168,8 +169,8 @@ func (s *Scope) Cookie(session LoginSession) *http.Cookie {
 		Name:     "moov-authn",
 		Value:    tokenString,
 		Path:     "/",
-		Expires:  time.Unix(session.ExpiresAt, 0),
-		MaxAge:   int(time.Unix(session.ExpiresAt, 0).Second()),
+		Expires:  session.Expiry.Time(),
+		MaxAge:   session.Expiry.Time().Second(),
 		SameSite: http.SameSiteDefaultMode,
 		Secure:   false,
 		HttpOnly: true,

@@ -14,7 +14,7 @@ func Test_ConfigLoading(t *testing.T) {
 
 	ConfigService := configpkg.NewConfigService(logger)
 
-	config := &Config{}
+	config := &GlobalConfig{}
 	err := ConfigService.Load(config)
 	require.Nil(t, err)
 }

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/moov-io/tumbler/pkg/jwe"
 	api "github.com/moov-io/identity/pkg/api"
 	log "github.com/moov-io/identity/pkg/logging"
 )
@@ -23,7 +23,7 @@ type LoginSession struct {
 	Scopes []string `'json:"scp"`
 
 	// standard JWT claims like expirations etc...
-	jwt.StandardClaims
+	jwe.Claims
 
 	// Store whatever we can get from the OIDC provider if the invite code isn't empty
 	api.Register

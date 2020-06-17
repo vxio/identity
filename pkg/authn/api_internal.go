@@ -55,7 +55,7 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 			TenantID:  session.TenantID,
 		}
 
-		result, err := c.service.LoginWithCredentials(login, session.State, session.IP)
+		result, err := c.service.LoginWithCredentials(r, login, session.State, session.IP)
 		if err != nil {
 			c.logger.Error().LogError("Not able to exchange login token for session token", err)
 			w.WriteHeader(404)
@@ -91,7 +91,7 @@ func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 func (c *authnAPIController) doRegistration(w http.ResponseWriter, r *http.Request, session LoginSession, registration *api.Register) {
 	DeleteAuthnCookie(w)
 
-	result, err := c.service.RegisterWithCredentials(*registration, session.State, session.IP)
+	result, err := c.service.RegisterWithCredentials(r, *registration, session.State, session.IP)
 	if err != nil {
 		c.logger.Error().LogError("Unable to RegisterWithCredentials", err)
 		w.WriteHeader(400)
