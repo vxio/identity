@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/moov-io/tumbler/pkg/jwe"
 	api "github.com/moov-io/identity/pkg/api"
 	log "github.com/moov-io/identity/pkg/logging"
+	"github.com/moov-io/tumbler/pkg/jwe"
 )
 
 // LoginSession is the values of the JWT coming in from the Authentication services.

@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/moov-io/tumbler/pkg/jwe"
 	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/stime"
+	"github.com/moov-io/tumbler/pkg/jwe"
 )
 
 // Middleware - Handles authenticating a request came from the authn services
