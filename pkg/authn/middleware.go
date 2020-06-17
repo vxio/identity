@@ -50,7 +50,7 @@ func (s *Middleware) FromRequest(r *http.Request) (*LoginSession, error) {
 	}
 
 	session := LoginSession{}
-	_, err = s.jweService.Parse(r, cookie.Value, &session)
+	_, err = s.jweService.ParseEncrypted(r, cookie.Value, &session)
 	if err != nil {
 		return nil, s.log.Error().LogErrorF("Session token parse failure - %w", err)
 	}
