@@ -1,7 +1,7 @@
-name: Go
+name: Publish Release
 
 on:
-  pull_request:
+  push:
     branches: [ master ]
 
 jobs:
@@ -33,3 +33,9 @@ jobs:
 
     - name: Check
       run: make check
+    
+    - name: Docker
+      run: make docker
+
+    - name: Docker push
+      run: docker push moov/identity
