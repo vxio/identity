@@ -40,7 +40,7 @@ func NewAuthnService(
 }
 
 // RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
-func (s *authnService) RegisterWithCredentials(register api.Register, nonce string, ip string) (*http.Cookie, error) {
+func (s *authnService) RegisterWithCredentials(req *http.Request, register api.Register, nonce string, ip string) (*http.Cookie, error) {
 	logCtx := s.log.WithMap(map[string]string{
 		"tenant_id":         register.TenantID,
 		"email":             register.Email,
@@ -78,11 +78,11 @@ func (s *authnService) RegisterWithCredentials(register api.Register, nonce stri
 		TenantID:  identity.TenantID,
 	}
 
-	return s.LoginWithCredentials(login, nonce, ip)
+	return s.LoginWithCredentials(req, login, nonce, ip)
 }
 
 // LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service receives a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
-func (s *authnService) LoginWithCredentials(login api.Login, nonce string, ip string) (*http.Cookie, error) {
+func (s *authnService) LoginWithCredentials(req *http.Request, login api.Login, nonce string, ip string) (*http.Cookie, error) {
 	logCtx := s.log.
 		With(api.NewLoginLogContext(&login)).
 		WithKeyValue("ip", ip)
@@ -112,7 +112,7 @@ func (s *authnService) LoginWithCredentials(login api.Login, nonce string, ip st
 		CredentialID: uuid.MustParse(loggedIn.CredentialID),
 	}
 
-	cookie, err := s.token.GenerateCookie(session)
+	cookie, err := s.token.GenerateCookie(req, session)
 	if err != nil {
 		return nil, logCtx.Error().LogError("Unable to generate cookie", err)
 	}

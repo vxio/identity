@@ -8,7 +8,10 @@ import (
 	"time"
 
 	"github.com/moov-io/identity/pkg/authn"
+	"github.com/square/go-jose/jwt"
 )
+
+const Host = "http://local.moov.io"
 
 func Test_Handler(t *testing.T) {
 	a, s, f := Setup(t)
@@ -16,7 +19,9 @@ func Test_Handler(t *testing.T) {
 	ls := authn.LoginSession{}
 	f.Fuzz(&ls)
 
-	req, err := http.NewRequest("GET", "/", strings.NewReader(""))
+	req, err := http.NewRequest("GET", Host+"/", strings.NewReader(""))
+	req.Header.Add("X-Forwarded-For", "1.2.3.4")
+	req.Header.Add("Origin", Host)
 	a.Nil(err)
 	req.AddCookie(s.Cookie(ls))
 
@@ -33,7 +38,9 @@ func Test_Handler(t *testing.T) {
 func Test_NoAuthnCookie(t *testing.T) {
 	a, s, _ := Setup(t)
 
-	req, err := http.NewRequest("GET", "/", strings.NewReader(""))
+	req, err := http.NewRequest("GET", Host+"/", strings.NewReader(""))
+	req.Header.Add("X-Forwarded-For", "1.2.3.4")
+	req.Header.Add("Origin", Host)
 	a.Nil(err)
 
 	endpoint := newEndpoint(s, func(_ authn.LoginSession) {
@@ -51,9 +58,11 @@ func Test_Expired(t *testing.T) {
 
 	ls := authn.LoginSession{}
 	f.Fuzz(&ls)
-	ls.ExpiresAt = s.stime.Now().Add(time.Hour * -1).Unix()
+	ls.Expiry = jwt.NewNumericDate(s.stime.Now().Add(time.Hour * -1))
 
-	req, err := http.NewRequest("GET", "/", strings.NewReader(""))
+	req, err := http.NewRequest("GET", Host+"/", strings.NewReader(""))
+	req.Header.Add("X-Forwarded-For", "1.2.3.4")
+	req.Header.Add("Origin", Host)
 	a.Nil(err)
 	req.AddCookie(s.Cookie(ls))
 
@@ -72,9 +81,11 @@ func Test_NotBefore(t *testing.T) {
 
 	ls := authn.LoginSession{}
 	f.Fuzz(&ls)
-	ls.NotBefore = s.stime.Now().Add(time.Hour).Unix()
+	ls.NotBefore = jwt.NewNumericDate(s.stime.Now().Add(time.Hour))
 
-	req, err := http.NewRequest("GET", "/", strings.NewReader(""))
+	req, err := http.NewRequest("GET", Host+"/", strings.NewReader(""))
+	req.Header.Add("X-Forwarded-For", "1.2.3.4")
+	req.Header.Add("Origin", Host)
 	a.Nil(err)
 	req.AddCookie(s.Cookie(ls))
 
@@ -89,7 +100,7 @@ func Test_NotBefore(t *testing.T) {
 }
 
 func newEndpoint(s Scope, run func(loginSession authn.LoginSession)) http.Handler {
-	mw, err := authn.NewMiddleware(s.logger, s.stime, s.authnKeys)
+	mw, err := authn.NewMiddleware(s.logger, s.stime, s.authnJwe)
 	if err != nil {
 		panic(err)
 	}

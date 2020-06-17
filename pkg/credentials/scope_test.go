@@ -10,15 +10,15 @@ import (
 	clienttest "github.com/moov-io/identity/pkg/client_test"
 	. "github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
-	"github.com/moov-io/identity/pkg/gateway"
-	"github.com/moov-io/identity/pkg/gateway/gatewaytest"
 	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/stime"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
+	tmwt "github.com/moov-io/tumbler/pkg/middleware/middlewaretest"
 	"github.com/stretchr/testify/require"
 )
 
 type Scope struct {
-	session    gateway.Session
+	session    tmw.TumblerClaims
 	time       stime.StaticTimeService
 	repository CredentialRepository
 	service    CredentialsService
@@ -27,7 +27,7 @@ type Scope struct {
 
 func NewScope(t *testing.T) Scope {
 	logger := logging.NewDefaultLogger()
-	session := gateway.NewRandomSession()
+	session := tmwt.NewRandomClaims()
 	times := stime.NewStaticTimeService()
 
 	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, nil, nil)
@@ -45,7 +45,7 @@ func NewScope(t *testing.T) Scope {
 	routes := mux.NewRouter()
 	api.AppendRouters(logger, routes, controller)
 
-	testMiddleware := gatewaytest.NewTestMiddleware(times, session)
+	testMiddleware := tmwt.NewTestMiddleware(times, session)
 	routes.Use(testMiddleware.Handler)
 
 	testAPI := clienttest.NewTestClient(routes)

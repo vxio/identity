@@ -3,8 +3,8 @@ package credentials
 import (
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/stime"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
 // CredentialsService is a service that implents the logic for the CredentialsApiServicer
@@ -24,13 +24,13 @@ func NewCredentialsService(time stime.TimeService, repository CredentialReposito
 }
 
 // DisableCredentials - Disables a credential so it can&#39;t be used anymore to login
-func (s *CredentialsService) DisableCredentials(auth gateway.Session, identityID string, credentialID string) (*api.Credential, error) {
+func (s *CredentialsService) DisableCredentials(auth tmw.TumblerClaims, identityID string, credentialID string) (*api.Credential, error) {
 	cred, err := s.repository.get(identityID, credentialID, auth.TenantID.String())
 	if err != nil {
 		return nil, err
 	}
 
-	caller := auth.CallerID.String()
+	caller := auth.IdentityID.String()
 	now := s.time.Now()
 	cred.DisabledOn = &now
 	cred.DisabledBy = &caller
@@ -46,7 +46,7 @@ func (s *CredentialsService) DisableCredentials(auth gateway.Session, identityID
 }
 
 // ListCredentials - List the credentials this user has used.
-func (s *CredentialsService) ListCredentials(auth gateway.Session, identityID string) ([]api.Credential, error) {
+func (s *CredentialsService) ListCredentials(auth tmw.TumblerClaims, identityID string) ([]api.Credential, error) {
 	return s.repository.list(identityID, auth.TenantID.String())
 }
 

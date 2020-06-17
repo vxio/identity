@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	api "github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/logging"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
 type whoAmIController struct {
@@ -46,16 +46,16 @@ func (c *whoAmIController) WhoAmI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gatewaySession, err := gateway.SessionFromRequest(r)
+	tumblerClaims, err := tmw.ClaimsFromRequest(r)
 	if err != nil {
 		c.log.Info().Log("Gateway session not found")
 		w.WriteHeader(404)
 		return
 	}
 
-	logCtx := c.log.With(gatewaySession)
+	logCtx := c.log.With(tumblerClaims)
 
-	identity, err := c.identities.GetIdentity(*gatewaySession, gatewaySession.CallerID.String())
+	identity, err := c.identities.GetIdentity(*tumblerClaims, tumblerClaims.IdentityID.String())
 	if err != nil {
 		logCtx.Info().Log("Unable to lookup identity")
 		w.WriteHeader(404)
@@ -64,7 +64,7 @@ func (c *whoAmIController) WhoAmI(w http.ResponseWriter, r *http.Request) {
 
 	type Output struct {
 		Cookie   Session
-		Gateway  gateway.Session
+		Tumbler  tmw.TumblerClaims
 		Identity api.Identity
 		XUser    string
 		XTenant  string
@@ -72,7 +72,7 @@ func (c *whoAmIController) WhoAmI(w http.ResponseWriter, r *http.Request) {
 
 	output := Output{
 		Cookie:   *cookieSession,
-		Gateway:  *gatewaySession,
+		Tumbler:  *tumblerClaims,
 		Identity: *identity,
 		XUser:    r.Header.Get("X-User"),
 		XTenant:  r.Header.Get("X-Tenant"),

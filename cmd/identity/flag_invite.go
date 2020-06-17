@@ -8,8 +8,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/gateway"
 	"github.com/moov-io/identity/pkg/identity"
+	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
 func sendInvite(env identity.Environment) error {
@@ -36,9 +36,9 @@ func sendInvite(env identity.Environment) error {
 		return logCtx.Fatal().LogError("Is not a valid email: "+*fEmail, errors.New("email is required and isn't valid"))
 	}
 
-	session := gateway.Session{
-		CallerID: gateway.IdentityID(cID),
-		TenantID: gateway.TenantID(tID),
+	session := tmw.TumblerClaims{
+		IdentityID: cID,
+		TenantID:   tID,
 	}
 
 	invite := api.SendInvite{

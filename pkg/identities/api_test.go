@@ -211,7 +211,7 @@ func Test_DisableAPI(t *testing.T) {
 
 	a.Equal(s.time.Now(), *disabled.DisabledOn)
 	a.Equal(s.time.Now(), disabled.LastUpdatedOn)
-	a.Equal(s.session.CallerID.String(), *disabled.DisabledBy)
+	a.Equal(s.session.IdentityID.String(), *disabled.DisabledBy)
 }
 
 func Test_DisableAPI_NotFound(t *testing.T) {
