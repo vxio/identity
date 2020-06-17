@@ -14,7 +14,7 @@ require (
 	github.com/markbates/pkger v0.17.0
 	github.com/mattn/go-sqlite3 v2.0.6+incompatible
 	github.com/moov-io/base v0.11.0
-	github.com/moov-io/tumbler v0.0.0-20200617200000-2f0a3e26a521
+	github.com/moov-io/tumbler v0.0.0-20200617212523-2a85ad22d0a9
 	github.com/ory/dockertest/v3 v3.6.0
 	github.com/prometheus/client_golang v1.6.0
 	github.com/spf13/viper v1.7.0
