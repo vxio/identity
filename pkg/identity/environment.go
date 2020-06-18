@@ -26,137 +26,152 @@ import (
 
 // Environment - Contains everything thats been instantiated for this service.
 type Environment struct {
-	Logger logging.Logger
-	Config Config
+	Logger      logging.Logger
+	Config      *Config
+	TimeService *stime.TimeService
+
+	AuthnKeys   webkeys.WebKeysService
+	SessionKeys webkeys.WebKeysService
 
 	InviteService      api.InvitesApiServicer
-	IdentitiesService  identities.Service
-	CredentialsService credentials.CredentialsService
+	IdentitiesService  *identities.Service
+	CredentialsService *credentials.CredentialsService
 
-	PublicRouter mux.Router
+	PublicRouter *mux.Router
 
 	Shutdown func()
 }
 
 // NewEnvironment - Generates a new default environment. Overrides can be specified via configs.
-func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Environment, error) {
-	var config *Config
-	if configOverride != nil {
-		config = &configOverride.Identity
-	} else {
-		ConfigService := configpkg.NewConfigService(logger)
+func NewEnvironment(env *Environment) (*Environment, error) {
+	if env.Logger == nil {
+		env.Logger = logging.NewDefaultLogger()
+	}
+
+	if env.Config == nil {
+		ConfigService := configpkg.NewConfigService(env.Logger)
 
 		global := &GlobalConfig{}
 		if err := ConfigService.Load(global); err != nil {
 			return nil, err
 		}
 
-		config = &global.Identity
+		env.Config = &global.Identity
 	}
 
 	//db setup
-	db, close, err := initializeDatabase(logger, config.Database)
+	db, close, err := initializeDatabase(env.Logger, env.Config.Database)
 	if err != nil {
 		close()
 		return nil, err
 	}
 
-	TimeService := stime.NewSystemTimeService()
-
-	AuthnKeys, err := webkeys.NewWebKeysService(logger, config.Authentication.Keys)
-	if err != nil {
-		return nil, logger.Fatal().LogErrorF("Unable to load up the Authentication JSON Web Key Set - %w", err)
+	if env.TimeService == nil {
+		t := stime.NewSystemTimeService()
+		env.TimeService = &t
 	}
 
-	AuthnTokenService := jwe.NewJWEService(TimeService, time.Second, AuthnKeys)
-
-	SessionKeys, err := webkeys.NewWebKeysService(logger, config.Session.Keys)
-	if err != nil {
-		return nil, logger.Fatal().LogErrorF("Unable to load up up the Session JSON Web Key Set - %w", err)
+	if env.AuthnKeys == nil {
+		ak, err := webkeys.NewWebKeysService(env.Logger, env.Config.Authentication.Keys)
+		if err != nil {
+			return nil, env.Logger.Fatal().LogErrorF("Unable to load up the Authentication JSON Web Key Set - %w", err)
+		}
+		env.AuthnKeys = ak
 	}
 
-	SessionJwe := jwe.NewJWEService(TimeService, config.Session.Expiration, SessionKeys)
+	AuthnTokenService := jwe.NewJWEService(*env.TimeService, time.Second, env.AuthnKeys)
 
-	SessionService := session.NewSessionService(TimeService, SessionJwe, config.Session)
-
-	templateService, err := notifications.NewTemplateRepository(logger)
-	if err != nil {
-		return nil, err
+	if env.SessionKeys == nil {
+		SessionKeys, err := webkeys.NewWebKeysService(env.Logger, env.Config.Session.Keys)
+		if err != nil {
+			return nil, env.Logger.Fatal().LogErrorF("Unable to load up up the Session JSON Web Key Set - %w", err)
+		}
+		env.SessionKeys = SessionKeys
 	}
 
-	NotificationsService, err := notifications.NewNotificationsService(logger, config.Notifications, templateService)
-	if err != nil {
-		return nil, err
-	}
+	SessionJwe := jwe.NewJWEService(*env.TimeService, env.Config.Session.Expiration, env.SessionKeys)
 
-	IdentityRepository := identities.NewIdentityRepository(db)
-	IdentitiesService := identities.NewIdentitiesService(TimeService, IdentityRepository)
+	SessionService := session.NewSessionService(*env.TimeService, SessionJwe, env.Config.Session)
 
-	CredentialRepository := credentials.NewCredentialRepository(db)
-	CredentialsService := credentials.NewCredentialsService(TimeService, CredentialRepository)
-
-	InvitesRepository := invites.NewInvitesRepository(db)
-	InvitesService, err := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService)
+	templateService, err := notifications.NewTemplateRepository(env.Logger)
 	if err != nil {
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(logger, *CredentialsService, *IdentitiesService, SessionService, InvitesService, config.Authentication.LandingURL)
+	NotificationsService, err := notifications.NewNotificationsService(env.Logger, env.Config.Notifications, templateService)
+	if err != nil {
+		return nil, err
+	}
+
+	if env.IdentitiesService == nil {
+		IdentityRepository := identities.NewIdentityRepository(db)
+		IdentitiesService := identities.NewIdentitiesService(*env.TimeService, IdentityRepository)
+		env.IdentitiesService = IdentitiesService
+	}
+
+	if env.CredentialsService == nil {
+		CredentialRepository := credentials.NewCredentialRepository(db)
+		CredentialsService := credentials.NewCredentialsService(*env.TimeService, CredentialRepository)
+		env.CredentialsService = CredentialsService
+	}
+
+	if env.InviteService == nil {
+		InvitesRepository := invites.NewInvitesRepository(db)
+		InvitesService, err := invites.NewInvitesService(env.Config.Invites, *env.TimeService, InvitesRepository, NotificationsService)
+		if err != nil {
+			return nil, err
+		}
+
+		env.InviteService = InvitesService
+	}
+
+	AuthnService := authn.NewAuthnService(env.Logger, *env.CredentialsService, *env.IdentitiesService, SessionService, env.InviteService, env.Config.Authentication.LandingURL)
 
 	// router
-	router := mux.NewRouter()
+	if env.PublicRouter == nil {
+		env.PublicRouter = mux.NewRouter()
+	}
 
 	// public endpoint
-	jwksController := webkeys.NewJWKSController(SessionKeys)
-	jwksRouter := router.NewRoute().Subrouter()
+	jwksController := webkeys.NewJWKSController(env.SessionKeys)
+	jwksRouter := env.PublicRouter.NewRoute().Subrouter()
 	jwksController.AppendRoutes(jwksRouter)
 
 	// authn endpoints
 
-	AuthnMiddleware, err := authn.NewMiddleware(logger, TimeService, AuthnTokenService)
+	AuthnMiddleware, err := authn.NewMiddleware(env.Logger, *env.TimeService, AuthnTokenService)
 	if err != nil {
-		return nil, logger.Fatal().LogErrorF("Can't startup the Authn middleware - %w", err)
+		return nil, env.Logger.Fatal().LogErrorF("Can't startup the Authn middleware - %w", err)
 	}
 
-	AuthnController := authn.NewAuthnAPIController(logger, AuthnService)
+	AuthnController := authn.NewAuthnAPIController(env.Logger, AuthnService)
 
-	authnRouter := router.NewRoute().Subrouter()
-	authnRouter = api.AppendRouters(logger, authnRouter, AuthnController)
+	authnRouter := env.PublicRouter.NewRoute().Subrouter()
+	authnRouter = api.AppendRouters(env.Logger, authnRouter, AuthnController)
 	authnRouter.Use(AuthnMiddleware.Handler)
 
 	// authed server
 
 	// auth middleware for the tokens coming from the gateway
-	GatewayMiddleware, err := tmw.NewTumblerMiddlewareFromConfig(logger, TimeService, config.Gateway) //gateway.NewMiddleware(logger, TimeService, GatewayPublicKeys)
+	GatewayMiddleware, err := tmw.NewTumblerMiddlewareFromConfig(env.Logger, *env.TimeService, env.Config.Gateway)
 	if err != nil {
-		return nil, logger.Fatal().LogErrorF("Can't startup the Gateway middleware - %w", err)
+		return nil, env.Logger.Fatal().LogErrorF("Can't startup the Gateway middleware - %w", err)
 	}
 
-	WhoAmIController := session.NewWhoAmIController(logger, SessionService, *IdentitiesService)
-	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
-	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
-	InvitesController := invites.NewInvitesController(InvitesService)
+	WhoAmIController := session.NewWhoAmIController(env.Logger, SessionService, *env.IdentitiesService)
+	IdentitiesController := identities.NewIdentitiesController(env.IdentitiesService)
+	CredentialsController := credentials.NewCredentialsApiController(env.CredentialsService)
+	InvitesController := invites.NewInvitesController(env.InviteService)
 
-	authedRouter := router.NewRoute().Subrouter()
-	authedRouter = api.AppendRouters(logger, authedRouter, IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
+	authedRouter := env.PublicRouter.NewRoute().Subrouter()
+	authedRouter = api.AppendRouters(env.Logger, authedRouter, IdentitiesController, CredentialsController, InvitesController, WhoAmIController)
 	authedRouter.Use(GatewayMiddleware.Handler)
 
-	env := Environment{
-		Logger: logger,
-		Config: *config,
-
-		InviteService:      InvitesService,
-		IdentitiesService:  *IdentitiesService,
-		CredentialsService: *CredentialsService,
-
-		PublicRouter: *router,
-
-		Shutdown: func() {
-			close()
-		},
+	env.Shutdown = func() {
+		close()
 	}
 
-	return &env, nil
+	return env, nil
 }
 
 func initializeDatabase(logger logging.Logger, config database.DatabaseConfig) (*sql.DB, func(), error) {

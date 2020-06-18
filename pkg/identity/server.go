@@ -25,7 +25,7 @@ func (env *Environment) RunServers(await bool) func() {
 
 	adminServer := bootAdminServer(terminationListener, env.Logger, env.Config.Servers.Admin)
 
-	_, shutdownPublicServer := bootHTTPServer("public", &env.PublicRouter, terminationListener, env.Logger, env.Config.Servers.Public)
+	_, shutdownPublicServer := bootHTTPServer("public", env.PublicRouter, terminationListener, env.Logger, env.Config.Servers.Public)
 
 	if await {
 		awaitTermination(env.Logger, terminationListener)

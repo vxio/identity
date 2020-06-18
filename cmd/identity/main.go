@@ -17,11 +17,13 @@ var (
 )
 
 func main() {
-	logger := logging.NewDefaultLogger().WithKeyValue("app", "identity")
+	env := &identity.Environment{
+		Logger: logging.NewDefaultLogger().WithKeyValue("app", "identity"),
+	}
 
-	env, err := identity.NewEnvironment(logger, nil)
+	env, err := identity.NewEnvironment(env)
 	if err != nil {
-		logger.Fatal().LogError("Error loading up environment.", err)
+		env.Logger.Fatal().LogError("Error loading up environment.", err)
 		os.Exit(1)
 	}
 	defer env.Shutdown()
