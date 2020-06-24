@@ -308,6 +308,7 @@ github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJ
 github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/moov-io/authn v0.0.0-20200617215513-66004d37afbf/go.mod h1:V1B1hPjcF1qgt7SmDGwX1DKv7JdVUAaON7ToDVbaU0A=
+github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757 h1:sWetZ+V8cnxCuylHBDAqI0/4kPoyKfxI8Vna66/RQq8=
 github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757/go.mod h1:X5Cbe60BsdDXJIr8mwExQrc7giJdO3dCl0UXOHaEAHQ=
 github.com/moov-io/base v0.11.0/go.mod h1:jEkZukoSaJ4rDFoe00S5zuoLE+p3U3BEunSEPchgSbU=
 github.com/moov-io/identity v0.0.0-20200616225744-0dba4de79fed/go.mod h1:8cp+tvEWLT4l5+KaYAm39a54/Eazk21x3+124QWm1cQ=
