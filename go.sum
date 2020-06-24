@@ -317,6 +317,7 @@ github.com/moov-io/identity v0.0.0-20200617222838-75f18c632b1b/go.mod h1:vht1Eqh
 github.com/moov-io/tumbler v0.0.0-20200617212523-2a85ad22d0a9/go.mod h1:NmMeFW5pxs9+UXWRdykFOBq0vywh1s//VPzReT72W0s=
 github.com/moov-io/tumbler v0.0.0-20200617215154-5dcc2086b159/go.mod h1:DygEzjd1S/5WoTOYhDyP3tqXQNae/yRx4Vywy20oA9g=
 github.com/moov-io/tumbler v0.0.0-20200617223608-90d44979500f/go.mod h1:DygEzjd1S/5WoTOYhDyP3tqXQNae/yRx4Vywy20oA9g=
+github.com/moov-io/tumbler v0.0.0-20200624142544-e34edfe5e2b4 h1:JSCsh+l5jrh2p8UEn1Ihzf6LiARx5qIDKqEVZehuXIk=
 github.com/moov-io/tumbler v0.0.0-20200624142544-e34edfe5e2b4/go.mod h1:yy5fEWtKoxxfh8KCewMHLJ+V1kWXEIPzFLt/h5zVTsc=
 github.com/morikuni/aec v1.0.0/go.mod h1:BbKIizmSmc5MMPqRYbxO4ZU0S0+P200+tUnFx7PXmsc=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
