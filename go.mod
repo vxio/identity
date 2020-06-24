@@ -13,9 +13,9 @@ require (
 	github.com/gorilla/mux v1.7.4
 	github.com/markbates/pkger v0.17.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/moov-io/authn v0.0.0-20200617215513-66004d37afbf
+	github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757
 	github.com/moov-io/base v0.11.0
-	github.com/moov-io/tumbler v0.0.0-20200617215154-5dcc2086b159
+	github.com/moov-io/tumbler v0.0.0-20200617223608-90d44979500f
 	github.com/ory/dockertest/v3 v3.6.0
 	github.com/prometheus/client_golang v1.6.0
 	github.com/spf13/viper v1.7.0
