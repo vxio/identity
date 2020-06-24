@@ -12,7 +12,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.4
 	github.com/markbates/pkger v0.17.0
-	github.com/mattn/go-sqlite3 v2.0.6+incompatible
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757
 	github.com/moov-io/base v0.11.0
 	github.com/moov-io/tumbler v0.0.0-20200624142544-e34edfe5e2b4
