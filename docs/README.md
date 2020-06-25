@@ -9,7 +9,7 @@ Identity is one of a trio of services that handle authentication in the system. 
 
 Once the identity has been authenticated or registered the user will be given a JWT that lasts for a period of time. This JWT is only usable on the domain they logged into and only from their same IP.
 
-Users are authenticated by a service like our `authn` providing a token to the browser that they authenticated with another provider. The authenticating service forwards the browser to either `/authenticated` or `/register` where the token is read and then the credentials within it are checked against what they registered their user.
+Users are authenticated by a service like [`authn`](https://github.com/moov-io/authn) by providing a token to the browser that they authenticated with against a OIDC provider. The authenticating service forwards the browser to either `/authenticated` or `/register` where the token is read and then the credentials within it are checked against what they registered their user.
 
 ## Invites
 
