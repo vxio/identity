@@ -7,7 +7,7 @@
 
 Identity is one of a trio of services that handle authentication in the system. Identities purpose is to manage the details of the user and finalize the authentication flow once they have verified the person logging in is a member of the system. 
 
-Once the identity has been authentication or registered the user will be given a JWT that lasts for a period of time. This JWT is only usuable on the domain they logged into and only from their same IP.
+Once the identity has been authenticated or registered the user will be given a JWT that lasts for a period of time. This JWT is only usable on the domain they logged into and only from their same IP.
 
 Users are authenticated by a service like our `authn` providing a token to the browser that they authenticated with another provider. The authenticating service forwards the browser to either `/authenticated` or `/register` where the token is read and then the credentials within it are checked against what they registered their user.
 
