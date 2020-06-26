@@ -1,6 +1,8 @@
 # Identity
 **[Purpose](README.md)** | **[Configuration](CONFIGURATION.md)** | **Running** | **[Client](../pkg/client/README.md)**
 
+--- 
+
 ## Running
 
 ### Getting Started

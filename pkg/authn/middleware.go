@@ -44,6 +44,14 @@ func (s *Middleware) Handler(h http.Handler) http.Handler {
 
 // FromRequest - Pulls out authenticationd details from the Request and calls Parse.
 func (s *Middleware) FromRequest(r *http.Request) (*LoginSession, error) {
+
+	// This is kind of a hack but we don't want the origin checking on a callback. So we're just going to set the correct value.
+	target, err := jwe.GetTarget(r)
+	r.Header.Set("Origin", target)
+	if err != nil {
+		return nil, err
+	}
+
 	cookie, err := GetAuthnCookie(r)
 	if err != nil {
 		return nil, s.log.Error().LogError("No session cookie found", err)
