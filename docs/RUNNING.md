@@ -13,6 +13,7 @@ Identity can be ran various ways via docker or running locally. However you will
 
 More tutorials to come on how to use this as other pieces required to handle authorization are in place!
 
+- [Auth Example](https://github.com/moov-io/auth-example)
 - [Using docker-compose](#local-development)
 - [Using our Docker image](#docker-image)
 

@@ -9,7 +9,7 @@ moov-io/identity
 
 Moov Identity is a RESTful API for managing users that can interact with the system. It handles the last piece of authentication converting an authentication session into an authenticated session that can be used for checking authorization.
 
-Docs: [docs](docs/README.md) | [api docs](https://moov-io.github.io/identity/) | [open api specification](api/identityapi.yml)
+Docs: [docs](docs/README.md) | [open api specification](api/identityapi.yml)
 
 ## Project Status
 
