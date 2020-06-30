@@ -11,6 +11,11 @@ jobs:
       fail-fast: false
     runs-on: self-hosted
     steps:
+      - name: Configure access to moov-io/identity
+        env:
+          TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: git config --global url."https://${TOKEN}@github.com/moov-io/identity".insteadOf "https://github.com/moov-io/identity"
+
       - name: Checkout repository
         uses: actions/checkout@v2
 
