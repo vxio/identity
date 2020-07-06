@@ -11,11 +11,6 @@ jobs:
       fail-fast: false
     runs-on: self-hosted
     steps:
-      - name: Configure access to moov-io/identity
-        env:
-          TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: git config --global url."https://${TOKEN}@github.com/moov-io/identity".insteadOf "https://github.com/moov-io/identity"
-
       - name: Checkout repository
         uses: actions/checkout@v2
 
@@ -24,7 +19,11 @@ jobs:
         with:
           languages: go
 
-      - run: make
+      - name: Install
+        run: make install
+
+      - name: Build
+        run: make
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
