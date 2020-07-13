@@ -1377,11 +1377,13 @@ components:
   securitySchemes:
     GatewayAuth:
       bearerFormat: JWT
-      description: JWT that comes from the gateway that validates against the gateways
-        public RSA key
+      description: |+
+          [JSON Web Tokens](https://en.wikipedia.org/wiki/JSON_Web_Token) (JWT) that come from the gateway to validates against a public RSA key. These are designed for automated access of our API endpoints and are valid for short durations (...).
       scheme: bearer
       type: http
     LoginAuth:
       in: cookie
       name: moov-login
       type: apiKey
+      description: |+
+        An HTTP cookie that is designed for browser workflows through `app.moov.io` which is a mirror of this API for our back-office dashbaord.
