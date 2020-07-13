@@ -2,7 +2,7 @@ moov-io/identity
 ===
 
 [![GoDoc](https://godoc.org/github.com/moov-io/identity?status.svg)](https://godoc.org/github.com/moov-io/identity)
-[![Build Status](https://travis-ci.com/moov-io/identity.svg?branch=master)](https://travis-ci.com/moov-io/identity)
+[![Build Status](https://github.com/moov-io/identity/workflows/Go/badge.svg)](https://github.com/moov-io/identity/actions)
 [![Coverage Status](https://codecov.io/gh/moov-io/identity/branch/master/graph/badge.svg)](https://codecov.io/gh/moov-io/identity)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/identity)](https://goreportcard.com/report/github.com/moov-io/identity)
 [![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/identity/master/LICENSE)
@@ -17,7 +17,7 @@ This project is currently under development and could introduce breaking changes
 
 ## Getting Started
 
-Read through the [project docs](docs/README.md) over here to get an understanding of the purpose of Identity and how to run it. 
+Read through the [project docs](docs/README.md) over here to get an understanding of the purpose of Identity and how to run it.
 
 ## Getting Help
 
