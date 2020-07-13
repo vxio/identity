@@ -247,68 +247,6 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
-
-  /identities/{identityID}/credentials:
-    get:
-      operationId: ListCredentials
-      summary: List the credentials this user has used.
-      tags:
-      - credentials
-      security:
-      - GatewayAuth: []
-      parameters:
-      - in: path
-        name: identityID
-        description: ID of the Identity to lookup
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-      responses:
-        '200':
-          description: List of credentials tied to this identity
-          content:
-            application/json:
-              schema:
-                type: array
-                maxItems: 300
-                items:
-                  $ref: '#/components/schemas/Credential'
-        '404':
-          description: IdentityID doesn't exist
-          $ref: '#/components/responses/Empty'
-        default:
-          $ref: '#/components/responses/Empty'
-
-  /identities/{identityID}/credentials/{credentialID}:
-    delete:
-      operationId: DisableCredentials
-      summary: Disables a credential so it can't be used anymore to login
-      tags:
-      - credentials
-      security:
-      - GatewayAuth: []
-      parameters:
-      - in: path
-        name: identityID
-        description: ID of the Identity for the credential
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-      - in: path
-        name: credentialID
-        description: ID of the credential to disable
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-      responses:
-        '204':
-          description: Credential was disabled
-        '404':
-          description: Credential was not found.
-          $ref: '#/components/responses/Empty'
-        default:
-          $ref: '#/components/responses/Empty'
-
 components:
   responses:
     Empty:
@@ -650,55 +588,6 @@ components:
           example: US
         validated: 
           type: boolean
-          
-    LastLogin:
-      description: |
-        Defines when and what credential was used for the last login
-      type: object
-      additionalProperties: false
-      properties:
-        credentialId:
-          $ref: '#/components/schemas/UUID'
-          readOnly: true
-        on:
-          $ref: '#/components/schemas/DateTime'
-          readOnly: true
-
-    Credential:
-      description: |
-        Description of a successful OpenID connect credential
-      type: object
-      additionalProperties: false
-      properties:
-        credentialID:
-          $ref: '#/components/schemas/UUID'
-          description: Unique identifier for this specific credential
-          readOnly: true
-        provider:
-          $ref: '#/components/schemas/Provider'
-          readOnly: true
-        subjectID:
-          $ref: '#/components/schemas/SubjectID'
-          readOnly: true
-        identityID:
-          $ref: '#/components/schemas/UUID'
-          readOnly: true
-        tenantID:
-          $ref: '#/components/schemas/UUID'
-        createdOn:
-          $ref: '#/components/schemas/DateTime'
-          readOnly: true
-        lastUsedOn:
-          $ref: '#/components/schemas/DateTime'
-          readOnly: true
-        disabledOn:
-          description: Describes when the user was removed.
-          readOnly: true
-          $ref: '#/components/schemas/OptionalDateTime'
-        disabledBy:
-          description: IdentityID of the user who disabled this user.
-          readOnly: true
-          $ref: '#/components/schemas/OptionalUUID'
 
     OFACSearch:
       type: object

@@ -33,8 +33,6 @@ All URIs are relative to *https://local.moov.io*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*CredentialsApi* | [**DisableCredentials**](docs/CredentialsApi.md#disablecredentials) | **Delete** /identities/{identityID}/credentials/{credentialID} | Disables a credential so it can&#39;t be used anymore to login
-*CredentialsApi* | [**ListCredentials**](docs/CredentialsApi.md#listcredentials) | **Get** /identities/{identityID}/credentials | List the credentials this user has used.
 *IdentitiesApi* | [**DisableIdentity**](docs/IdentitiesApi.md#disableidentity) | **Delete** /identities/{identityID} | Disable an identity. Its left around for historical reporting
 *IdentitiesApi* | [**GetIdentity**](docs/IdentitiesApi.md#getidentity) | **Get** /identities/{identityID} | List identities and associates userId
 *IdentitiesApi* | [**ListIdentities**](docs/IdentitiesApi.md#listidentities) | **Get** /identities | List identities and associates userId
@@ -49,10 +47,8 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [Address](docs/Address.md)
- - [Credential](docs/Credential.md)
  - [Identity](docs/Identity.md)
  - [Invite](docs/Invite.md)
- - [LastLogin](docs/LastLogin.md)
  - [LoggedIn](docs/LoggedIn.md)
  - [Login](docs/Login.md)
  - [OfacSearch](docs/OfacSearch.md)

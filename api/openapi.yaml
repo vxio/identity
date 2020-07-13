@@ -363,95 +363,7 @@ paths:
       - GatewayAuth: []
       summary: Update a specific Identity
       tags: [Identities]
-  /identities/{identityID}/credentials:
-    get:
-      operationId: ListCredentials
-      parameters:
-      - description: ID of the Identity to lookup
-        explode: false
-        in: path
-        name: identityID
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/Credential'
-                maxItems: 300
-                type: array
-          description: List of credentials tied to this identity
-        "404":
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-        default:
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-      security:
-      - GatewayAuth: []
-      summary: List the credentials this user has used.
-      tags: [Credentials]
-  /identities/{identityID}/credentials/{credentialID}:
-    delete:
-      operationId: DisableCredentials
-      parameters:
-      - description: ID of the Identity for the credential
-        explode: false
-        in: path
-        name: identityID
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-        style: simple
-      - description: ID of the credential to disable
-        explode: false
-        in: path
-        name: credentialID
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-        style: simple
-      responses:
-        "204":
-          description: Credential was disabled
-        "404":
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-        default:
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-      security:
-      - GatewayAuth: []
-      summary: Disables a credential so it can't be used anymore to login
-      tags: [Credentials]
+
 components:
   responses:
     Empty:
@@ -1180,6 +1092,8 @@ components:
       additionalProperties: false
       description: Request to register a user in the system
       example:
+        credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        inviteCode: inviteCode
         firstName: John
         lastName: Doe
         addresses:
@@ -1218,9 +1132,7 @@ components:
           postalCode: "50613"
           state: IA
           type: primary
-        provider: google
         nickName: nickName
-        inviteCode: inviteCode
         phones:
         - number: number
           type: home
@@ -1235,24 +1147,10 @@ components:
         middleName: Jimmy
         suffix: suffix
         birthDate: 2000-01-23T04:56:07.000+00:00
-        subjectID: aSDDfasd23Dfasdf
         email: john.doe@gmail.com
       properties:
-        provider:
-          description: OIDC provider that was used to handle authentication of this
-            user.
-          example: google
-          maxLength: 255
-          pattern: ^\w+$
-          readOnly: true
-          type: string
-        subjectID:
-          description: ID of the remote OIDC server gives to this identity
-          example: aSDDfasd23Dfasdf
-          maxLength: 255
-          pattern: ^[0-9a-zA-Z_-]+$
-          readOnly: true
-          type: string
+        credentialID:
+          $ref: '#/components/schemas/UUID'
         inviteCode:
           maxLength: 60
           pattern: ^w+$
