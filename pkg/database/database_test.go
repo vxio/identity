@@ -3,6 +3,8 @@ package database
 import (
 	"errors"
 	"testing"
+
+	"github.com/moov-io/base/docker"
 )
 
 func Test_NewAndMigration_SqlLite3(t *testing.T) {
@@ -14,6 +16,10 @@ func Test_NewAndMigration_SqlLite3(t *testing.T) {
 }
 
 func Test_NewAndMigration_MySql(t *testing.T) {
+	if !docker.Enabled() {
+		t.SkipNow()
+	}
+
 	config := DatabaseConfig{
 		DatabaseName: "identity",
 		MySql: &MySqlConfig{
