@@ -21,15 +21,15 @@ var (
 	_ _context.Context
 )
 
-// InternalApiService InternalApi service
-type InternalApiService service
+// AuthenticationApiService AuthenticationApi service
+type AuthenticationApiService service
 
 /*
 Authenticated Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint. 
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 @return LoggedIn
 */
-func (a *InternalApiService) Authenticated(ctx _context.Context) (LoggedIn, *_nethttp.Response, error) {
+func (a *AuthenticationApiService) Authenticated(ctx _context.Context) (LoggedIn, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -120,7 +120,7 @@ Register Returns the partially completed registration details that were pulled b
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 @return Register
 */
-func (a *InternalApiService) Register(ctx _context.Context) (Register, *_nethttp.Response, error) {
+func (a *AuthenticationApiService) Register(ctx _context.Context) (Register, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -202,7 +202,7 @@ RegisterWithCredentials Called when the user is registering for the first time. 
  * @param register Arguments needed register a user with OIDC credentials.
 @return LoggedIn
 */
-func (a *InternalApiService) RegisterWithCredentials(ctx _context.Context, register Register) (LoggedIn, *_nethttp.Response, error) {
+func (a *AuthenticationApiService) RegisterWithCredentials(ctx _context.Context, register Register) (LoggedIn, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}

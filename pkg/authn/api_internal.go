@@ -26,19 +26,19 @@ func (c *authnAPIController) Routes() api.Routes {
 		{
 			Name:        "Authenticated",
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "/authenticated",
+			Pattern:     "/authentication/authenticated",
 			HandlerFunc: c.Authenticated,
 		},
 		{
 			Name:        "Register",
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "/register",
+			Pattern:     "/authentication/register",
 			HandlerFunc: c.Register,
 		},
 		{
 			Name:        "SubmitRegistration",
 			Method:      strings.ToUpper("Post"),
-			Pattern:     "/register",
+			Pattern:     "/authentication/register",
 			HandlerFunc: c.SubmitRegistration,
 		},
 	}

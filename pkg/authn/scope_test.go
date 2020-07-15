@@ -68,8 +68,7 @@ func Setup(t *testing.T) Scope {
 	sessionJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, identityKeys)
 	token := sessionpkg.NewSessionService(stime, sessionJwe, sessionConfig)
 
-	authnConfig := authn.Config{LandingURL: "https://localhost/whoami"}
-	service := authn.NewAuthnService(logger, *creds, *identities, token, invites, authnConfig.LandingURL)
+	service := authn.NewAuthnService(logger, *creds, *identities, token, invites)
 
 	authnJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, webkeys.NewStaticJwksService(authnKeys))
 
@@ -100,7 +99,6 @@ func Setup(t *testing.T) Scope {
 		assert:        a,
 		fuzz:          f,
 		sessionConfig: sessionConfig,
-		authnConfig:   authnConfig,
 		session:       session,
 		stime:         stime,
 		logger:        logger,
@@ -115,7 +113,6 @@ type Scope struct {
 	assert        *require.Assertions
 	fuzz          *fuzz.Fuzzer
 	sessionConfig sessionpkg.Config
-	authnConfig   authn.Config
 	session       tmw.TumblerClaims
 	stime         stime.StaticTimeService
 	logger        log.Logger

@@ -23,7 +23,7 @@ func Test_Register(t *testing.T) {
 	ls.Scopes = []string{"register"}
 
 	c := s.NewClient(ls)
-	_, resp, err := c.InternalApi.RegisterWithCredentials(context.Background(), ls.Register)
+	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
 	s.assert.Equal(200, resp.StatusCode)
 	s.assert.Nil(err)
 }
@@ -38,7 +38,7 @@ func Test_Register_InvalidInviteCode(t *testing.T) {
 	ls.Scopes = []string{"register"}
 
 	c := s.NewClient(ls)
-	_, resp, err := c.InternalApi.RegisterWithCredentials(context.Background(), ls.Register)
+	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
 	s.assert.NotNil(err)
 	s.assert.Equal(400, resp.StatusCode)
 }
@@ -53,7 +53,7 @@ func Test_Register_Invalid_Scope(t *testing.T) {
 	ls.Scopes = []string{"badscope"}
 
 	c := s.NewClient(ls)
-	_, resp, err := c.InternalApi.RegisterWithCredentials(context.Background(), ls.Register)
+	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
 	s.assert.NotNil(err)
 	s.assert.Equal(404, resp.StatusCode)
 }
@@ -66,7 +66,7 @@ func Test_Login_Failed(t *testing.T) {
 	ls.Scopes = []string{"authenticate"}
 
 	c := s.NewClient(ls)
-	_, resp, err := c.InternalApi.Authenticated(context.Background())
+	_, resp, err := c.AuthenticationApi.Authenticated(context.Background())
 	s.assert.Equal(404, resp.StatusCode)
 	s.assert.NotNil(err)
 }
@@ -79,7 +79,7 @@ func Test_Login_Invalid_Scope(t *testing.T) {
 	ls.Scopes = []string{"badscope"}
 
 	c := s.NewClient(ls)
-	_, resp, err := c.InternalApi.Authenticated(context.Background())
+	_, resp, err := c.AuthenticationApi.Authenticated(context.Background())
 	s.assert.Equal(404, resp.StatusCode)
 	s.assert.NotNil(err)
 }
@@ -99,7 +99,7 @@ func Test_Login_Success(t *testing.T) {
 
 	// Test if we can login with it.
 	c := s.NewClient(loginSession)
-	_, resp, err := c.InternalApi.Authenticated(context.Background())
+	_, resp, err := c.AuthenticationApi.Authenticated(context.Background())
 	s.assert.Equal(200, resp.StatusCode)
 	s.assert.Nil(err)
 }

@@ -101,7 +101,7 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(logger, *CredentialsService, *IdentitiesService, SessionService, InvitesService, config.Authentication.LandingURL)
+	AuthnService := authn.NewAuthnService(logger, *CredentialsService, *IdentitiesService, SessionService, InvitesService)
 
 	// router
 	router := mux.NewRouter()

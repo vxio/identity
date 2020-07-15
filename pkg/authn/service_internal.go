@@ -18,7 +18,6 @@ type authnService struct {
 	identities  identities.Service
 	token       session.SessionService
 	invites     api.InvitesApiServicer
-	landingURL  string
 }
 
 // NewAuthnService - Creates a default service that handles the registration and login
@@ -28,7 +27,6 @@ func NewAuthnService(
 	identities identities.Service,
 	token session.SessionService,
 	invites api.InvitesApiServicer,
-	landingURL string,
 ) api.InternalApiServicer {
 	return &authnService{
 		log:         log,
@@ -36,7 +34,6 @@ func NewAuthnService(
 		identities:  identities,
 		token:       token,
 		invites:     invites,
-		landingURL:  landingURL,
 	}
 }
 
@@ -120,8 +117,4 @@ func (s *authnService) LoginWithCredentials(req *http.Request, login client.Logi
 	}
 
 	return cookie, nil
-}
-
-func (s *authnService) LandingURL() string {
-	return s.landingURL
 }
