@@ -27,7 +27,7 @@ func NewAuthnService(
 	identities identities.Service,
 	token session.SessionService,
 	invites api.InvitesApiServicer,
-) api.InternalApiServicer {
+) api.AuthenticationApiServicer {
 	return &authnService{
 		log:         log,
 		credentials: credentials,

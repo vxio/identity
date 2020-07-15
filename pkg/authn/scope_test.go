@@ -116,7 +116,7 @@ type Scope struct {
 	session       tmw.TumblerClaims
 	stime         stime.StaticTimeService
 	logger        log.Logger
-	service       api.InternalApiServicer
+	service       api.AuthenticationApiServicer
 	invites       api.InvitesApiServicer
 	authnJwe      jwe.JWEService
 	identityJwe   jwe.JWEService

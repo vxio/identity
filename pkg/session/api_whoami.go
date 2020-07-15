@@ -25,7 +25,7 @@ func NewWhoAmIController(log logging.Logger, service SessionService, identities 
 	}
 }
 
-// Routes returns all of the api route for the InternalApiController
+// Routes returns all of the api route for the AuthenticationApiController
 func (c *whoAmIController) Routes() api.Routes {
 	return api.Routes{
 		{
