@@ -67,8 +67,7 @@ func Setup(t *testing.T) (*require.Assertions, Scope) {
 
 func (s *Scope) RegisterRandom() (*api.Credential, error) {
 	identityID := uuid.New().String()
-	provider := "moovtest"
-	subjectID := uuid.New().String()
+	credentialID := uuid.New().String()
 
-	return s.service.Register(identityID, provider, subjectID, s.session.TenantID.String())
+	return s.service.Register(identityID, credentialID, s.session.TenantID.String())
 }

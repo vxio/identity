@@ -10,7 +10,7 @@ import (
 
 type CredentialRepository interface {
 	list(identityID string, tenantID string) ([]api.Credential, error)
-	lookup(providerID string, subjectID string, tenantID string) (*api.Credential, error)
+	lookup(credentialID string, tenantID string) (*api.Credential, error)
 	get(identityID string, credentialID string, tenantID string) (*api.Credential, error)
 	add(credentials api.Credential) (*api.Credential, error)
 	update(updated api.Credential) (*api.Credential, error)
@@ -35,15 +35,15 @@ func (r *sqlCredsRepo) list(identityID string, tenantID string) ([]api.Credentia
 	return r.queryScan(qry, identityID, tenantID)
 }
 
-func (r *sqlCredsRepo) lookup(providerID string, subjectID string, tenantID string) (*api.Credential, error) {
+func (r *sqlCredsRepo) lookup(credentialID string, tenantID string) (*api.Credential, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM credentials
-		WHERE provider = ? AND subject_id = ? AND tenant_id = ?
+		WHERE credential_id = ? AND tenant_id = ?
 		LIMIT 1
 	`, credentialSelect)
 
-	results, err := r.queryScan(qry, providerID, subjectID, tenantID)
+	results, err := r.queryScan(qry, credentialID, tenantID)
 	if err != nil {
 		return nil, err
 	}
@@ -80,20 +80,16 @@ func (r *sqlCredsRepo) add(credentials api.Credential) (*api.Credential, error) 
 		INSERT INTO credentials(
 			credential_id, 
 			tenant_id,
-			provider, 
-			subject_id, 
 			identity_id,
 			created_on, 
 			last_used_on, 
 			disabled_on, 
 			disabled_by
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+		) VALUES (?, ?, ?, ?, ?, ?, ?)
 	`
 	res, err := r.db.Exec(qry,
 		credentials.CredentialID,
 		credentials.TenantID,
-		credentials.Provider,
-		credentials.SubjectID,
 		credentials.IdentityID,
 		credentials.CreatedOn,
 		credentials.LastUsedOn,
@@ -149,8 +145,6 @@ func (r *sqlCredsRepo) update(updated api.Credential) (*api.Credential, error) {
 			disabled_by = ?
 		WHERE
 			credential_id = ? AND
-			provider = ? AND
-			subject_id = ? AND
 			identity_id = ? AND
 			tenant_id = ?
 	`
@@ -160,8 +154,6 @@ func (r *sqlCredsRepo) update(updated api.Credential) (*api.Credential, error) {
 		updated.DisabledBy,
 
 		updated.CredentialID,
-		updated.Provider,
-		updated.SubjectID,
 		updated.IdentityID,
 		updated.TenantID)
 
@@ -175,8 +167,6 @@ func (r *sqlCredsRepo) update(updated api.Credential) (*api.Credential, error) {
 var credentialSelect = `
 	credential_id, 
 	tenant_id, 
-	provider, 
-	subject_id, 
 	identity_id, 
 	created_on, 
 	last_used_on, 
@@ -194,7 +184,7 @@ func (r *sqlCredsRepo) queryScan(query string, args ...interface{}) ([]api.Crede
 	credentials := []api.Credential{}
 	for rows.Next() {
 		cred := api.Credential{}
-		if err := rows.Scan(&cred.CredentialID, &cred.TenantID, &cred.Provider, &cred.SubjectID, &cred.IdentityID, &cred.CreatedOn, &cred.LastUsedOn, &cred.DisabledOn, &cred.DisabledBy); err != nil {
+		if err := rows.Scan(&cred.CredentialID, &cred.TenantID, &cred.IdentityID, &cred.CreatedOn, &cred.LastUsedOn, &cred.DisabledOn, &cred.DisabledBy); err != nil {
 			return nil, err
 		}
 

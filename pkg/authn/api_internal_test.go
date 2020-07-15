@@ -66,8 +66,7 @@ func Test_Login_Success(t *testing.T) {
 	f.Fuzz(&loginSession)
 
 	// These are the values that have to match up to what was registered.
-	loginSession.Provider = registerSession.Provider
-	loginSession.SubjectID = registerSession.SubjectID
+	loginSession.CredentialID = registerSession.CredentialID
 	loginSession.TenantID = registerSession.TenantID
 
 	// Test if we can login with it.

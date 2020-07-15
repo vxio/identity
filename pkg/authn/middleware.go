@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/tumbler/pkg/jwe"
@@ -62,6 +63,16 @@ func (s *Middleware) FromRequest(r *http.Request) (*LoginSession, error) {
 	if err != nil {
 		return nil, s.log.Error().LogErrorF("Session token parse failure - %w", err)
 	}
+
+	_, err = uuid.Parse(session.CredentialID)
+	if err != nil {
+		return nil, s.log.Error().LogErrorF("credentialID invalid - %w", err)
+	}
+
+	// _, err = uuid.Parse(session.TenantID)
+	// if err != nil {
+	// 	return nil, s.log.Error().LogErrorF("identityID invalid - %w", err)
+	// }
 
 	return &session, nil
 }

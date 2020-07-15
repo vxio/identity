@@ -1024,34 +1024,17 @@ components:
       example:
         lastUsedOn: 2000-01-23T04:56:07.000+00:00
         disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        provider: google
         identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         disabledOn: 2000-01-23T04:56:07.000+00:00
         createdOn: 2000-01-23T04:56:07.000+00:00
-        subjectID: aSDDfasd23Dfasdf
       properties:
         credentialID:
           description: UUID v4
           format: uuid
           maxLength: 36
           pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
-          type: string
-        provider:
-          description: OIDC provider that was used to handle authentication of this
-            user.
-          example: google
-          maxLength: 255
-          pattern: ^\w+$
-          readOnly: true
-          type: string
-        subjectID:
-          description: ID of the remote OIDC server gives to this identity
-          example: aSDDfasd23Dfasdf
-          maxLength: 255
-          pattern: ^[0-9a-zA-Z_-]+$
-          readOnly: true
           type: string
         identityID:
           description: UUID v4
@@ -1219,20 +1202,11 @@ components:
       description: |
         User has authenticated with an OIDC now to verify the system can find them. This verifies theirs stored credentials for a user that match the arguments
       properties:
-        provider:
-          description: OIDC provider that was used to handle authentication of this
-            user.
-          example: google
-          maxLength: 255
-          pattern: ^\w+$
-          readOnly: true
-          type: string
-        subjectID:
-          description: ID of the remote OIDC server gives to this identity
-          example: aSDDfasd23Dfasdf
-          maxLength: 255
-          pattern: ^[0-9a-zA-Z_-]+$
-          readOnly: true
+        credentialID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
         tenantID:
           description: UUID v4
@@ -1257,6 +1231,7 @@ components:
       additionalProperties: false
       description: Request to register a user in the system
       example:
+        firstName: John
         lastName: Doe
         addresses:
         - country: US
@@ -1295,6 +1270,9 @@ components:
           state: IA
           type: primary
         nickName: nickName
+        inviteCode: inviteCode
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         phones:
         - number: number
           type: home
@@ -1306,30 +1284,16 @@ components:
           type: home
         - number: number
           type: home
+        middleName: Jimmy
         suffix: suffix
         birthDate: 2000-01-23T04:56:07.000+00:00
-        subjectID: aSDDfasd23Dfasdf
-        firstName: John
-        provider: google
-        inviteCode: inviteCode
-        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        middleName: Jimmy
         email: john.doe@gmail.com
       properties:
-        provider:
-          description: OIDC provider that was used to handle authentication of this
-            user.
-          example: google
-          maxLength: 255
-          pattern: ^\w+$
-          readOnly: true
-          type: string
-        subjectID:
-          description: ID of the remote OIDC server gives to this identity
-          example: aSDDfasd23Dfasdf
-          maxLength: 255
-          pattern: ^[0-9a-zA-Z_-]+$
-          readOnly: true
+        credentialID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
         tenantID:
           description: UUID v4

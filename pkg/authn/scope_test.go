@@ -89,10 +89,9 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 			}
 
 			e.Register = client.Register{
-				Provider:   c.RandString(),
-				SubjectID:  uuid.New().String(),
-				InviteCode: c.RandString(),
-				Email:      c.RandString() + "@moovtest.io",
+				CredentialID: uuid.New().String(),
+				InviteCode:   c.RandString(),
+				Email:        c.RandString() + "@moovtest.io",
 			}
 		},
 	)

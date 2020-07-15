@@ -356,8 +356,6 @@ github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3Rllmb
 github.com/moov-io/authn v0.0.0-20200617215513-66004d37afbf/go.mod h1:V1B1hPjcF1qgt7SmDGwX1DKv7JdVUAaON7ToDVbaU0A=
 github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757 h1:sWetZ+V8cnxCuylHBDAqI0/4kPoyKfxI8Vna66/RQq8=
 github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757/go.mod h1:X5Cbe60BsdDXJIr8mwExQrc7giJdO3dCl0UXOHaEAHQ=
-github.com/moov-io/authn v0.0.0-20200629175015-7e19867b3b33 h1:071gHbWKEtT9TGz+WC1nzLI4ko9tW6/OvwdSjrMGERs=
-github.com/moov-io/authn v0.0.0-20200629175015-7e19867b3b33/go.mod h1:X5Cbe60BsdDXJIr8mwExQrc7giJdO3dCl0UXOHaEAHQ=
 github.com/moov-io/authn v0.0.0-20200702173859-0575c2c0dcb5 h1:k5Lw8/6Qp8Gm5r6WLqAr6n6dezsyB01YZxpQp2hMapk=
 github.com/moov-io/authn v0.0.0-20200702173859-0575c2c0dcb5/go.mod h1:6ojOGG2NjByRcs6lRXs47MOCasanEDS26CqA95tjlEw=
 github.com/moov-io/base v0.11.0 h1:1dhI8qsIxsUjMmbzE52ycyy2S1z3DGUN6swGYjSmOLs=

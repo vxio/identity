@@ -133,8 +133,7 @@ func NewFuzzer() *fuzz.Fuzzer {
 		},
 
 		func(e *api.Register, c fuzz.Continue) {
-			e.Provider = "moovtest"
-			e.SubjectID = uuid.New().String()
+			e.CredentialID = uuid.New().String()
 
 			e.InviteCode = c.RandString()
 			e.FirstName = c.RandString()

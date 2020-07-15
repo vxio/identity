@@ -1,7 +1,6 @@
 package credentials
 
 import (
-	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/stime"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
@@ -52,7 +51,7 @@ func (s *CredentialsService) ListCredentials(auth tmw.TumblerClaims, identityID 
 
 func (s *CredentialsService) Login(login api.Login, nonce string, ip string) (*api.Credential, error) {
 	// look into the repo for any matches
-	cred, err := s.repository.lookup(login.Provider, login.SubjectID, login.TenantID)
+	cred, err := s.repository.lookup(login.CredentialID, login.TenantID)
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +74,9 @@ func (s *CredentialsService) Login(login api.Login, nonce string, ip string) (*a
 	return saved, nil
 }
 
-func (s *CredentialsService) Register(identityID string, provider string, subjectID string, tenantID string) (*api.Credential, error) {
+func (s *CredentialsService) Register(identityID string, credentialID, tenantID string) (*api.Credential, error) {
 	cred := api.Credential{
-		CredentialID: uuid.New().String(),
-		Provider:     provider,
-		SubjectID:    subjectID,
+		CredentialID: credentialID,
 		IdentityID:   identityID,
 		TenantID:     tenantID,
 		CreatedOn:    s.time.Now(),

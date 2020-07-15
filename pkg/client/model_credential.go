@@ -15,10 +15,6 @@ import (
 type Credential struct {
 	// UUID v4
 	CredentialID string `json:"credentialID,omitempty"`
-	// OIDC provider that was used to handle authentication of this user.
-	Provider string `json:"provider,omitempty"`
-	// ID of the remote OIDC server gives to this identity
-	SubjectID string `json:"subjectID,omitempty"`
 	// UUID v4
 	IdentityID string `json:"identityID,omitempty"`
 	// UUID v4

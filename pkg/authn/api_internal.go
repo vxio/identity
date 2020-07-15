@@ -50,9 +50,8 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 		DeleteAuthnCookie(w)
 
 		login := api.Login{
-			Provider:  session.Provider,
-			SubjectID: session.SubjectID,
-			TenantID:  session.TenantID,
+			CredentialID: session.CredentialID,
+			TenantID:     session.TenantID,
 		}
 
 		result, err := c.service.LoginWithCredentials(r, login, session.State, session.IP)

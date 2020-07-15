@@ -10,10 +10,8 @@
 package client
 // Login User has authenticated with an OIDC now to verify the system can find them. This verifies theirs stored credentials for a user that match the arguments 
 type Login struct {
-	// OIDC provider that was used to handle authentication of this user.
-	Provider string `json:"provider,omitempty"`
-	// ID of the remote OIDC server gives to this identity
-	SubjectID string `json:"subjectID,omitempty"`
+	// UUID v4
+	CredentialID string `json:"credentialID,omitempty"`
 	// UUID v4
 	TenantID string `json:"tenantID,omitempty"`
 }

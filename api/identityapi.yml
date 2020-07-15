@@ -674,12 +674,6 @@ components:
           $ref: '#/components/schemas/UUID'
           description: Unique identifier for this specific credential
           readOnly: true
-        provider:
-          $ref: '#/components/schemas/Provider'
-          readOnly: true
-        subjectID:
-          $ref: '#/components/schemas/SubjectID'
-          readOnly: true
         identityID:
           $ref: '#/components/schemas/UUID'
           readOnly: true
@@ -807,12 +801,8 @@ components:
       type: object
       additionalProperties: false
       properties:
-        provider:
-          $ref: '#/components/schemas/Provider'
-          writeOnly: true
-        subjectID:
-          $ref: '#/components/schemas/SubjectID'
-          writeOnly: true
+        credentialID:
+          $ref: '#/components/schemas/UUID'
         tenantID:
           $ref: '#/components/schemas/UUID'
 
@@ -832,12 +822,8 @@ components:
       type: object
       additionalProperties: false
       properties:
-        provider:
-          $ref: '#/components/schemas/Provider'
-          writeOnly: true
-        subjectID:
-          $ref: '#/components/schemas/SubjectID'
-          writeOnly: true
+        credentialID:
+          $ref: '#/components/schemas/UUID'
         tenantID:
           $ref: '#/components/schemas/UUID'
         inviteCode:
