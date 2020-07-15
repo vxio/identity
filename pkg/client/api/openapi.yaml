@@ -151,6 +151,30 @@ paths:
       tags:
       - internal
   /register:
+    get:
+      operationId: Register
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+          description: User successfully registered, they can now log in
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - LoginAuth: []
+      summary: |
+        Returns the partially completed registration details that were pulled by AuthN service.
+      tags:
+      - internal
     post:
       operationId: RegisterWithCredentials
       requestBody:

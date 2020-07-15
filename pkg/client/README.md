@@ -40,6 +40,7 @@ Class | Method | HTTP request | Description
 *IdentitiesApi* | [**ListIdentities**](docs/IdentitiesApi.md#listidentities) | **Get** /identities | List identities and associates userId
 *IdentitiesApi* | [**UpdateIdentity**](docs/IdentitiesApi.md#updateidentity) | **Put** /identities/{identityID} | Update a specific Identity
 *InternalApi* | [**Authenticated**](docs/InternalApi.md#authenticated) | **Get** /authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint. 
+*InternalApi* | [**Register**](docs/InternalApi.md#register) | **Get** /register | Returns the partially completed registration details that were pulled by AuthN service. 
 *InternalApi* | [**RegisterWithCredentials**](docs/InternalApi.md#registerwithcredentials) | **Post** /register | Called when the user is registering for the first time. It requires that they have authenticated with a  supported OIDC provider and recieved a valid invite code. 
 *InvitesApi* | [**DisableInvite**](docs/InvitesApi.md#disableinvite) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
 *InvitesApi* | [**ListInvites**](docs/InvitesApi.md#listinvites) | **Get** /invites | List outstanding invites

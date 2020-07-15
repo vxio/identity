@@ -102,7 +102,7 @@ func newEndpoint(s Scope, run func(loginSession authn.LoginSession)) http.Handle
 	}
 
 	endpoint := mw.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authn.WithLoginSessionFromRequest(s.logger, w, r, func(loginSession authn.LoginSession) {
+		authn.WithLoginSessionFromRequest(s.logger, w, r, make([]string, 0), func(loginSession authn.LoginSession) {
 			run(loginSession)
 			w.WriteHeader(200)
 		})

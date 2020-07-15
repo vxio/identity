@@ -20,14 +20,12 @@ func Test_Register(t *testing.T) {
 	s.fuzz.Fuzz(&ls)
 	ls.TenantID = invite.TenantID
 	ls.InviteCode = code
+	ls.Scopes = []string{"register"}
 
 	c := s.NewClient(ls)
-	_, resp, _ := c.InternalApi.RegisterWithCredentials(context.Background(), ls.Register)
-	s.assert.Equal(302, resp.StatusCode)
-
-	redirectTo, err := resp.Location()
+	_, resp, err := c.InternalApi.RegisterWithCredentials(context.Background(), ls.Register)
+	s.assert.Equal(200, resp.StatusCode)
 	s.assert.Nil(err)
-	s.assert.Equal(redirectTo.String(), s.authnConfig.LandingURL)
 }
 
 func Test_Register_InvalidInviteCode(t *testing.T) {
@@ -37,6 +35,7 @@ func Test_Register_InvalidInviteCode(t *testing.T) {
 	s.fuzz.Fuzz(&ls)
 	ls.TenantID = s.session.TenantID.String()
 	ls.InviteCode = "doesnotexist"
+	ls.Scopes = []string{"register"}
 
 	c := s.NewClient(ls)
 	_, resp, err := c.InternalApi.RegisterWithCredentials(context.Background(), ls.Register)
@@ -44,11 +43,40 @@ func Test_Register_InvalidInviteCode(t *testing.T) {
 	s.assert.Equal(400, resp.StatusCode)
 }
 
+func Test_Register_Invalid_Scope(t *testing.T) {
+	s := Setup(t)
+
+	ls := LoginSession{}
+	s.fuzz.Fuzz(&ls)
+	ls.TenantID = s.session.TenantID.String()
+	ls.InviteCode = "doesnotexist"
+	ls.Scopes = []string{"badscope"}
+
+	c := s.NewClient(ls)
+	_, resp, err := c.InternalApi.RegisterWithCredentials(context.Background(), ls.Register)
+	s.assert.NotNil(err)
+	s.assert.Equal(404, resp.StatusCode)
+}
+
 func Test_Login_Failed(t *testing.T) {
 	s := Setup(t)
 
 	ls := LoginSession{}
 	s.fuzz.Fuzz(&ls)
+	ls.Scopes = []string{"authenticate"}
+
+	c := s.NewClient(ls)
+	_, resp, err := c.InternalApi.Authenticated(context.Background())
+	s.assert.Equal(404, resp.StatusCode)
+	s.assert.NotNil(err)
+}
+
+func Test_Login_Invalid_Scope(t *testing.T) {
+	s := Setup(t)
+
+	ls := LoginSession{}
+	s.fuzz.Fuzz(&ls)
+	ls.Scopes = []string{"badscope"}
 
 	c := s.NewClient(ls)
 	_, resp, err := c.InternalApi.Authenticated(context.Background())
@@ -67,12 +95,13 @@ func Test_Login_Success(t *testing.T) {
 	// These are the values that have to match up to what was registered.
 	loginSession.CredentialID = registerSession.CredentialID
 	loginSession.TenantID = registerSession.TenantID
+	loginSession.Scopes = []string{"authenticate"}
 
 	// Test if we can login with it.
 	c := s.NewClient(loginSession)
 	_, resp, err := c.InternalApi.Authenticated(context.Background())
-	s.assert.Equal(302, resp.StatusCode)
-	s.assert.NotNil(err)
+	s.assert.Equal(200, resp.StatusCode)
+	s.assert.Nil(err)
 }
 
 func RegisterRandomIdentity(s Scope) LoginSession {
@@ -91,6 +120,7 @@ func RegisterRandomIdentity(s Scope) LoginSession {
 	s.fuzz.Fuzz(&registerSession)
 	registerSession.TenantID = invite.TenantID
 	registerSession.InviteCode = code
+	registerSession.Scopes = []string{"register"}
 
 	_, err = s.service.RegisterWithCredentials(req, registerSession.Register, registerSession.State, registerSession.IP)
 	if err != nil {

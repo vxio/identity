@@ -107,6 +107,7 @@ func Setup(t *testing.T) Scope {
 		service:       service,
 		invites:       invites,
 		authnJwe:      authnJwe,
+		identityJwe:   sessionJwe,
 	}
 }
 
@@ -121,6 +122,7 @@ type Scope struct {
 	service       api.InternalApiServicer
 	invites       api.InvitesApiServicer
 	authnJwe      jwe.JWEService
+	identityJwe   jwe.JWEService
 }
 
 func (s *Scope) NewClient(loginSession authn.LoginSession) *client.APIClient {

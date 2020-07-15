@@ -50,6 +50,7 @@ func (s *CredentialsService) ListCredentials(auth tmw.TumblerClaims, identityID 
 }
 
 func (s *CredentialsService) Login(login api.Login, nonce string, ip string) (*api.Credential, error) {
+
 	// look into the repo for any matches
 	cred, err := s.repository.lookup(login.CredentialID, login.TenantID)
 	if err != nil {

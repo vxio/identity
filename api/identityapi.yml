@@ -112,6 +112,24 @@ paths:
           $ref: '#/components/responses/Empty'
 
   /register:
+    get:
+      operationId: Register
+      summary: |
+        Returns the partially completed registration details that were pulled by AuthN service.
+      security:
+      - LoginAuth: []
+      tags:
+      - internal
+      responses:
+        '200':
+          description: User successfully registered, they can now log in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+        default:
+          $ref: '#/components/responses/Empty'
+      
     post:
       operationId: RegisterWithCredentials
       summary: |

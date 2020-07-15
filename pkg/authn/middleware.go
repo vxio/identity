@@ -69,10 +69,5 @@ func (s *Middleware) FromRequest(r *http.Request) (*LoginSession, error) {
 		return nil, s.log.Error().LogErrorF("credentialID invalid - %w", err)
 	}
 
-	// _, err = uuid.Parse(session.TenantID)
-	// if err != nil {
-	// 	return nil, s.log.Error().LogErrorF("identityID invalid - %w", err)
-	// }
-
 	return &session, nil
 }
