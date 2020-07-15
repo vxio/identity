@@ -356,10 +356,8 @@ github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3Rllmb
 github.com/moov-io/authn v0.0.0-20200617215513-66004d37afbf/go.mod h1:V1B1hPjcF1qgt7SmDGwX1DKv7JdVUAaON7ToDVbaU0A=
 github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757 h1:sWetZ+V8cnxCuylHBDAqI0/4kPoyKfxI8Vna66/RQq8=
 github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757/go.mod h1:X5Cbe60BsdDXJIr8mwExQrc7giJdO3dCl0UXOHaEAHQ=
-github.com/moov-io/authn v0.0.0-20200629175015-7e19867b3b33 h1:071gHbWKEtT9TGz+WC1nzLI4ko9tW6/OvwdSjrMGERs=
-github.com/moov-io/authn v0.0.0-20200629175015-7e19867b3b33/go.mod h1:X5Cbe60BsdDXJIr8mwExQrc7giJdO3dCl0UXOHaEAHQ=
-github.com/moov-io/authn v0.0.0-20200702173859-0575c2c0dcb5 h1:k5Lw8/6Qp8Gm5r6WLqAr6n6dezsyB01YZxpQp2hMapk=
-github.com/moov-io/authn v0.0.0-20200702173859-0575c2c0dcb5/go.mod h1:6ojOGG2NjByRcs6lRXs47MOCasanEDS26CqA95tjlEw=
+github.com/moov-io/authn v0.0.0-20200709161736-a03007d9f67a h1:baMLufVa0jpDfSI3kCRXIDB1l9AUt63FYMAJxfS/rls=
+github.com/moov-io/authn v0.0.0-20200709161736-a03007d9f67a/go.mod h1:6ojOGG2NjByRcs6lRXs47MOCasanEDS26CqA95tjlEw=
 github.com/moov-io/base v0.11.0 h1:1dhI8qsIxsUjMmbzE52ycyy2S1z3DGUN6swGYjSmOLs=
 github.com/moov-io/base v0.11.0/go.mod h1:jEkZukoSaJ4rDFoe00S5zuoLE+p3U3BEunSEPchgSbU=
 github.com/moov-io/identity v0.0.0-20200616225744-0dba4de79fed/go.mod h1:8cp+tvEWLT4l5+KaYAm39a54/Eazk21x3+124QWm1cQ=
@@ -373,6 +371,8 @@ github.com/moov-io/tumbler v0.0.0-20200624142544-e34edfe5e2b4 h1:JSCsh+l5jrh2p8U
 github.com/moov-io/tumbler v0.0.0-20200624142544-e34edfe5e2b4/go.mod h1:yy5fEWtKoxxfh8KCewMHLJ+V1kWXEIPzFLt/h5zVTsc=
 github.com/moov-io/tumbler v0.0.0-20200702154909-c9a5dbdd4b59 h1:hb4fs1OUR2DmQnVGsNNsa4ZZyOuzdhBkFLYpJMv4gOs=
 github.com/moov-io/tumbler v0.0.0-20200702154909-c9a5dbdd4b59/go.mod h1:2oPTr8Ne5jVLFui5yGrP6K8bDFSfHALjtO9ZIQb+Phw=
+github.com/moov-io/tumbler v0.1.0 h1:Lmbd9Urlk6tFspnwP5gNYfV5Jb7glZd9W7uifOZ5xPw=
+github.com/moov-io/tumbler v0.1.0/go.mod h1:2oPTr8Ne5jVLFui5yGrP6K8bDFSfHALjtO9ZIQb+Phw=
 github.com/morikuni/aec v1.0.0 h1:nP9CBfwrvYnBRgY6qfDQkygYDmYwOilePFkwzv4dU8A=
 github.com/morikuni/aec v1.0.0/go.mod h1:BbKIizmSmc5MMPqRYbxO4ZU0S0+P200+tUnFx7PXmsc=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=

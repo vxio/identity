@@ -14,89 +14,85 @@ import (
 const Host = "http://local.moov.io"
 
 func Test_Handler(t *testing.T) {
-	a, s, f := Setup(t)
-
-	ls := authn.LoginSession{}
-	f.Fuzz(&ls)
+	s := Setup(t)
 
 	req, err := http.NewRequest("GET", Host+"/", strings.NewReader(""))
+	s.assert.Nil(err)
 	req.Header.Add("X-Forwarded-For", "1.2.3.4")
 	req.Header.Add("Origin", Host)
-	a.Nil(err)
-	req.AddCookie(s.Cookie(ls))
+
+	ls := s.AddSession(req, func(ls *authn.LoginSession) {})
 
 	endpoint := newEndpoint(s, func(loginSession authn.LoginSession) {
-		a.Equal(ls, loginSession)
+		s.assert.Equal(ls, loginSession)
 	})
 
 	recorder := httptest.NewRecorder()
 	endpoint.ServeHTTP(recorder, req)
 
-	a.Equal(200, recorder.Result().StatusCode)
+	s.assert.Equal(200, recorder.Result().StatusCode)
 }
 
 func Test_NoAuthnCookie(t *testing.T) {
-	a, s, _ := Setup(t)
+	s := Setup(t)
 
 	req, err := http.NewRequest("GET", Host+"/", strings.NewReader(""))
+	s.assert.Nil(err)
 	req.Header.Add("X-Forwarded-For", "1.2.3.4")
 	req.Header.Add("Origin", Host)
-	a.Nil(err)
 
 	endpoint := newEndpoint(s, func(_ authn.LoginSession) {
-		a.Fail("Should not have ran")
+		s.assert.Fail("Should not have ran")
 	})
 
 	recorder := httptest.NewRecorder()
 	endpoint.ServeHTTP(recorder, req)
 
-	a.Equal(404, recorder.Result().StatusCode)
+	s.assert.Equal(404, recorder.Result().StatusCode)
 }
 
 func Test_Expired(t *testing.T) {
-	a, s, f := Setup(t)
-
-	ls := authn.LoginSession{}
-	f.Fuzz(&ls)
-	ls.Expiry = jwt.NewNumericDate(s.stime.Now().Add(time.Hour * -1))
+	s := Setup(t)
 
 	req, err := http.NewRequest("GET", Host+"/", strings.NewReader(""))
+	s.assert.Nil(err)
 	req.Header.Add("X-Forwarded-For", "1.2.3.4")
 	req.Header.Add("Origin", Host)
-	a.Nil(err)
-	req.AddCookie(s.Cookie(ls))
+
+	s.AddSession(req, func(ls *authn.LoginSession) {
+		ls.Expiry = jwt.NewNumericDate(s.stime.Now().Add(time.Hour * -1))
+	})
 
 	endpoint := newEndpoint(s, func(loginSession authn.LoginSession) {
-		a.Fail("Should not have ran")
+		s.assert.Fail("Should not have ran")
 	})
 
 	recorder := httptest.NewRecorder()
 	endpoint.ServeHTTP(recorder, req)
 
-	a.Equal(404, recorder.Result().StatusCode)
+	s.assert.Equal(404, recorder.Result().StatusCode)
 }
 
 func Test_NotBefore(t *testing.T) {
-	a, s, f := Setup(t)
-
-	ls := authn.LoginSession{}
-	f.Fuzz(&ls)
-	ls.NotBefore = jwt.NewNumericDate(s.stime.Now().Add(time.Hour))
+	s := Setup(t)
 
 	req, err := http.NewRequest("GET", Host+"/", strings.NewReader(""))
+	s.assert.Nil(err)
 	req.Header.Add("X-Forwarded-For", "1.2.3.4")
 	req.Header.Add("Origin", Host)
-	a.Nil(err)
-	req.AddCookie(s.Cookie(ls))
+
+	s.AddSession(req, func(ls *authn.LoginSession) {
+		ls.NotBefore = jwt.NewNumericDate(s.stime.Now().Add(time.Hour))
+	})
 
 	endpoint := newEndpoint(s, func(loginSession authn.LoginSession) {
-		a.Fail("Should not have ran")
+		s.assert.Fail("Should not have ran")
 	})
 
 	recorder := httptest.NewRecorder()
 	endpoint.ServeHTTP(recorder, req)
 
-	a.Equal(404, recorder.Result().StatusCode)
+	s.assert.Equal(404, recorder.Result().StatusCode)
 }
 
 func newEndpoint(s Scope, run func(loginSession authn.LoginSession)) http.Handler {

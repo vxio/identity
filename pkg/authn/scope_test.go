@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/moov-io/identity/pkg/authn"
+	"github.com/moov-io/identity/pkg/authn"
 	log "github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/tumbler/pkg/jwe"
 	"github.com/square/go-jose/jwt"
@@ -35,7 +35,7 @@ import (
 var authnKeys, _ = keygen.GenerateKeys()
 var identityKeys, _ = webkeys.NewGenerateJwksService()
 
-func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
+func Setup(t *testing.T) Scope {
 	a := require.New(t)
 
 	logger := log.NewDefaultLogger()
@@ -68,13 +68,13 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	sessionJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, identityKeys)
 	token := sessionpkg.NewSessionService(stime, sessionJwe, sessionConfig)
 
-	authnConfig := Config{LandingURL: "https://localhost/whoami"}
-	service := NewAuthnService(logger, *creds, *identities, token, invites, authnConfig.LandingURL)
+	authnConfig := authn.Config{LandingURL: "https://localhost/whoami"}
+	service := authn.NewAuthnService(logger, *creds, *identities, token, invites, authnConfig.LandingURL)
 
 	authnJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, webkeys.NewStaticJwksService(authnKeys))
 
 	f := fuzz.New().Funcs(
-		func(e *LoginSession, c fuzz.Continue) {
+		func(e *authn.LoginSession, c fuzz.Continue) {
 			e.IP = "1.2.3.4"
 			e.State = c.RandString()
 
@@ -97,7 +97,9 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 		},
 	)
 
-	return a, Scope{
+	return Scope{
+		assert:        a,
+		fuzz:          f,
 		sessionConfig: sessionConfig,
 		authnConfig:   authnConfig,
 		session:       session,
@@ -106,12 +108,14 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 		service:       service,
 		invites:       invites,
 		authnJwe:      authnJwe,
-	}, f
+	}
 }
 
 type Scope struct {
+	assert        *require.Assertions
+	fuzz          *fuzz.Fuzzer
 	sessionConfig sessionpkg.Config
-	authnConfig   Config
+	authnConfig   authn.Config
 	session       tmw.TumblerClaims
 	stime         stime.StaticTimeService
 	logger        log.Logger
@@ -120,10 +124,10 @@ type Scope struct {
 	authnJwe      jwe.JWEService
 }
 
-func (s *Scope) NewClient(loginSession LoginSession) *client.APIClient {
+func (s *Scope) NewClient(loginSession authn.LoginSession) *client.APIClient {
 	testAuthnMiddleware := NewTestMiddleware(s.stime, loginSession)
 
-	controller := NewAuthnAPIController(s.logger, s.service)
+	controller := authn.NewAuthnAPIController(s.logger, s.service)
 
 	routes := mux.NewRouter()
 	api.AppendRouters(s.logger, routes, controller)
@@ -137,11 +141,11 @@ func (s *Scope) NewClient(loginSession LoginSession) *client.APIClient {
 // TestMiddleware - Handles injecting a session into a request for testing
 type TestMiddleware struct {
 	time    stime.TimeService
-	session LoginSession
+	session authn.LoginSession
 }
 
 // NewTestMiddleware - Generates a default Middleware that always injects the specified Session into the request
-func NewTestMiddleware(time stime.TimeService, session LoginSession) *TestMiddleware {
+func NewTestMiddleware(time stime.TimeService, session authn.LoginSession) *TestMiddleware {
 	return &TestMiddleware{
 		time:    time,
 		session: session,
@@ -152,13 +156,26 @@ func NewTestMiddleware(time stime.TimeService, session LoginSession) *TestMiddle
 func (s *TestMiddleware) Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Don't really like using this map of any objects in the context for this, but it seems how its done.
-		ctx := context.WithValue(r.Context(), LoginSessionContextKey, &s.session)
+		ctx := context.WithValue(r.Context(), authn.LoginSessionContextKey, &s.session)
 
 		h.ServeHTTP(w, r.Clone(ctx))
 	})
 }
 
-func (s *Scope) Cookie(session LoginSession) *http.Cookie {
+func (s *Scope) AddSession(req *http.Request, modify func(session *authn.LoginSession)) authn.LoginSession {
+	ls := authn.LoginSession{}
+	s.fuzz.Fuzz(&ls)
+	claims, err := s.authnJwe.Start(req)
+	s.assert.Nil(err)
+	ls.Claims = *claims
+
+	modify(&ls)
+
+	req.AddCookie(s.Cookie(ls))
+	return ls
+}
+
+func (s *Scope) Cookie(session authn.LoginSession) *http.Cookie {
 	tokenString, err := s.authnJwe.SerializeEncrypted(&session.Claims, &session)
 	if err != nil {
 		panic(err)
