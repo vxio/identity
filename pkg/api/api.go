@@ -24,10 +24,10 @@ type IdentitiesApiRouter interface {
 	UpdateIdentity(http.ResponseWriter, *http.Request)
 }
 
-// InternalApiRouter defines the required methods for binding the api requests to a responses for the InternalApi
-// The InternalApiRouter implementation should parse necessary information from the http request,
-// pass the data to a InternalApiServicer to perform the required actions, then write the service results to the http response.
-type InternalApiRouter interface {
+// AuthenticationApiRouter defines the required methods for binding the api requests to a responses for the AuthenticationApi
+// The AuthenticationApiRouter implementation should parse necessary information from the http request,
+// pass the data to a AuthenticationApiServicer to perform the required actions, then write the service results to the http response.
+type AuthenticationApiRouter interface {
 	LoginWithCredentials(http.ResponseWriter, *http.Request)
 	RegisterWithCredentials(http.ResponseWriter, *http.Request)
 }
@@ -61,14 +61,13 @@ type IdentitiesApiServicer interface {
 	UpdateIdentity(tmw.TumblerClaims, string, UpdateIdentity) (*Identity, error)
 }
 
-// InternalApiServicer defines the api actions for the InternalApi service
+// AuthenticationApiServicer defines the api actions for the AuthenticationApi service
 // This interface intended to stay up to date with the openapi yaml used to generate it,
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
-type InternalApiServicer interface {
+type AuthenticationApiServicer interface {
 	LoginWithCredentials(*http.Request, Login, string, string) (*http.Cookie, error)
 	RegisterWithCredentials(*http.Request, Register, string, string) (*http.Cookie, error)
-	LandingURL() string
 }
 
 // InvitesApiServicer defines the api actions for the InvitesApi service

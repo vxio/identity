@@ -12,6 +12,98 @@ servers:
 - description: Internal address of service
   url: https://identity.srvs.moov.local/
 paths:
+  /authentication/authenticated:
+    get:
+      operationId: Authenticated
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggedIn'
+          description: User successfully logged in.
+        "404":
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - LoginAuth: []
+      summary: |
+        Complete a login via a OIDC.
+        Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.
+      tags:
+      - authentication
+  /authentication/register:
+    get:
+      operationId: Register
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+          description: User successfully registered, they can now log in
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - LoginAuth: []
+      summary: |
+        Returns the partially completed registration details that were pulled by AuthN service.
+      tags:
+      - authentication
+    post:
+      operationId: RegisterWithCredentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+        description: Arguments needed register a user with OIDC credentials.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggedIn'
+          description: User successfully registered, they can now log in
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - LoginAuth: []
+      summary: "Called when the user is registering for the first time. It requires\
+        \ that they have authenticated with a \nsupported OIDC provider and recieved\
+        \ a valid invite code.\n"
+      tags:
+      - authentication
   /invites:
     get:
       operationId: ListInvites
@@ -115,74 +207,6 @@ paths:
       summary: Delete an invite that was sent and invalidate the token.
       tags:
       - invites
-  /authenticated:
-    get:
-      operationId: Authenticated
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggedIn'
-          description: User successfully logged in.
-        "404":
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-        default:
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-      security:
-      - LoginAuth: []
-      summary: |
-        Complete a login via a OIDC.
-        Once the OIDC client service has authenticated their identity the client service redirect to this endpoint.
-      tags:
-      - internal
-  /register:
-    post:
-      operationId: RegisterWithCredentials
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Register'
-        description: Arguments needed register a user with OIDC credentials.
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LoggedIn'
-          description: User successfully registered, they can now log in
-        default:
-          content:
-            text/plain:
-              schema:
-                maxLength: 0
-                pattern: //i
-                type: string
-          description: Empty response for unauthorized or any other returned http
-            status code
-      security:
-      - LoginAuth: []
-      summary: "Called when the user is registering for the first time. It requires\
-        \ that they have authenticated with a \nsupported OIDC provider and recieved\
-        \ a valid invite code.\n"
-      tags:
-      - internal
   /identities:
     get:
       operationId: ListIdentities
@@ -1024,34 +1048,17 @@ components:
       example:
         lastUsedOn: 2000-01-23T04:56:07.000+00:00
         disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        provider: google
         identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         disabledOn: 2000-01-23T04:56:07.000+00:00
         createdOn: 2000-01-23T04:56:07.000+00:00
-        subjectID: aSDDfasd23Dfasdf
       properties:
         credentialID:
           description: UUID v4
           format: uuid
           maxLength: 36
           pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
-          type: string
-        provider:
-          description: OIDC provider that was used to handle authentication of this
-            user.
-          example: google
-          maxLength: 255
-          pattern: ^\w+$
-          readOnly: true
-          type: string
-        subjectID:
-          description: ID of the remote OIDC server gives to this identity
-          example: aSDDfasd23Dfasdf
-          maxLength: 255
-          pattern: ^[0-9a-zA-Z_-]+$
-          readOnly: true
           type: string
         identityID:
           description: UUID v4
@@ -1219,20 +1226,11 @@ components:
       description: |
         User has authenticated with an OIDC now to verify the system can find them. This verifies theirs stored credentials for a user that match the arguments
       properties:
-        provider:
-          description: OIDC provider that was used to handle authentication of this
-            user.
-          example: google
-          maxLength: 255
-          pattern: ^\w+$
-          readOnly: true
-          type: string
-        subjectID:
-          description: ID of the remote OIDC server gives to this identity
-          example: aSDDfasd23Dfasdf
-          maxLength: 255
-          pattern: ^[0-9a-zA-Z_-]+$
-          readOnly: true
+        credentialID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
         tenantID:
           description: UUID v4
@@ -1257,6 +1255,7 @@ components:
       additionalProperties: false
       description: Request to register a user in the system
       example:
+        firstName: John
         lastName: Doe
         addresses:
         - country: US
@@ -1295,6 +1294,9 @@ components:
           state: IA
           type: primary
         nickName: nickName
+        inviteCode: inviteCode
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         phones:
         - number: number
           type: home
@@ -1306,30 +1308,16 @@ components:
           type: home
         - number: number
           type: home
+        middleName: Jimmy
         suffix: suffix
         birthDate: 2000-01-23T04:56:07.000+00:00
-        subjectID: aSDDfasd23Dfasdf
-        firstName: John
-        provider: google
-        inviteCode: inviteCode
-        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        middleName: Jimmy
         email: john.doe@gmail.com
       properties:
-        provider:
-          description: OIDC provider that was used to handle authentication of this
-            user.
-          example: google
-          maxLength: 255
-          pattern: ^\w+$
-          readOnly: true
-          type: string
-        subjectID:
-          description: ID of the remote OIDC server gives to this identity
-          example: aSDDfasd23Dfasdf
-          maxLength: 255
-          pattern: ^[0-9a-zA-Z_-]+$
-          readOnly: true
+        credentialID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
         tenantID:
           description: UUID v4

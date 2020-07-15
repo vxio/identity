@@ -5,6 +5,31 @@ import (
 	"testing"
 )
 
+func Test_NewAndMigration_SqlLite3(t *testing.T) {
+	_, close, err := NewAndMigrate(InMemorySqliteConfig, nil, nil)
+	if err != nil {
+		t.FailNow()
+	}
+	close()
+}
+
+func Test_NewAndMigration_MySql(t *testing.T) {
+	config := DatabaseConfig{
+		DatabaseName: "identity",
+		MySql: &MySqlConfig{
+			Address:  "tcp(localhost:4306)",
+			User:     "identity",
+			Password: "identity",
+		},
+	}
+
+	_, close, err := NewAndMigrate(config, nil, nil)
+	if err != nil {
+		t.FailNow()
+	}
+	close()
+}
+
 func TestUniqueViolation(t *testing.T) {
 	err := errors.New(`problem upserting depository="282f6ffcd9ba5b029afbf2b739ee826e22d9df3b", userId="f25f48968da47ef1adb5b6531a1c2197295678ce": Error 1062: Duplicate entry '282f6ffcd9ba5b029afbf2b739ee826e22d9df3b' for key 'PRIMARY'`)
 	if !UniqueViolation(err) {

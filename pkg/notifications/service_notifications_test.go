@@ -17,12 +17,13 @@ func Test_SMTP_SendInvite(t *testing.T) {
 
 	config := NotificationsConfig{
 		SMTP: &SMTPConfig{
-			Host: "localhost",
-			Port: 2025,
-			User: "test",
-			Pass: "test",
-			From: "noreply@moovtest.io",
-			SSL:  true,
+			Host:        "localhost",
+			Port:        2025,
+			User:        "test",
+			Pass:        "test",
+			From:        "noreply@moovtest.io",
+			SSL:         true,
+			InsecureSSL: true,
 		},
 	}
 

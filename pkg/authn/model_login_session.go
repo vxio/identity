@@ -39,10 +39,31 @@ func LoginSessionFromRequest(r *http.Request) (*LoginSession, error) {
 }
 
 // WithLoginSessionFromRequest - Pulls the Login Session out of the context of a request if its not available returns an error response on `w`.
-func WithLoginSessionFromRequest(l log.Logger, w http.ResponseWriter, r *http.Request, run func(LoginSession)) {
+func WithLoginSessionFromRequest(l log.Logger, w http.ResponseWriter, r *http.Request, scopes []string, run func(LoginSession)) {
 	session, err := LoginSessionFromRequest(r)
 	if err != nil {
 		l.Error().LogError("LoginSessionFromRequest errored", err)
+		w.WriteHeader(404)
+		return
+	}
+
+	hasAllScopes := true
+	for _, v := range scopes {
+		found := false
+		for _, s := range session.Scopes {
+			if v == s {
+				found = true
+				break
+			}
+		}
+		if !found {
+			hasAllScopes = false
+			break
+		}
+	}
+
+	if !hasAllScopes {
+		l.Error().LogError("LoginSessionFromRequest missing scopes", err)
 		w.WriteHeader(404)
 		return
 	}

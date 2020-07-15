@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/logging"
@@ -17,7 +18,6 @@ type authnService struct {
 	identities  identities.Service
 	token       session.SessionService
 	invites     api.InvitesApiServicer
-	landingURL  string
 }
 
 // NewAuthnService - Creates a default service that handles the registration and login
@@ -27,15 +27,13 @@ func NewAuthnService(
 	identities identities.Service,
 	token session.SessionService,
 	invites api.InvitesApiServicer,
-	landingURL string,
-) api.InternalApiServicer {
+) api.AuthenticationApiServicer {
 	return &authnService{
 		log:         log,
 		credentials: credentials,
 		identities:  identities,
 		token:       token,
 		invites:     invites,
-		landingURL:  landingURL,
 	}
 }
 
@@ -43,10 +41,10 @@ func NewAuthnService(
 func (s *authnService) RegisterWithCredentials(req *http.Request, register api.Register, nonce string, ip string) (*http.Cookie, error) {
 	logCtx := s.log.WithMap(map[string]string{
 		"tenant_id":         register.TenantID,
+		"credential_id":     register.CredentialID,
 		"email":             register.Email,
 		"invite_code_trunc": register.InviteCode[0:5],
 		"ip":                ip,
-		"provider":          register.Provider,
 	})
 
 	invite, err := s.invites.Redeem(register.InviteCode)
@@ -66,26 +64,27 @@ func (s *authnService) RegisterWithCredentials(req *http.Request, register api.R
 	}
 
 	// Register the credentials with the new Identity created.
-	creds, err := s.credentials.Register(identity.IdentityID, register.Provider, register.SubjectID, register.TenantID)
+	creds, err := s.credentials.Register(identity.IdentityID, register.CredentialID, register.TenantID)
 	if err != nil {
 		return nil, logCtx.Error().LogErrorF("Unable to register credential", err)
 	}
 
 	// Using the new creds create the login object to log the user in.
 	login := api.Login{
-		Provider:  creds.Provider,
-		SubjectID: creds.SubjectID,
-		TenantID:  identity.TenantID,
+		CredentialID: creds.CredentialID,
+		TenantID:     identity.TenantID,
 	}
 
 	return s.LoginWithCredentials(req, login, nonce, ip)
 }
 
 // LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service receives a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
-func (s *authnService) LoginWithCredentials(req *http.Request, login api.Login, nonce string, ip string) (*http.Cookie, error) {
-	logCtx := s.log.
-		With(api.NewLoginLogContext(&login)).
-		WithKeyValue("ip", ip)
+func (s *authnService) LoginWithCredentials(req *http.Request, login client.Login, nonce string, ip string) (*http.Cookie, error) {
+	logCtx := s.log.WithMap(map[string]string{
+		"tenant_id":     login.TenantID,
+		"credential_id": login.CredentialID,
+		"ip":            ip,
+	})
 
 	// check if they exist in the credentials service and if its enabled.
 	loggedIn, err := s.credentials.Login(login, nonce, ip)
@@ -118,8 +117,4 @@ func (s *authnService) LoginWithCredentials(req *http.Request, login api.Login, 
 	}
 
 	return cookie, nil
-}
-
-func (s *authnService) LandingURL() string {
-	return s.landingURL
 }

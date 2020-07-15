@@ -48,11 +48,11 @@ type APIClient struct {
 
 	// API Services
 
+	AuthenticationApi *AuthenticationApiService
+
 	CredentialsApi *CredentialsApiService
 
 	IdentitiesApi *IdentitiesApiService
-
-	InternalApi *InternalApiService
 
 	InvitesApi *InvitesApiService
 }
@@ -73,9 +73,9 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
+	c.AuthenticationApi = (*AuthenticationApiService)(&c.common)
 	c.CredentialsApi = (*CredentialsApiService)(&c.common)
 	c.IdentitiesApi = (*IdentitiesApiService)(&c.common)
-	c.InternalApi = (*InternalApiService)(&c.common)
 	c.InvitesApi = (*InvitesApiService)(&c.common)
 
 	return c

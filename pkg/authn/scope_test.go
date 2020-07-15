@@ -68,8 +68,7 @@ func Setup(t *testing.T) Scope {
 	sessionJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, identityKeys)
 	token := sessionpkg.NewSessionService(stime, sessionJwe, sessionConfig)
 
-	authnConfig := authn.Config{LandingURL: "https://localhost/whoami"}
-	service := authn.NewAuthnService(logger, *creds, *identities, token, invites, authnConfig.LandingURL)
+	service := authn.NewAuthnService(logger, *creds, *identities, token, invites)
 
 	authnJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, webkeys.NewStaticJwksService(authnKeys))
 
@@ -89,10 +88,9 @@ func Setup(t *testing.T) Scope {
 			}
 
 			e.Register = client.Register{
-				Provider:   c.RandString(),
-				SubjectID:  uuid.New().String(),
-				InviteCode: c.RandString(),
-				Email:      c.RandString() + "@moovtest.io",
+				CredentialID: uuid.New().String(),
+				InviteCode:   c.RandString(),
+				Email:        c.RandString() + "@moovtest.io",
 			}
 		},
 	)
@@ -101,13 +99,13 @@ func Setup(t *testing.T) Scope {
 		assert:        a,
 		fuzz:          f,
 		sessionConfig: sessionConfig,
-		authnConfig:   authnConfig,
 		session:       session,
 		stime:         stime,
 		logger:        logger,
 		service:       service,
 		invites:       invites,
 		authnJwe:      authnJwe,
+		identityJwe:   sessionJwe,
 	}
 }
 
@@ -115,13 +113,13 @@ type Scope struct {
 	assert        *require.Assertions
 	fuzz          *fuzz.Fuzzer
 	sessionConfig sessionpkg.Config
-	authnConfig   authn.Config
 	session       tmw.TumblerClaims
 	stime         stime.StaticTimeService
 	logger        log.Logger
-	service       api.InternalApiServicer
+	service       api.AuthenticationApiServicer
 	invites       api.InvitesApiServicer
 	authnJwe      jwe.JWEService
+	identityJwe   jwe.JWEService
 }
 
 func (s *Scope) NewClient(loginSession authn.LoginSession) *client.APIClient {
