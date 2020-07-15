@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/moov-io/identity/pkg/authn"
 	. "github.com/moov-io/identity/pkg/authn"
 	log "github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/tumbler/pkg/jwe"
@@ -35,7 +36,7 @@ import (
 var authnKeys, _ = keygen.GenerateKeys()
 var identityKeys, _ = webkeys.NewGenerateJwksService()
 
-func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
+func Setup(t *testing.T) Scope {
 	a := require.New(t)
 
 	logger := log.NewDefaultLogger()
@@ -97,7 +98,9 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 		},
 	)
 
-	return a, Scope{
+	return Scope{
+		assert:        a,
+		fuzz:          f,
 		sessionConfig: sessionConfig,
 		authnConfig:   authnConfig,
 		session:       session,
@@ -106,10 +109,12 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 		service:       service,
 		invites:       invites,
 		authnJwe:      authnJwe,
-	}, f
+	}
 }
 
 type Scope struct {
+	assert        *require.Assertions
+	fuzz          *fuzz.Fuzzer
 	sessionConfig sessionpkg.Config
 	authnConfig   Config
 	session       tmw.TumblerClaims
@@ -156,6 +161,19 @@ func (s *TestMiddleware) Handler(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, r.Clone(ctx))
 	})
+}
+
+func (s *Scope) AddSession(req *http.Request, modify func(session *authn.LoginSession)) authn.LoginSession {
+	ls := authn.LoginSession{}
+	s.fuzz.Fuzz(&ls)
+	claims, err := s.authnJwe.Start(req)
+	s.assert.Nil(err)
+	ls.Claims = *claims
+
+	modify(&ls)
+
+	req.AddCookie(s.Cookie(ls))
+	return ls
 }
 
 func (s *Scope) Cookie(session LoginSession) *http.Cookie {
