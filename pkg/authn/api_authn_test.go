@@ -20,7 +20,7 @@ func Test_Register(t *testing.T) {
 	s.fuzz.Fuzz(&ls)
 	ls.TenantID = invite.TenantID
 	ls.InviteCode = code
-	ls.Scopes = []string{"register"}
+	ls.Scopes = []string{"register", "finished"}
 
 	c := s.NewClient(ls)
 	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
@@ -35,7 +35,7 @@ func Test_Register_InvalidInviteCode(t *testing.T) {
 	s.fuzz.Fuzz(&ls)
 	ls.TenantID = s.session.TenantID.String()
 	ls.InviteCode = "doesnotexist"
-	ls.Scopes = []string{"register"}
+	ls.Scopes = []string{"register", "finished"}
 
 	c := s.NewClient(ls)
 	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
@@ -63,7 +63,7 @@ func Test_Login_Failed(t *testing.T) {
 
 	ls := LoginSession{}
 	s.fuzz.Fuzz(&ls)
-	ls.Scopes = []string{"authenticate"}
+	ls.Scopes = []string{"authenticate", "finished"}
 
 	c := s.NewClient(ls)
 	_, resp, err := c.AuthenticationApi.Authenticated(context.Background())
@@ -95,7 +95,7 @@ func Test_Login_Success(t *testing.T) {
 	// These are the values that have to match up to what was registered.
 	loginSession.CredentialID = registerSession.CredentialID
 	loginSession.TenantID = registerSession.TenantID
-	loginSession.Scopes = []string{"authenticate"}
+	loginSession.Scopes = []string{"authenticate", "finished"}
 
 	// Test if we can login with it.
 	c := s.NewClient(loginSession)

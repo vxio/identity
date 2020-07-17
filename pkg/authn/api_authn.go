@@ -46,7 +46,7 @@ func (c *authnAPIController) Routes() api.Routes {
 
 // Authenticated - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service receives a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
 func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Request) {
-	WithLoginSessionFromRequest(c.logger, w, r, []string{"authenticate"}, func(session LoginSession) {
+	WithLoginSessionFromRequest(c.logger, w, r, []string{"authenticate", "finished"}, func(session LoginSession) {
 		DeleteAuthnCookie(w)
 
 		login := api.Login{
@@ -80,7 +80,7 @@ func (c *authnAPIController) Register(w http.ResponseWriter, r *http.Request) {
 
 // SubmitRegistration - Finalizes the registration and handles all the user creation and first login
 func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.Request) {
-	WithLoginSessionFromRequest(c.logger, w, r, []string{"register"}, func(session LoginSession) {
+	WithLoginSessionFromRequest(c.logger, w, r, []string{"register", "finished"}, func(session LoginSession) {
 		registration := &api.Register{}
 		if err := json.NewDecoder(r.Body).Decode(&registration); err != nil {
 			w.WriteHeader(400)
