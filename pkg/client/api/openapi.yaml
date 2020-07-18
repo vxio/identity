@@ -88,6 +88,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoggedIn'
           description: User successfully registered, they can now log in
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterErrors'
+          description: Validation failure of the model passed in
         default:
           content:
             text/plain:
@@ -793,6 +799,7 @@ components:
           description: UUID v4
           format: uuid
           maxLength: 36
+          nullable: true
           pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
           type: string
       required:
@@ -1243,12 +1250,51 @@ components:
       additionalProperties: false
       description: User has logged in and is being given a token to proof identity
       example:
+        firstName: John
+        lastName: Doe
         jwt: jwt
+        identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        nickName: nickName
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
         jwt:
           description: JWT token that provides authentication of identity
           maxLength: 4000
           pattern: ^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$
+          type: string
+        credentialID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        tenantID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        identityID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        firstName:
+          example: John
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        lastName:
+          example: Doe
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        nickName:
+          maxLength: 255
+          nullable: true
+          pattern: ^\w+$
           type: string
       type: object
     Register:
@@ -1444,6 +1490,116 @@ components:
           maxLength: 2
           minLength: 2
           pattern: ^\w+$
+          type: string
+      type: object
+    ValidationError:
+      description: Descriptive reason for failing validation
+      nullable: true
+      readOnly: true
+      type: string
+    RegisterErrors:
+      additionalProperties: false
+      description: Request to register a user in the system
+      properties:
+        firstName:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        middleName:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        lastName:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        nickName:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        suffix:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        birthDate:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        email:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        phones:
+          items:
+            $ref: '#/components/schemas/RegisterPhoneErrors'
+          maxItems: 50
+          type: array
+        addresses:
+          items:
+            $ref: '#/components/schemas/RegisterAddressErrors'
+          maxItems: 50
+          type: array
+      type: object
+    RegisterPhoneErrors:
+      additionalProperties: false
+      description: Phone number
+      properties:
+        number:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        type:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+      type: object
+    RegisterAddressErrors:
+      additionalProperties: false
+      description: Address of the Identity
+      properties:
+        type:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        address1:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        address2:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        city:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        state:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        postalCode:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
+          type: string
+        country:
+          description: Descriptive reason for failing validation
+          nullable: true
+          readOnly: true
           type: string
       type: object
   securitySchemes:

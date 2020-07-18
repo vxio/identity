@@ -2,9 +2,12 @@ package authn
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	api "github.com/moov-io/identity/pkg/api"
 	log "github.com/moov-io/identity/pkg/logging"
 )
@@ -49,23 +52,30 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 	WithLoginSessionFromRequest(c.logger, w, r, []string{"authenticate", "finished"}, func(session LoginSession) {
 		DeleteAuthnCookie(w)
 
+		// Validation the session
+		if err := validation.ValidateStruct(&session,
+			validation.Field(&session.CredentialID, validation.Required, is.UUID),
+			validation.Field(&session.TenantID, validation.Required, is.UUID),
+			validation.Field(&session.State, validation.Required),
+			validation.Field(&session.IP, validation.Required, is.IP),
+		); err != nil {
+			w.WriteHeader(404)
+			return
+		}
+
 		login := api.Login{
 			CredentialID: session.CredentialID,
 			TenantID:     session.TenantID,
 		}
 
-		result, err := c.service.LoginWithCredentials(r, login, session.State, session.IP)
+		cookie, loggedIn, err := c.service.LoginWithCredentials(r, login, session.State, session.IP)
 		if err != nil {
 			c.logger.Error().LogError("Not able to exchange login token for session token", err)
 			w.WriteHeader(404)
 			return
 		}
 
-		loggedIn := api.LoggedIn{
-			Jwt: result.Value,
-		}
-
-		http.SetCookie(w, result)
+		http.SetCookie(w, cookie)
 		api.EncodeJSONResponse(loggedIn, nil, w)
 	})
 }
@@ -81,26 +91,51 @@ func (c *authnAPIController) Register(w http.ResponseWriter, r *http.Request) {
 // SubmitRegistration - Finalizes the registration and handles all the user creation and first login
 func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.Request) {
 	WithLoginSessionFromRequest(c.logger, w, r, []string{"register", "finished"}, func(session LoginSession) {
-		registration := &api.Register{}
+
+		// Validation the session
+		if err := validation.ValidateStruct(&session,
+			validation.Field(&session.CredentialID, validation.Required, is.UUID),
+			validation.Field(&session.State, validation.Required),
+			validation.Field(&session.IP, validation.Required, is.IP),
+		); err != nil {
+			w.WriteHeader(404)
+			return
+		}
+
+		// Going to overwrite or use what they've already sent.
+		registration := &session.Register
+		fmt.Println("SubmitRegistration email - " + registration.Email)
+
 		if err := json.NewDecoder(r.Body).Decode(&registration); err != nil {
 			w.WriteHeader(400)
 			return
 		}
 
+		// Validate the registration
+		if err := registration.Validate(); err != nil {
+			s := http.StatusBadRequest
+			_ = api.EncodeJSONResponse(err, &s, w)
+			return
+		}
+
+		// Check if this is a signup so we don't force the invite code lookup
+		isSignup := false
+		for _, v := range session.Scopes {
+			if v == "signup" {
+				isSignup = true
+			}
+		}
+
 		DeleteAuthnCookie(w)
 
-		result, err := c.service.RegisterWithCredentials(r, *registration, session.State, session.IP)
+		cookie, loggedIn, err := c.service.RegisterWithCredentials(r, *registration, session.State, session.IP, isSignup)
 		if err != nil {
 			c.logger.Error().LogError("Unable to RegisterWithCredentials", err)
 			w.WriteHeader(400)
 			return
 		}
 
-		loggedIn := api.LoggedIn{
-			Jwt: result.Value,
-		}
-
-		http.SetCookie(w, result)
+		http.SetCookie(w, cookie)
 		api.EncodeJSONResponse(loggedIn, nil, w)
 	})
 }

@@ -79,6 +79,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoggedIn'
+        '400':
+          description: Validation failure of the model passed in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterErrors'
         default:
           $ref: '#/components/responses/Empty'
 
@@ -524,7 +530,6 @@ components:
           $ref: '#/components/schemas/OptionalDateTime'
         disabledBy:
           description: IdentityID of the user who disabled this user.
-          readOnly: true
           $ref: '#/components/schemas/OptionalUUID'
         lastUpdatedOn:
           description: Last time this user was updated
@@ -533,9 +538,7 @@ components:
           $ref: '#/components/schemas/DateTime'
         inviteID:
           description: Invite ID that was used to register.
-          readOnly: true
-          nullable: false
-          $ref: '#/components/schemas/UUID'
+          $ref: '#/components/schemas/OptionalUUID'
 
       required:
         - firstName
@@ -834,6 +837,29 @@ components:
           description: JWT token that provides authentication of identity
           pattern: ^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$
           maxLength: 4000
+        credentialID:
+          $ref: '#/components/schemas/UUID'
+        tenantID:
+          $ref: '#/components/schemas/UUID'
+        identityID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        firstName:
+          type: string
+          example: John
+          maxLength: 255
+          pattern: ^\w+$
+        lastName:
+          type: string
+          example: Doe
+          maxLength: 255
+          pattern: ^\w+$
+        nickName:
+          type: string
+          nullable: true
+          maxLength: 255
+          pattern: ^\w+$
+        
 
     Register:
       description: Request to register a user in the system
@@ -949,3 +975,69 @@ components:
           minLength: 2
           pattern: ^\w+$
           example: US
+
+    ValidationError:
+      description: Descriptive reason for failing validation
+      type: string
+      nullable: true
+      readOnly: true
+
+    RegisterErrors:
+      description: Request to register a user in the system
+      type: object
+      additionalProperties: false
+      properties:
+        firstName:
+          $ref: '#/components/schema/ValidationError'
+        middleName:
+          $ref: '#/components/schema/ValidationError'
+        lastName:
+          $ref: '#/components/schema/ValidationError'
+        nickName:
+          $ref: '#/components/schema/ValidationError'
+        suffix:
+          $ref: '#/components/schema/ValidationError'
+        birthDate:
+          $ref: '#/components/schema/ValidationError'
+        email:
+          $ref: '#/components/schema/ValidationError'
+        phones:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/RegisterPhoneErrors'
+        addresses:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/RegisterAddressErrors'
+
+    RegisterPhoneErrors:
+      description: Phone number
+      type: object
+      additionalProperties: false
+      properties:
+        number:
+          $ref: '#/components/schema/ValidationError'
+        type:
+          $ref: '#/components/schema/ValidationError'
+
+    RegisterAddressErrors:
+      description: Address of the Identity
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          $ref: '#/components/schema/ValidationError'
+        address1:
+          $ref: '#/components/schema/ValidationError'
+        address2:
+          $ref: '#/components/schema/ValidationError'
+        city:
+          $ref: '#/components/schema/ValidationError'
+        state:
+          $ref: '#/components/schema/ValidationError'
+        postalCode:
+          $ref: '#/components/schema/ValidationError'
+        country:
+          $ref: '#/components/schema/ValidationError'

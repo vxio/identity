@@ -2,6 +2,7 @@ package authn_test
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -79,8 +80,8 @@ func Setup(t *testing.T) Scope {
 
 			e.Claims = jwe.Claims{
 				Expiry:    jwt.NewNumericDate(stime.Now().Add(time.Hour)),
-				NotBefore: jwt.NewNumericDate(stime.Now().Add(time.Minute * -1)),
-				IssuedAt:  jwt.NewNumericDate(stime.Now().Add(time.Minute * -1)),
+				NotBefore: jwt.NewNumericDate(stime.Now()),
+				IssuedAt:  jwt.NewNumericDate(stime.Now()),
 				ID:        uuid.New().String(),
 				Subject:   uuid.New().String(),
 				Audience:  jwt.Audience{e.IP},
@@ -90,7 +91,9 @@ func Setup(t *testing.T) Scope {
 			e.Register = client.Register{
 				CredentialID: uuid.New().String(),
 				InviteCode:   c.RandString(),
-				Email:        c.RandString() + "@moovtest.io",
+				Email:        fmt.Sprintf("myemail.%d@example.com", c.Intn(1000)),
+				FirstName:    c.RandString() + "fn",
+				LastName:     c.RandString() + "ln",
 			}
 		},
 	)

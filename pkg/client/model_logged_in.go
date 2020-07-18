@@ -12,4 +12,13 @@ package client
 type LoggedIn struct {
 	// JWT token that provides authentication of identity
 	Jwt string `json:"jwt,omitempty"`
+	// UUID v4
+	CredentialID string `json:"credentialID,omitempty"`
+	// UUID v4
+	TenantID string `json:"tenantID,omitempty"`
+	// UUID v4
+	IdentityID string `json:"identityID,omitempty"`
+	FirstName string `json:"firstName,omitempty"`
+	LastName string `json:"lastName,omitempty"`
+	NickName *string `json:"nickName,omitempty"`
 }

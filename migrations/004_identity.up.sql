@@ -7,13 +7,13 @@ CREATE TABLE identity (
     last_name       VARCHAR(255) NOT NULL,
     nick_name       VARCHAR(255),
     suffix          VARCHAR(20),
-    birth_date      TIMESTAMP NOT NULL,
+    birth_date      TIMESTAMP,
     status          VARCHAR(20) NOT NULL,
     email           VARCHAR(255) NOT NULL,
     email_verified  BOOLEAN DEFAULT false,
 
     registered_on   TIMESTAMP NOT NULL,
-    invite_id       VARCHAR(36) NOT NULL,
+    invite_id       VARCHAR(36),
     
     disabled_on     TIMESTAMP,
     disabled_by     VARCHAR(36),
