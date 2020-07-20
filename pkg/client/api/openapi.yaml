@@ -13,7 +13,7 @@ servers:
   url: https://identity.srvs.moov.local/
 paths:
   /authentication/authenticated:
-    get:
+    post:
       operationId: Authenticated
       responses:
         "200":
