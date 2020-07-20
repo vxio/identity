@@ -2,7 +2,6 @@ package authn
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -104,7 +103,6 @@ func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 
 		// Going to overwrite or use what they've already sent.
 		registration := &session.Register
-		fmt.Println("SubmitRegistration email - " + registration.Email)
 
 		if err := json.NewDecoder(r.Body).Decode(&registration); err != nil {
 			w.WriteHeader(400)
