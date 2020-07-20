@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/antihax/optional v1.0.0
 	github.com/go-kit/kit v0.10.0
+	github.com/go-ozzo/ozzo-validation/v4 v4.2.1
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang-migrate/migrate/v4 v4.11.0
 	github.com/google/go-cmp v0.5.0

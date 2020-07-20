@@ -16,6 +16,7 @@ func Test_Register(t *testing.T) {
 	invite := s.RandomInvite()
 	r := api.Register{}
 	f.Fuzz(&r)
+	r.TenantID = invite.TenantID
 
 	r.Phones = make([]api.RegisterPhone, 1)
 	f.Fuzz(&r.Phones[0])
@@ -23,7 +24,7 @@ func Test_Register(t *testing.T) {
 	r.Addresses = make([]api.RegisterAddress, 1)
 	f.Fuzz(&r.Addresses[0])
 
-	i, err := s.service.Register(invite, r)
+	i, err := s.service.Register(r, &invite)
 	a.Nil(err)
 
 	a.Equal(invite.TenantID, i.TenantID)
@@ -57,7 +58,7 @@ func Test_Register(t *testing.T) {
 	}
 
 	// Fail on second register
-	_, err = s.service.Register(invite, r)
+	_, err = s.service.Register(r, &invite)
 	a.NotNil(err)
 }
 
@@ -227,7 +228,7 @@ func RegisterIdentity(s Scope, f *fuzz.Fuzzer) api.Identity {
 	register := api.Register{}
 	f.Fuzz(&register)
 
-	identity, err := s.service.Register(invite, register)
+	identity, err := s.service.Register(register, &invite)
 	if err != nil {
 		panic(err)
 	}

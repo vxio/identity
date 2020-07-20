@@ -138,7 +138,7 @@ func (s *Service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, up
 }
 
 // Register - Takes an invite and the registration information and creates the new identity from it.
-func (s *Service) Register(invite api.Invite, register api.Register) (*api.Identity, error) {
+func (s *Service) Register(register api.Register, invite *api.Invite) (*api.Identity, error) {
 	identityID := uuid.New().String()
 
 	phones := []api.Phone{}
@@ -170,8 +170,8 @@ func (s *Service) Register(invite api.Invite, register api.Register) (*api.Ident
 
 	identity := api.Identity{
 		IdentityID:    identityID,
-		TenantID:      invite.TenantID,
-		InviteID:      invite.InviteID,
+		TenantID:      register.TenantID,
+		InviteID:      nil,
 		FirstName:     register.FirstName,
 		MiddleName:    register.MiddleName,
 		LastName:      register.LastName,
@@ -186,6 +186,11 @@ func (s *Service) Register(invite api.Invite, register api.Register) (*api.Ident
 		RegisteredOn:  s.time.Now(),
 		LastLogin:     api.LastLogin{},
 		LastUpdatedOn: s.time.Now(),
+	}
+
+	if invite != nil {
+		identity.TenantID = invite.TenantID
+		identity.InviteID = &invite.InviteID
 	}
 
 	saved, err := s.repository.add(identity)

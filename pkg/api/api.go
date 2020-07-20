@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 
+	"github.com/moov-io/identity/pkg/client"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
@@ -66,8 +67,8 @@ type IdentitiesApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type AuthenticationApiServicer interface {
-	LoginWithCredentials(*http.Request, Login, string, string) (*http.Cookie, error)
-	RegisterWithCredentials(*http.Request, Register, string, string) (*http.Cookie, error)
+	LoginWithCredentials(*http.Request, Login, string, string) (*http.Cookie, *client.LoggedIn, error)
+	RegisterWithCredentials(*http.Request, Register, string, string, bool) (*http.Cookie, *client.LoggedIn, error)
 }
 
 // InvitesApiServicer defines the api actions for the InvitesApi service
