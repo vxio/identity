@@ -31,7 +31,7 @@ Authenticated Complete a login via a OIDC. Once the OIDC client service has auth
 */
 func (a *AuthenticationApiService) Authenticated(ctx _context.Context) (LoggedIn, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string

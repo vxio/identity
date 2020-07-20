@@ -33,7 +33,7 @@ All URIs are relative to *https://local.moov.io*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*AuthenticationApi* | [**Authenticated**](docs/AuthenticationApi.md#authenticated) | **Get** /authentication/authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint. 
+*AuthenticationApi* | [**Authenticated**](docs/AuthenticationApi.md#authenticated) | **Post** /authentication/authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint. 
 *AuthenticationApi* | [**Register**](docs/AuthenticationApi.md#register) | **Get** /authentication/register | Returns the partially completed registration details that were pulled by AuthN service. 
 *AuthenticationApi* | [**RegisterWithCredentials**](docs/AuthenticationApi.md#registerwithcredentials) | **Post** /authentication/register | Called when the user is registering for the first time. It requires that they have authenticated with a  supported OIDC provider and recieved a valid invite code. 
 *CredentialsApi* | [**DisableCredentials**](docs/CredentialsApi.md#disablecredentials) | **Delete** /identities/{identityID}/credentials/{credentialID} | Disables a credential so it can&#39;t be used anymore to login

@@ -15,7 +15,7 @@ servers:
 paths:
 
   /authentication/authenticated:
-    get:
+    post:
       operationId: Authenticated
       summary: |
         Complete a login via a OIDC.

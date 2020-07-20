@@ -27,7 +27,7 @@ func (c *authnAPIController) Routes() api.Routes {
 	return api.Routes{
 		{
 			Name:        "Authenticated",
-			Method:      strings.ToUpper("Get"),
+			Method:      strings.ToUpper("Post"),
 			Pattern:     "/authentication/authenticated",
 			HandlerFunc: c.Authenticated,
 		},
@@ -58,6 +58,7 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 			validation.Field(&session.State, validation.Required),
 			validation.Field(&session.IP, validation.Required, is.IP),
 		); err != nil {
+			c.logger.Error().LogError("session validate failed", err)
 			w.WriteHeader(404)
 			return
 		}
