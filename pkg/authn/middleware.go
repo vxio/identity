@@ -4,8 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/stime"
 	"github.com/moov-io/tumbler/pkg/jwe"
@@ -63,15 +61,6 @@ func (s *Middleware) FromRequest(r *http.Request) (*LoginSession, error) {
 	_, err = s.jweService.ParseEncrypted(r, cookie.Value, &session)
 	if err != nil {
 		return nil, s.log.Error().LogErrorF("Session token parse failure - %w", err)
-	}
-
-	// Validation the session
-	if err := validation.ValidateStruct(&session,
-		validation.Field(&session.CredentialID, validation.Required, is.UUID),
-		validation.Field(&session.State, validation.Required),
-		validation.Field(&session.IP, validation.Required, is.IP),
-	); err != nil {
-		return nil, s.log.Error().LogErrorF("validation of session failed - %w", err)
 	}
 
 	return &session, nil
