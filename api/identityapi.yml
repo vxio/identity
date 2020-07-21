@@ -55,11 +55,11 @@ paths:
                 $ref: '#/components/schemas/Register'
         default:
           $ref: '#/components/responses/Empty'
-      
+
     post:
       operationId: RegisterWithCredentials
       summary: |
-        Called when the user is registering for the first time. It requires that they have authenticated with a 
+        Called when the user is registering for the first time. It requires that they have authenticated with a
         supported OIDC provider and recieved a valid invite code.
       security:
       - LoginAuth: []
@@ -490,7 +490,7 @@ components:
           maxLength: 255
         birthDate:
           $ref: '#/components/schemas/DateTime'
-        status: 
+        status:
           type: string
           enum:
           - rejected
@@ -578,7 +578,7 @@ components:
           maxLength: 255
         birthDate:
           $ref: '#/components/schemas/DateTime'
-        status: 
+        status:
           type: string
           enum:
           - rejected
@@ -614,7 +614,7 @@ components:
           format: phone
           pattern: ^[0-9]+$
           maxLength: 15
-        validated: 
+        validated:
           type: boolean
         type:
           type: string
@@ -669,9 +669,9 @@ components:
           minLength: 2
           pattern: ^\w+$
           example: US
-        validated: 
+        validated:
           type: boolean
-          
+
     LastLogin:
       description: |
         Defines when and what credential was used for the last login
@@ -859,7 +859,7 @@ components:
           nullable: true
           maxLength: 255
           pattern: ^\w+$
-        
+
 
     Register:
       description: Request to register a user in the system
@@ -988,19 +988,19 @@ components:
       additionalProperties: false
       properties:
         firstName:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         middleName:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         lastName:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         nickName:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         suffix:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         birthDate:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         email:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         phones:
           type: array
           maxItems: 50
@@ -1018,9 +1018,9 @@ components:
       additionalProperties: false
       properties:
         number:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         type:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
 
     RegisterAddressErrors:
       description: Address of the Identity
@@ -1028,16 +1028,16 @@ components:
       additionalProperties: false
       properties:
         type:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         address1:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         address2:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         city:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         state:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         postalCode:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
         country:
-          $ref: '#/components/schema/ValidationError'
+          $ref: '#/components/schemas/ValidationError'
