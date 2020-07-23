@@ -120,7 +120,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionDetails'
-          description: User successfully registered, they can now log in
+          description: Information about the current session and user logged in.
         "404":
           content:
             text/plain:
