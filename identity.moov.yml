@@ -1,0 +1,42 @@
+# What file path to generate the project in.
+ProjectPath: "."
+# If this is a test run where no output is created or modified.
+# TestRun: true
+# To turn off gofmt cleaning
+# NoCleanup: true
+
+Project:
+  # Github project id
+  ProjectID: "identity"
+  # Human descriptive name for the project
+  ProjectName: "Identity"
+  Description: |
+    Moov Identity is a RESTful API for managing users that can interact with the system. It handles the last piece of authentication converting an authentication session into an authenticated session that can be used for checking authorization.
+
+# List of all the templates to run
+Templates:
+  GoService:
+    # # Description to use in README.md, OpenAPI spec, and other docs.
+    # # Public service port where most services run
+    # ServicePort: 8210
+    # # Health / Admin port
+    # HealthPort: 8211
+  GoGithubActionsPublic: 
+    #  - Executable: errorsservice
+  # Adds new custom endpoints.
+  GoEndpoint:
+    # simple endpoint
+      # Package to place this in, in the project
+    - PackageID: "session"
+      # What to name the controller
+      CollectionName: "Session"
+      # Private name of the controller
+      CollectionID: "session"
+      # List of all endpoints this controller handles
+      Endpoints:
+        # Name of the action of the endpoint
+      - EndpointID: "getSession"
+        # Method is responds to.
+        Method: "GET"
+        # Path to respond on
+        Path: "/session"

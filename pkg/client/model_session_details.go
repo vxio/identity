@@ -9,10 +9,8 @@
 
 package client
 
-// LoggedIn User has logged in and is being given a token to proof identity
-type LoggedIn struct {
-	// JWT token that provides authentication of identity
-	Jwt string `json:"jwt,omitempty"`
+// SessionDetails User has logged in and is being given a token to proof identity
+type SessionDetails struct {
 	// UUID v4
 	CredentialID string `json:"credentialID,omitempty"`
 	// UUID v4
@@ -22,4 +20,6 @@ type LoggedIn struct {
 	FirstName  string  `json:"firstName,omitempty"`
 	LastName   string  `json:"lastName,omitempty"`
 	NickName   *string `json:"nickName,omitempty"`
+	// Expires in seconds
+	ExpiresIn int64 `json:"expiresIn,omitempty"`
 }

@@ -35,7 +35,7 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *AuthenticationApi* | [**Authenticated**](docs/AuthenticationApi.md#authenticated) | **Post** /authentication/authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint. 
 *AuthenticationApi* | [**Register**](docs/AuthenticationApi.md#register) | **Get** /authentication/register | Returns the partially completed registration details that were pulled by AuthN service. 
-*AuthenticationApi* | [**RegisterWithCredentials**](docs/AuthenticationApi.md#registerwithcredentials) | **Post** /authentication/register | Called when the user is registering for the first time. It requires that they have authenticated with a  supported OIDC provider and recieved a valid invite code. 
+*AuthenticationApi* | [**RegisterWithCredentials**](docs/AuthenticationApi.md#registerwithcredentials) | **Post** /authentication/register | Called when the user is registering for the first time. It requires that they have authenticated with a supported OIDC provider and recieved a valid invite code. 
 *CredentialsApi* | [**DisableCredentials**](docs/CredentialsApi.md#disablecredentials) | **Delete** /identities/{identityID}/credentials/{credentialID} | Disables a credential so it can&#39;t be used anymore to login
 *CredentialsApi* | [**ListCredentials**](docs/CredentialsApi.md#listcredentials) | **Get** /identities/{identityID}/credentials | List the credentials this user has used.
 *IdentitiesApi* | [**DisableIdentity**](docs/IdentitiesApi.md#disableidentity) | **Delete** /identities/{identityID} | Disable an identity. Its left around for historical reporting
@@ -45,6 +45,7 @@ Class | Method | HTTP request | Description
 *InvitesApi* | [**DisableInvite**](docs/InvitesApi.md#disableinvite) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
 *InvitesApi* | [**ListInvites**](docs/InvitesApi.md#listinvites) | **Get** /invites | List outstanding invites
 *InvitesApi* | [**SendInvite**](docs/InvitesApi.md#sendinvite) | **Post** /invites | Send an email invite to a new user
+*SessionApi* | [**GetSessionDetails**](docs/SessionApi.md#getsessiondetails) | **Get** /session | Return information about the current session
 
 
 ## Documentation For Models
@@ -65,6 +66,7 @@ Class | Method | HTTP request | Description
  - [RegisterPhone](docs/RegisterPhone.md)
  - [RegisterPhoneErrors](docs/RegisterPhoneErrors.md)
  - [SendInvite](docs/SendInvite.md)
+ - [SessionDetails](docs/SessionDetails.md)
  - [UpdateAddress](docs/UpdateAddress.md)
  - [UpdateIdentity](docs/UpdateIdentity.md)
  - [UpdatePhone](docs/UpdatePhone.md)
