@@ -127,18 +127,19 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 	// authed server
 
 	// auth middleware for the tokens coming from the gateway
-	GatewayMiddleware, err := tmw.NewTumblerMiddlewareFromConfig(logger, TimeService, config.Gateway) //gateway.NewMiddleware(logger, TimeService, GatewayPublicKeys)
+	GatewayMiddleware, err := tmw.NewTumblerMiddlewareFromConfig(logger, TimeService, config.Gateway)
 	if err != nil {
 		return nil, logger.Fatal().LogErrorF("Can't startup the Gateway middleware - %w", err)
 	}
 
-	SessionController := session.NewSessionController(logger, SessionService, *IdentitiesService, TimeService)
+	SessionController := session.NewSessionController(logger, IdentitiesService, TimeService)
 	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(InvitesService)
 
 	authedRouter := router.NewRoute().Subrouter()
-	authedRouter = api.AppendRouters(logger, authedRouter, IdentitiesController, CredentialsController, InvitesController, SessionController)
+	authedRouter = api.AppendRouters(logger, authedRouter, IdentitiesController, CredentialsController, InvitesController)
+	SessionController.AppendRoutes(authedRouter)
 	authedRouter.Use(GatewayMiddleware.Handler)
 
 	env := Environment{

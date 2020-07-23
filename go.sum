@@ -199,6 +199,8 @@ github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.4.1/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.0 h1:/QaMHBdZ26BB3SSst0Iwl10Epc+xhTquomWX0oZEB6w=
 github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/go-cmp v0.5.1 h1:JFrFEBb2xKufg6XkJsJr+WbKb4FQlURi5RUcBveYu9k=
+github.com/google/go-cmp v0.5.1/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-github v17.0.0+incompatible/go.mod h1:zLgOLi98H3fifZn+44m+umXrS52loVEgC2AApnigrVQ=
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
@@ -362,12 +364,15 @@ github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757 h1:sWetZ+V8cnxCuylHB
 github.com/moov-io/authn v0.0.0-20200624134956-322faea3c757/go.mod h1:X5Cbe60BsdDXJIr8mwExQrc7giJdO3dCl0UXOHaEAHQ=
 github.com/moov-io/authn v0.0.0-20200709161736-a03007d9f67a h1:baMLufVa0jpDfSI3kCRXIDB1l9AUt63FYMAJxfS/rls=
 github.com/moov-io/authn v0.0.0-20200709161736-a03007d9f67a/go.mod h1:6ojOGG2NjByRcs6lRXs47MOCasanEDS26CqA95tjlEw=
+github.com/moov-io/authn v0.2.1 h1:/PQr0oTLV83UKPNNHAafErHlH+EkkVfOCTsjBQ8LY4U=
+github.com/moov-io/authn v0.2.1/go.mod h1:gQAzwEgTbMVTOZVT8c9Qn52HYSv8xVk2wHt288vLDSY=
 github.com/moov-io/base v0.11.0 h1:1dhI8qsIxsUjMmbzE52ycyy2S1z3DGUN6swGYjSmOLs=
 github.com/moov-io/base v0.11.0/go.mod h1:jEkZukoSaJ4rDFoe00S5zuoLE+p3U3BEunSEPchgSbU=
 github.com/moov-io/identity v0.0.0-20200616225744-0dba4de79fed/go.mod h1:8cp+tvEWLT4l5+KaYAm39a54/Eazk21x3+124QWm1cQ=
 github.com/moov-io/identity v0.0.0-20200617215100-dfd904ab610b/go.mod h1:knCJJiEPe0/yYmPe30LdKddeXZsUFk9TXPp7ynWXRP4=
 github.com/moov-io/identity v0.0.0-20200617222838-75f18c632b1b/go.mod h1:vht1EqhyPooW+PIrhryhmFG9sUbKKI8F9MmV/zaruWM=
 github.com/moov-io/identity v0.0.0-20200629175045-a9c82645ec0c/go.mod h1:1l0U9OBLjsYD66+L1wIBm/69vM2VnhxKK/MwSUS/8tI=
+github.com/moov-io/identity v0.1.1-0.20200715212009-1ee844d5d729/go.mod h1:QMOE24R2XH6jkMHD5WYifaDiYlgWcAEHsn+ob5lVFlE=
 github.com/moov-io/tumbler v0.0.0-20200617212523-2a85ad22d0a9/go.mod h1:NmMeFW5pxs9+UXWRdykFOBq0vywh1s//VPzReT72W0s=
 github.com/moov-io/tumbler v0.0.0-20200617215154-5dcc2086b159/go.mod h1:DygEzjd1S/5WoTOYhDyP3tqXQNae/yRx4Vywy20oA9g=
 github.com/moov-io/tumbler v0.0.0-20200617223608-90d44979500f/go.mod h1:DygEzjd1S/5WoTOYhDyP3tqXQNae/yRx4Vywy20oA9g=

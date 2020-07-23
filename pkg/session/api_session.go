@@ -1,10 +1,11 @@
 package session
 
 import (
+	"database/sql"
+	"encoding/json"
 	"net/http"
-	"strings"
 
-	api "github.com/moov-io/identity/pkg/api"
+	"github.com/gorilla/mux"
 	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/logging"
@@ -12,42 +13,58 @@ import (
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
-type sessionController struct {
-	log        logging.Logger
-	service    SessionService
-	identities identities.Service
-	stime      stime.TimeService
+type SessionController interface {
+	AppendRoutes(router *mux.Router) *mux.Router
 }
 
-// NewsessionController - Router for the Who Am I api routes.
-func NewSessionController(log logging.Logger, service SessionService, identities identities.Service, stime stime.TimeService) api.Router {
+func NewSessionController(logger logging.Logger, identities *identities.Service, stime stime.TimeService) SessionController {
 	return &sessionController{
-		log:        log,
-		service:    service,
+		logger:     logger,
 		identities: identities,
 		stime:      stime,
 	}
 }
 
-// Routes returns all of the api route for the AuthenticationApiController
-func (c *sessionController) Routes() api.Routes {
-	return api.Routes{
-		{
-			Name:        "session",
-			Method:      strings.ToUpper("Get"),
-			Pattern:     "/session",
-			HandlerFunc: c.session,
-		},
+type sessionController struct {
+	logger     logging.Logger
+	identities *identities.Service
+	stime      stime.TimeService
+}
+
+func (c sessionController) AppendRoutes(router *mux.Router) *mux.Router {
+
+	router.
+		Name("Identity.getSession").
+		Methods("GET").
+		Path("/session").
+		HandlerFunc(c.getSessionHandler)
+
+	return router
+}
+
+func (c *sessionController) jsonResponse(w http.ResponseWriter, value interface{}) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	e := json.NewEncoder(w)
+	e.SetIndent("", "  ")
+	e.Encode(value)
+}
+
+func (c *sessionController) errorResponse(w http.ResponseWriter, err error) {
+	switch err {
+	case sql.ErrNoRows:
+		w.WriteHeader(404)
+	default:
+		w.WriteHeader(500)
 	}
 }
 
-// session - Responds back with information about the authenticated session
-func (c *sessionController) session(w http.ResponseWriter, r *http.Request) {
+func (c *sessionController) getSessionHandler(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		identity, err := c.identities.GetIdentity(claims, claims.IdentityID.String())
 		if err != nil {
-			c.log.Info().Log("Unable to lookup identity")
-			w.WriteHeader(404)
+			c.logger.Info().Log("Unable to lookup identity")
+			c.errorResponse(w, err)
 			return
 		}
 
@@ -61,6 +78,6 @@ func (c *sessionController) session(w http.ResponseWriter, r *http.Request) {
 			ExpiresIn:    c.stime.Now().Unix() - claims.Expiry.Time().Unix(),
 		}
 
-		api.EncodeJSONResponse(&details, nil, w)
+		c.jsonResponse(w, &details)
 	})
 }

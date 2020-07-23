@@ -1,7 +1,6 @@
 package session
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -13,8 +12,6 @@ import (
 type SessionService interface {
 	Generate(r *http.Request, Session Session) (string, error)
 	GenerateCookie(r *http.Request, session Session) (*http.Cookie, error)
-
-	FromRequest(r *http.Request) (*Session, error)
 }
 
 type sessionService struct {
@@ -64,22 +61,6 @@ func (s *sessionService) GenerateCookie(r *http.Request, session Session) (*http
 		Secure:   false,
 		HttpOnly: true,
 	}, nil
-}
-
-// FromRequest - Pulls out authenticationd details from the Request and calls Parse.
-func (s *sessionService) FromRequest(r *http.Request) (*Session, error) {
-	cookie, err := r.Cookie("moov")
-	if err != nil {
-		return nil, errors.New("no session found")
-	}
-
-	session := &Session{}
-	_, err = s.jweService.Parse(r, cookie.Value, session)
-	if err != nil {
-		return nil, err
-	}
-
-	return session, nil
 }
 
 func (s *sessionService) calculateExpiration() time.Time {
