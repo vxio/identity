@@ -88,6 +88,28 @@ paths:
         default:
           $ref: '#/components/responses/Empty'
 
+  /session:
+    get:
+      operationId: GetSessionDetails
+      summary: Return information about the current session
+      tags:
+      - session
+      security:
+      - GatewayAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: User successfully registered, they can now log in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDetails'
+        '404':
+          description: "Authentication failed"
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
+
   /invites:
     get:
       operationId: ListInvites
@@ -1041,3 +1063,35 @@ components:
           $ref: '#/components/schemas/ValidationError'
         country:
           $ref: '#/components/schemas/ValidationError'
+            
+    SessionDetails:
+      description: User has logged in and is being given a token to proof identity
+      type: object
+      additionalProperties: false
+      properties:
+        credentialID:
+          $ref: '#/components/schemas/UUID'
+        tenantID:
+          $ref: '#/components/schemas/UUID'
+        identityID:
+          $ref: '#/components/schemas/UUID'
+          readOnly: true
+        firstName:
+          type: string
+          example: John
+          maxLength: 255
+          pattern: ^\w+$
+        lastName:
+          type: string
+          example: Doe
+          maxLength: 255
+          pattern: ^\w+$
+        nickName:
+          type: string
+          nullable: true
+          maxLength: 255
+          pattern: ^\w+$
+        expiresIn:
+          type: integer
+          format: int64
+          description: Expires in seconds

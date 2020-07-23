@@ -6,7 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**Authenticated**](AuthenticationApi.md#Authenticated) | **Post** /authentication/authenticated | Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service redirect to this endpoint. 
 [**Register**](AuthenticationApi.md#Register) | **Get** /authentication/register | Returns the partially completed registration details that were pulled by AuthN service. 
-[**RegisterWithCredentials**](AuthenticationApi.md#RegisterWithCredentials) | **Post** /authentication/register | Called when the user is registering for the first time. It requires that they have authenticated with a  supported OIDC provider and recieved a valid invite code. 
+[**RegisterWithCredentials**](AuthenticationApi.md#RegisterWithCredentials) | **Post** /authentication/register | Called when the user is registering for the first time. It requires that they have authenticated with a supported OIDC provider and recieved a valid invite code. 
 
 
 
@@ -70,7 +70,7 @@ This endpoint does not need any parameter.
 
 > LoggedIn RegisterWithCredentials(ctx, register)
 
-Called when the user is registering for the first time. It requires that they have authenticated with a  supported OIDC provider and recieved a valid invite code. 
+Called when the user is registering for the first time. It requires that they have authenticated with a supported OIDC provider and recieved a valid invite code. 
 
 ### Required Parameters
 

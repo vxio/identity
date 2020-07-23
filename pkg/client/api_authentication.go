@@ -197,7 +197,7 @@ func (a *AuthenticationApiService) Register(ctx _context.Context) (Register, *_n
 }
 
 /*
-RegisterWithCredentials Called when the user is registering for the first time. It requires that they have authenticated with a  supported OIDC provider and recieved a valid invite code. 
+RegisterWithCredentials Called when the user is registering for the first time. It requires that they have authenticated with a supported OIDC provider and recieved a valid invite code. 
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param register Arguments needed register a user with OIDC credentials.
 @return LoggedIn

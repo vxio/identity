@@ -2,6 +2,6 @@ package session_test
 
 import "testing"
 
-func Test_WhoAmI(t *testing.T) {
+func Test_Session(t *testing.T) {
 
 }

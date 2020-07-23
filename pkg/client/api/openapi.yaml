@@ -105,11 +105,45 @@ paths:
             status code
       security:
       - LoginAuth: []
-      summary: "Called when the user is registering for the first time. It requires\
-        \ that they have authenticated with a \nsupported OIDC provider and recieved\
-        \ a valid invite code.\n"
+      summary: |
+        Called when the user is registering for the first time. It requires that they have authenticated with a
+        supported OIDC provider and recieved a valid invite code.
       tags:
       - authentication
+  /session:
+    get:
+      operationId: GetSessionDetails
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDetails'
+          description: User successfully registered, they can now log in
+        "404":
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - GatewayAuth: []
+      summary: Return information about the current session
+      tags:
+      - session
   /invites:
     get:
       operationId: ListInvites
@@ -1601,6 +1635,56 @@ components:
           nullable: true
           readOnly: true
           type: string
+      type: object
+    SessionDetails:
+      additionalProperties: false
+      description: User has logged in and is being given a token to proof identity
+      example:
+        expiresIn: 0
+        firstName: John
+        lastName: Doe
+        identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        nickName: nickName
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        credentialID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        tenantID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        identityID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        firstName:
+          example: John
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        lastName:
+          example: Doe
+          maxLength: 255
+          pattern: ^\w+$
+          type: string
+        nickName:
+          maxLength: 255
+          nullable: true
+          pattern: ^\w+$
+          type: string
+        expiresIn:
+          description: Expires in seconds
+          format: int64
+          type: integer
       type: object
   securitySchemes:
     GatewayAuth:
