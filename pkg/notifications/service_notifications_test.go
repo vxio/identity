@@ -4,9 +4,11 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	authnclient "github.com/moov-io/authn/pkg/client"
 	"github.com/moov-io/base/docker"
 	"github.com/moov-io/identity/pkg/authn"
 	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
+	"github.com/moov-io/identity/pkg/client"
 	log "github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/tumbler/pkg/middleware"
 	"github.com/moov-io/tumbler/pkg/middleware/middlewaretest"
@@ -35,10 +37,19 @@ func Test_SMTP_SendInvite(t *testing.T) {
 	service, err := NewNotificationsService(s.logger, config, s.templates)
 	a.Nil(err, "Check that `docker-compose up` is running before running tests. Can't talk to mailslurper.")
 
-	tenant, err := s.authn.GetTenant(s.claims, uuid.New().String())
-	a.Nil(err)
+	inviter := client.Identity{
+		FirstName: "John",
+		LastName:  "Doe",
+	}
 
-	invite := NewInviteEmail("https://localhost/accept", *tenant)
+	tenant := authnclient.Tenant{
+		TenantID: uuid.New().String(),
+		Name:     "Tenant",
+		Alias:    "tenant",
+		Website:  "Website",
+	}
+
+	invite := NewInviteEmail("https://localhost/accept", inviter, tenant)
 
 	err = service.SendEmail("test@moovtest.io", &invite)
 	a.Nil(err, "Check that `docker-compose up` is running before running tests. Can't talk to mailslurper.")
@@ -56,10 +67,19 @@ func Test_Mock_SendInvite(t *testing.T) {
 	service, err := NewNotificationsService(s.logger, config, s.templates)
 	a.Nil(err, "Check that `docker-compose up` is running before running tests. Can't talk to mailslurper.")
 
-	tenant, err := s.authn.GetTenant(s.claims, uuid.New().String())
-	a.Nil(err)
+	inviter := client.Identity{
+		FirstName: "John",
+		LastName:  "Doe",
+	}
 
-	invite := NewInviteEmail("https://localhost/accept", *tenant)
+	tenant := authnclient.Tenant{
+		TenantID: uuid.New().String(),
+		Name:     "Tenant",
+		Alias:    "tenant",
+		Website:  "Website",
+	}
+
+	invite := NewInviteEmail("https://localhost/accept", inviter, tenant)
 
 	err = service.SendEmail("test@moovtest.io", &invite)
 	a.Nil(err, "Check that `docker-compose up` is running before running tests. Can't talk to mailslurper.")

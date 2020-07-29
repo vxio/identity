@@ -12,21 +12,31 @@ import (
 // Service - Service that implents the logic for the IdentitiesApiServicer
 // This service should implement the business logic for every endpoint for the IdentitiesApi API.
 // Include any external packages or services that will be required by this service.
-type Service struct {
+type Service interface {
+	DisableIdentity(claims tmw.TumblerClaims, identityID string) error
+	GetIdentity(claims tmw.TumblerClaims, identityID string) (*api.Identity, error)
+	ListIdentities(claims tmw.TumblerClaims, orgID string) ([]api.Identity, error)
+	UpdateIdentity(claims tmw.TumblerClaims, identityID string, update api.UpdateIdentity) (*api.Identity, error)
+
+	Register(register api.Register, invite *api.Invite) (*api.Identity, error)
+	GetIdentityByID(identityID string) (*api.Identity, error)
+}
+
+type service struct {
 	time       stime.TimeService
 	repository Repository
 }
 
 // NewIdentitiesService creates a default service
-func NewIdentitiesService(time stime.TimeService, repository Repository) *Service {
-	return &Service{
+func NewIdentitiesService(time stime.TimeService, repository Repository) Service {
+	return &service{
 		time:       time,
 		repository: repository,
 	}
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
-func (s *Service) DisableIdentity(claims tmw.TumblerClaims, identityID string) error {
+func (s *service) DisableIdentity(claims tmw.TumblerClaims, identityID string) error {
 	identity, err := s.GetIdentity(claims, identityID)
 	if err != nil {
 		return err
@@ -49,7 +59,7 @@ func (s *Service) DisableIdentity(claims tmw.TumblerClaims, identityID string) e
 }
 
 // GetIdentity - List identities and associates userId
-func (s *Service) GetIdentity(claims tmw.TumblerClaims, identityID string) (*api.Identity, error) {
+func (s *service) GetIdentity(claims tmw.TumblerClaims, identityID string) (*api.Identity, error) {
 	i, e := s.GetIdentityByID(identityID)
 	if e != nil {
 		return nil, e
@@ -63,13 +73,13 @@ func (s *Service) GetIdentity(claims tmw.TumblerClaims, identityID string) (*api
 }
 
 // ListIdentities - List identities and associates userId
-func (s *Service) ListIdentities(claims tmw.TumblerClaims, orgID string) ([]api.Identity, error) {
+func (s *service) ListIdentities(claims tmw.TumblerClaims, orgID string) ([]api.Identity, error) {
 	identities, err := s.repository.list(api.TenantID(claims.TenantID))
 	return identities, err
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *Service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
+func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
 	identity, err := s.GetIdentity(claims, identityID)
 	if err != nil {
 		return nil, err
@@ -138,7 +148,7 @@ func (s *Service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, up
 }
 
 // Register - Takes an invite and the registration information and creates the new identity from it.
-func (s *Service) Register(register api.Register, invite *api.Invite) (*api.Identity, error) {
+func (s *service) Register(register api.Register, invite *api.Invite) (*api.Identity, error) {
 	identityID := uuid.New().String()
 
 	phones := []api.Phone{}
@@ -206,7 +216,7 @@ func (s *Service) Register(register api.Register, invite *api.Invite) (*api.Iden
 }
 
 // GetIdentityByID - Returns the Identity specified by the ID. Used after a login session to get identity information
-func (s *Service) GetIdentityByID(identityID string) (*api.Identity, error) {
+func (s *service) GetIdentityByID(identityID string) (*api.Identity, error) {
 	i, e := s.repository.get(identityID)
 	if e != nil {
 		return nil, e

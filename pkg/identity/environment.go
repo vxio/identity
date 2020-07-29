@@ -101,12 +101,12 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 	}
 
 	InvitesRepository := invites.NewInvitesRepository(db)
-	InvitesService, err := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService, AuthnClient)
+	InvitesService, err := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService, AuthnClient, IdentitiesService)
 	if err != nil {
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(logger, *CredentialsService, *IdentitiesService, SessionService, InvitesService)
+	AuthnService := authn.NewAuthnService(logger, *CredentialsService, IdentitiesService, SessionService, InvitesService)
 
 	// router
 	router := mux.NewRouter()
@@ -152,7 +152,7 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 		Config: *config,
 
 		InviteService:      InvitesService,
-		IdentitiesService:  *IdentitiesService,
+		IdentitiesService:  IdentitiesService,
 		CredentialsService: *CredentialsService,
 
 		PublicRouter: *router,

@@ -17,7 +17,7 @@ type SessionController interface {
 	AppendRoutes(router *mux.Router) *mux.Router
 }
 
-func NewSessionController(logger logging.Logger, identities *identities.Service, stime stime.TimeService) SessionController {
+func NewSessionController(logger logging.Logger, identities identities.Service, stime stime.TimeService) SessionController {
 	return &sessionController{
 		logger:     logger,
 		identities: identities,
@@ -27,7 +27,7 @@ func NewSessionController(logger logging.Logger, identities *identities.Service,
 
 type sessionController struct {
 	logger     logging.Logger
-	identities *identities.Service
+	identities identities.Service
 	stime      stime.TimeService
 }
 

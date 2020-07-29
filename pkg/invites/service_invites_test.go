@@ -9,6 +9,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moov-io/identity/pkg/api"
 	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
+	identitiestestutils "github.com/moov-io/identity/pkg/identities/testutils"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
@@ -125,7 +126,9 @@ func NewInvitesScope(t *testing.T) InvitesServiceScope {
 
 	authnClient := authntestutils.NewMockAuthnClient()
 
-	service, err := NewInvitesService(config, times, repository, notification, authnClient)
+	identity := identitiestestutils.NewSingleService(nil)
+
+	service, err := NewInvitesService(config, times, repository, notification, authnClient, identity)
 	if err != nil {
 		panic(err)
 	}
