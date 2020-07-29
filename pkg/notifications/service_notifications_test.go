@@ -3,8 +3,13 @@ package notifications
 import (
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/moov-io/base/docker"
+	"github.com/moov-io/identity/pkg/authn"
+	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
 	log "github.com/moov-io/identity/pkg/logging"
+	"github.com/moov-io/tumbler/pkg/middleware"
+	"github.com/moov-io/tumbler/pkg/middleware/middlewaretest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,7 +35,10 @@ func Test_SMTP_SendInvite(t *testing.T) {
 	service, err := NewNotificationsService(s.logger, config, s.templates)
 	a.Nil(err, "Check that `docker-compose up` is running before running tests. Can't talk to mailslurper.")
 
-	invite := NewInviteEmail("https://localhost/accept")
+	tenant, err := s.authn.GetTenant(s.claims, uuid.New().String())
+	a.Nil(err)
+
+	invite := NewInviteEmail("https://localhost/accept", *tenant)
 
 	err = service.SendEmail("test@moovtest.io", &invite)
 	a.Nil(err, "Check that `docker-compose up` is running before running tests. Can't talk to mailslurper.")
@@ -48,7 +56,10 @@ func Test_Mock_SendInvite(t *testing.T) {
 	service, err := NewNotificationsService(s.logger, config, s.templates)
 	a.Nil(err, "Check that `docker-compose up` is running before running tests. Can't talk to mailslurper.")
 
-	invite := NewInviteEmail("https://localhost/accept")
+	tenant, err := s.authn.GetTenant(s.claims, uuid.New().String())
+	a.Nil(err)
+
+	invite := NewInviteEmail("https://localhost/accept", *tenant)
 
 	err = service.SendEmail("test@moovtest.io", &invite)
 	a.Nil(err, "Check that `docker-compose up` is running before running tests. Can't talk to mailslurper.")
@@ -63,10 +74,14 @@ func Test_Mock_SendInvite(t *testing.T) {
 type Scope struct {
 	logger    log.Logger
 	templates TemplateRepository
+	authn     authn.AuthnClient
+	claims    middleware.TumblerClaims
 }
 
 func Setup(t *testing.T) (*assert.Assertions, Scope) {
 	a := assert.New(t)
+
+	authn := authntestutils.NewMockAuthnClient()
 
 	logger := log.NewNopLogger()
 	templateRepository, err := NewTemplateRepository(logger)
@@ -75,5 +90,7 @@ func Setup(t *testing.T) (*assert.Assertions, Scope) {
 	return a, Scope{
 		logger:    logger,
 		templates: templateRepository,
+		authn:     authn,
+		claims:    middlewaretest.NewRandomClaims(),
 	}
 }

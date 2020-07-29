@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/moov-io/identity/pkg/authn"
+	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
 	log "github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/tumbler/pkg/jwe"
 	"github.com/square/go-jose/jwt"
@@ -55,8 +56,11 @@ func Setup(t *testing.T) Scope {
 		SendToHost: "https://localhost",
 		SendToPath: "/register",
 	}
+
+	authnClient := authntestutils.NewMockAuthnClient()
+
 	invitesRepo := invites.NewInvitesRepository(db)
-	invites, err := invites.NewInvitesService(invitesConfig, stime, invitesRepo, notifications)
+	invites, err := invites.NewInvitesService(invitesConfig, stime, invitesRepo, notifications, authnClient)
 	a.Nil(err)
 
 	identitiesRepo := identities.NewIdentityRepository(db)

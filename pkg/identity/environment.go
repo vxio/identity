@@ -95,8 +95,13 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 	CredentialRepository := credentials.NewCredentialRepository(db)
 	CredentialsService := credentials.NewCredentialsService(TimeService, CredentialRepository)
 
+	AuthnClient, err := authn.NewAuthnClient(config.Services.authn)
+	if err != nil {
+		return nil, err
+	}
+
 	InvitesRepository := invites.NewInvitesRepository(db)
-	InvitesService, err := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService)
+	InvitesService, err := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService, AuthnClient)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +132,7 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 	// authed server
 
 	// auth middleware for the tokens coming from the gateway
-	GatewayMiddleware, err := tmw.NewTumblerMiddlewareFromConfig(logger, TimeService, config.Gateway)
+	GatewayMiddleware, err := tmw.NewServerFromConfig(logger, TimeService, config.Gateway)
 	if err != nil {
 		return nil, logger.Fatal().LogErrorF("Can't startup the Gateway middleware - %w", err)
 	}

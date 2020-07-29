@@ -1,23 +1,25 @@
 Identity:
-  servers:
-    public:
-      bind:
-        address: ":8200"
-    admin:
-      bind:
-        address: ":8201"
-  database:
-    databaseName: "identity"
-    sqllite:
-      path: ":memory:"
-  invites:
-    expiration: 48h
-    sendToHost: https://api.moov.io 
-    sendToPath: /authentication/tenants/{{.TenantID}}
-  notifications:
+  Servers:
+    Public:
+      Bind:
+        Address: ":8200"
+    Admin:
+      Bind:
+        Address: ":8201"
+  Database:
+    DatabaseName: "identity"
+    SQLLite:
+      Path: ":memory:"
+  Services:
+    authn: http://authn:8202/
+  Invites:
+    Expiration: 48h
+    SendToHost: https://api.moov.io 
+    SendToPath: /authentication/tenants/{{.TenantID}}
+  Notifications:
     Mock:
-      from: noreply@moov.io
-  gateway:
+      From: noreply@moov.io
+  Gateway:
     # Examples of how to set up this config.
     # keys:
     #   http:
@@ -27,8 +29,8 @@ Identity:
     #     paths: 
     #     - ./configs/gateway-jwks-sig-pub.json
 
-  authentication:
-    landingUrl: "/whoami"
+  Authentication:
+    LandingUrl: "/whoami"
     # keys:
     #   http:
     #    urls:
@@ -36,8 +38,8 @@ Identity:
     #   file:
     #     paths: 
     #     - ./configs/authn-jwks-sig-pub.json
-  session:
-    expiration: 1h
+  Session:
+    Expiration: 1h
     # keys:
     #   paths:
     #   - ./configs/identity-jwks-sig-pub.json

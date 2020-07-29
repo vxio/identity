@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
+	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
 	client "github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
 	"github.com/moov-io/identity/pkg/logging"
@@ -43,7 +44,9 @@ func NewScope(t *testing.T) Scope {
 		From: "noreply@moov.io",
 	})
 
-	service, err := NewInvitesService(invitesConfig, times, repository, notifications)
+	authnClient := authntestutils.NewMockAuthnClient()
+
+	service, err := NewInvitesService(invitesConfig, times, repository, notifications, authnClient)
 	if err != nil {
 		t.Error(err)
 	}
