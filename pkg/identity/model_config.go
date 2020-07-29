@@ -42,5 +42,5 @@ type BindAddress struct {
 }
 
 type ServicesConfig struct {
-	authn string
+	Authn string
 }

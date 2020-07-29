@@ -414,8 +414,8 @@ github.com/moov-io/tumbler v0.0.0-20200702154909-c9a5dbdd4b59/go.mod h1:2oPTr8Ne
 github.com/moov-io/tumbler v0.1.0/go.mod h1:2oPTr8Ne5jVLFui5yGrP6K8bDFSfHALjtO9ZIQb+Phw=
 github.com/moov-io/tumbler v0.2.0 h1:uksgDAx+A85BhM2hJgPLEJHch6n8qtQkEXe0vbd8Iq8=
 github.com/moov-io/tumbler v0.2.0/go.mod h1:jaDvgmeUed0m3+WFiBslkZyUbl/zLWb4iXtWNxpL7Ik=
-github.com/moov-io/tumbler v0.2.1-0.20200729180434-053345117b75 h1:wTcYcQza827oA4SjpAoFA93PPBQYv18aUcm6i1OjoCQ=
-github.com/moov-io/tumbler v0.2.1-0.20200729180434-053345117b75/go.mod h1:jaDvgmeUed0m3+WFiBslkZyUbl/zLWb4iXtWNxpL7Ik=
+github.com/moov-io/tumbler v0.2.1-0.20200729213046-363c03b59922 h1:+/LoaMvJ94OQZup9bAo8W4N/r/I/eO6QGHLDOPCm+PA=
+github.com/moov-io/tumbler v0.2.1-0.20200729213046-363c03b59922/go.mod h1:jaDvgmeUed0m3+WFiBslkZyUbl/zLWb4iXtWNxpL7Ik=
 github.com/morikuni/aec v1.0.0 h1:nP9CBfwrvYnBRgY6qfDQkygYDmYwOilePFkwzv4dU8A=
 github.com/morikuni/aec v1.0.0/go.mod h1:BbKIizmSmc5MMPqRYbxO4ZU0S0+P200+tUnFx7PXmsc=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=

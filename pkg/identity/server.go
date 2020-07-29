@@ -14,6 +14,7 @@ import (
 	"github.com/moov-io/base/admin"
 	_ "github.com/moov-io/identity" // need to import the embedded files
 
+	"github.com/moov-io/identity/pkg/logging"
 	log "github.com/moov-io/identity/pkg/logging"
 )
 
@@ -55,11 +56,12 @@ func awaitTermination(logger log.Logger, terminationListener chan error) {
 }
 
 func bootHTTPServer(name string, routes *mux.Router, errs chan<- error, logger log.Logger, config HTTPConfig) (*http.Server, func()) {
+	loggedHandler := RequestLogger(logger, routes, "http")
 
 	// Create main HTTP server
 	serve := &http.Server{
 		Addr:    config.Bind.Address,
-		Handler: routes,
+		Handler: loggedHandler,
 		TLSConfig: &tls.Config{
 			InsecureSkipVerify:       false,
 			PreferServerCipherSuites: true,
@@ -98,4 +100,26 @@ func bootAdminServer(errs chan<- error, logger log.Logger, config HTTPConfig) *a
 	}()
 
 	return adminServer
+}
+
+func RequestLogger(log logging.Logger, inner http.Handler, name string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		ctx := map[string]string{
+			"request_method": r.Method,
+			"require_uri":    r.RequestURI,
+			"route_name":     name,
+			"response_time":  time.Since(start).String(),
+		}
+
+		func() {
+			if r := recover(); r != nil {
+				ctx["panic"] = fmt.Sprintf("%v", r)
+			}
+
+			log.WithMap(ctx).Info().Log(fmt.Sprintf("%s %s %s", r.Method, r.RequestURI, name))
+		}()
+
+		inner.ServeHTTP(w, r)
+	})
 }

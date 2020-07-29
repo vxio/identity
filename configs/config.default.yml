@@ -11,7 +11,7 @@ Identity:
     SQLLite:
       Path: ":memory:"
   Services:
-    authn: http://authn:8202/
+    Authn: http://authn:8202
   Invites:
     Expiration: 48h
     SendToHost: https://api.moov.io 

@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	authnClient "github.com/moov-io/authn/pkg/client"
+	"github.com/moov-io/identity/pkg/logging"
 
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
@@ -14,25 +15,26 @@ type AuthnClient interface {
 }
 
 type authnApiClient struct {
-	api *authnClient.APIClient
+	logger logging.Logger
+	api    *authnClient.APIClient
 }
 
-func NewAuthnClient(serviceURL string) (AuthnClient, error) {
-	url, err := url.Parse(serviceURL)
+func NewAuthnClient(logger logging.Logger, serviceURL string) (AuthnClient, error) {
+	_, err := url.Parse(serviceURL)
 	if err != nil {
 		return nil, err
 	}
 
 	config := authnClient.NewConfiguration()
-	config.Servers = []authnClient.ServerConfiguration{
-		authnClient.ServerConfiguration{
-			Url: url.String(),
-		},
-	}
+	config.BasePath = serviceURL
+	config.Servers = []authnClient.ServerConfiguration{{Url: serviceURL}}
 	config.HTTPClient = tmw.UseClient(&http.Client{})
 
+	logger.WithKeyValue("base_path", serviceURL).Info().Log("Instantiated new Authn client")
+
 	return &authnApiClient{
-		api: authnClient.NewAPIClient(config),
+		logger: logger,
+		api:    authnClient.NewAPIClient(config),
 	}, nil
 }
 

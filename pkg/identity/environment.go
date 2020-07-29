@@ -95,7 +95,7 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 	CredentialRepository := credentials.NewCredentialRepository(db)
 	CredentialsService := credentials.NewCredentialsService(TimeService, CredentialRepository)
 
-	AuthnClient, err := authn.NewAuthnClient(config.Services.authn)
+	AuthnClient, err := authn.NewAuthnClient(logger, config.Services.Authn)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 	SessionController := session.NewSessionController(logger, IdentitiesService, TimeService)
 	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
-	InvitesController := invites.NewInvitesController(InvitesService)
+	InvitesController := invites.NewInvitesController(logger, InvitesService)
 
 	authedRouter := router.NewRoute().Subrouter()
 	authedRouter = api.AppendRouters(logger, authedRouter, IdentitiesController, CredentialsController, InvitesController)
