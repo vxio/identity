@@ -112,7 +112,7 @@ func RequestLogger(log logging.Logger, inner http.Handler, name string) http.Han
 			"response_time":  time.Since(start).String(),
 		}
 
-		func() {
+		defer func() {
 			if r := recover(); r != nil {
 				ctx["panic"] = fmt.Sprintf("%v", r)
 			}
