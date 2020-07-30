@@ -53,7 +53,7 @@ func NewScope(t *testing.T) Scope {
 		t.Error(err)
 	}
 
-	controller := NewInvitesController(service)
+	controller := NewInvitesController(logging, service)
 
 	routes := mux.NewRouter()
 	api.AppendRouters(logging, routes, controller)
