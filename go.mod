@@ -16,7 +16,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/moov-io/authn v0.2.4
 	github.com/moov-io/base v0.11.0
-	github.com/moov-io/tumbler v0.2.1-0.20200729213046-363c03b59922
+	github.com/moov-io/tumbler v0.2.1
 	github.com/ory/dockertest/v3 v3.6.0
 	github.com/prometheus/client_golang v1.7.1
 	github.com/spf13/viper v1.7.0
