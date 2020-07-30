@@ -22,6 +22,7 @@ type Config struct {
 	Session        session.Config
 	Notifications  notifications.NotificationsConfig
 	Invites        invites.Config
+	Services       ServicesConfig
 }
 
 // ServerConfig - Groups all the http configs for the servers and ports that get opened.
@@ -38,4 +39,8 @@ type HTTPConfig struct {
 // BindAddress specifies where the http server should bind to.
 type BindAddress struct {
 	Address string
+}
+
+type ServicesConfig struct {
+	Authn string
 }

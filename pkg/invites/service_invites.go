@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/moov-io/identity/pkg/authn"
+	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
 
@@ -22,10 +24,12 @@ type invitesService struct {
 	time          stime.TimeService
 	repository    Repository
 	notifications notifications.NotificationsService
+	authnClient   authn.AuthnClient
+	identity      identities.Service
 }
 
 // NewInvitesService instantiates a new invitesService for interacting with Invites from outside of the package.
-func NewInvitesService(config Config, time stime.TimeService, repository Repository, notifications notifications.NotificationsService) (api.InvitesApiServicer, error) {
+func NewInvitesService(config Config, time stime.TimeService, repository Repository, notifications notifications.NotificationsService, authnClient authn.AuthnClient, identity identities.Service) (api.InvitesApiServicer, error) {
 
 	urlTemplate, err := template.New("send").Parse(config.SendToHost + config.SendToPath)
 	if err != nil {
@@ -38,6 +42,8 @@ func NewInvitesService(config Config, time stime.TimeService, repository Reposit
 		time:          time,
 		repository:    repository,
 		notifications: notifications,
+		authnClient:   authnClient,
+		identity:      identity,
 	}, nil
 }
 
@@ -71,7 +77,17 @@ func (s *invitesService) SendInvite(claims tmw.TumblerClaims, send api.SendInvit
 		return nil, "", err
 	}
 
-	notification := notifications.NewInviteEmail(redeemURL.String())
+	tenant, err := s.authnClient.GetTenant(claims, claims.TenantID.String())
+	if err != nil {
+		return nil, "", err
+	}
+
+	inviter, err := s.identity.GetIdentity(claims, claims.IdentityID.String())
+	if err != nil {
+		return nil, "", err
+	}
+
+	notification := notifications.NewInviteEmail(redeemURL.String(), *inviter, *tenant)
 
 	if err := s.notifications.SendEmail(invite.Email, &notification); err != nil {
 		return nil, "", err

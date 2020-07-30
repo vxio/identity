@@ -6,8 +6,10 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
+	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
 	client "github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
+	identitiestestutils "github.com/moov-io/identity/pkg/identities/testutils"
 	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
@@ -43,12 +45,15 @@ func NewScope(t *testing.T) Scope {
 		From: "noreply@moov.io",
 	})
 
-	service, err := NewInvitesService(invitesConfig, times, repository, notifications)
+	authnClient := authntestutils.NewMockAuthnClient()
+	singleIdentity := identitiestestutils.NewSingleService(nil)
+
+	service, err := NewInvitesService(invitesConfig, times, repository, notifications, authnClient, singleIdentity)
 	if err != nil {
 		t.Error(err)
 	}
 
-	controller := NewInvitesController(service)
+	controller := NewInvitesController(logging, service)
 
 	routes := mux.NewRouter()
 	api.AppendRouters(logging, routes, controller)

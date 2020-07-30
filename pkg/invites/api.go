@@ -7,17 +7,22 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/logging"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
 // A Controller binds http requests to an api service and writes the service results to the http response
 type Controller struct {
+	logger  logging.Logger
 	service api.InvitesApiServicer
 }
 
 // NewInvitesController creates a default api controller
-func NewInvitesController(s api.InvitesApiServicer) api.Router {
-	return &Controller{service: s}
+func NewInvitesController(logger logging.Logger, s api.InvitesApiServicer) api.Router {
+	return &Controller{
+		logger:  logger,
+		service: s,
+	}
 }
 
 // Routes returns all of the api route for the InvitesApiController
@@ -85,6 +90,7 @@ func (c *Controller) SendInvite(w http.ResponseWriter, r *http.Request) {
 
 		result, _, err := c.service.SendInvite(claims, *invite)
 		if err != nil {
+			c.logger.Error().LogError("unable to send invite", err)
 			w.WriteHeader(500)
 			return
 		}

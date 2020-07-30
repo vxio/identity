@@ -95,13 +95,18 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 	CredentialRepository := credentials.NewCredentialRepository(db)
 	CredentialsService := credentials.NewCredentialsService(TimeService, CredentialRepository)
 
-	InvitesRepository := invites.NewInvitesRepository(db)
-	InvitesService, err := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService)
+	AuthnClient, err := authn.NewAuthnClient(logger, config.Services.Authn)
 	if err != nil {
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(logger, *CredentialsService, *IdentitiesService, SessionService, InvitesService)
+	InvitesRepository := invites.NewInvitesRepository(db)
+	InvitesService, err := invites.NewInvitesService(config.Invites, TimeService, InvitesRepository, NotificationsService, AuthnClient, IdentitiesService)
+	if err != nil {
+		return nil, err
+	}
+
+	AuthnService := authn.NewAuthnService(logger, *CredentialsService, IdentitiesService, SessionService, InvitesService)
 
 	// router
 	router := mux.NewRouter()
@@ -127,7 +132,7 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 	// authed server
 
 	// auth middleware for the tokens coming from the gateway
-	GatewayMiddleware, err := tmw.NewTumblerMiddlewareFromConfig(logger, TimeService, config.Gateway)
+	GatewayMiddleware, err := tmw.NewServerFromConfig(logger, TimeService, config.Gateway)
 	if err != nil {
 		return nil, logger.Fatal().LogErrorF("Can't startup the Gateway middleware - %w", err)
 	}
@@ -135,7 +140,7 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 	SessionController := session.NewSessionController(logger, IdentitiesService, TimeService)
 	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
-	InvitesController := invites.NewInvitesController(InvitesService)
+	InvitesController := invites.NewInvitesController(logger, InvitesService)
 
 	authedRouter := router.NewRoute().Subrouter()
 	authedRouter = api.AppendRouters(logger, authedRouter, IdentitiesController, CredentialsController, InvitesController)
@@ -147,7 +152,7 @@ func NewEnvironment(logger logging.Logger, configOverride *GlobalConfig) (*Envir
 		Config: *config,
 
 		InviteService:      InvitesService,
-		IdentitiesService:  *IdentitiesService,
+		IdentitiesService:  IdentitiesService,
 		CredentialsService: *CredentialsService,
 
 		PublicRouter: *router,

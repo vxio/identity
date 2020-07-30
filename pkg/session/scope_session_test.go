@@ -46,7 +46,7 @@ func NewSessionScope(t *testing.T) SessionScope {
 		assert:     a,
 		claims:     claims,
 		time:       times,
-		identities: *identities,
+		identities: identities,
 		controller: controller,
 	}
 }

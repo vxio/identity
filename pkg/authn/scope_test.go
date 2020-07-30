@@ -8,6 +8,9 @@ import (
 	"time"
 
 	"github.com/moov-io/identity/pkg/authn"
+	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
+	"github.com/moov-io/identity/pkg/identities"
+	identitiestestutils "github.com/moov-io/identity/pkg/identities/testutils"
 	log "github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/tumbler/pkg/jwe"
 	"github.com/square/go-jose/jwt"
@@ -21,7 +24,6 @@ import (
 	clienttest "github.com/moov-io/identity/pkg/client_test"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
-	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/notifications"
 	sessionpkg "github.com/moov-io/identity/pkg/session"
@@ -55,12 +57,15 @@ func Setup(t *testing.T) Scope {
 		SendToHost: "https://localhost",
 		SendToPath: "/register",
 	}
-	invitesRepo := invites.NewInvitesRepository(db)
-	invites, err := invites.NewInvitesService(invitesConfig, stime, invitesRepo, notifications)
-	a.Nil(err)
+
+	authnClient := authntestutils.NewMockAuthnClient()
 
 	identitiesRepo := identities.NewIdentityRepository(db)
 	identities := identities.NewIdentitiesService(stime, identitiesRepo)
+
+	invitesRepo := invites.NewInvitesRepository(db)
+	invites, err := invites.NewInvitesService(invitesConfig, stime, invitesRepo, notifications, authnClient, identitiestestutils.NewSingleService(nil))
+	a.Nil(err)
 
 	credsRepo := credentials.NewCredentialRepository(db)
 	creds := credentials.NewCredentialsService(stime, credsRepo)
@@ -69,7 +74,7 @@ func Setup(t *testing.T) Scope {
 	sessionJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, identityKeys)
 	token := sessionpkg.NewSessionService(stime, sessionJwe, sessionConfig)
 
-	service := authn.NewAuthnService(logger, *creds, *identities, token, invites)
+	service := authn.NewAuthnService(logger, *creds, identities, token, invites)
 
 	authnJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, webkeys.NewStaticJwksService(authnKeys))
 
