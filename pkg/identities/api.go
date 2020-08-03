@@ -13,17 +13,17 @@ import (
 )
 
 // A Controller binds http requests to an api service and writes the service results to the http response
-type Controller struct {
-	service api.IdentitiesApiServicer
+type controller struct {
+	service Service
 }
 
 // NewIdentitiesController creates a default api controller
-func NewIdentitiesController(s api.IdentitiesApiServicer) api.Router {
-	return &Controller{service: s}
+func NewIdentitiesController(s Service) api.Router {
+	return &controller{service: s}
 }
 
 // Routes returns all of the api route for the IdentitiesApiController
-func (c *Controller) Routes() api.Routes {
+func (c *controller) Routes() api.Routes {
 	return api.Routes{
 		{
 			Name:        "DisableIdentity",
@@ -63,7 +63,7 @@ func errorHandling(w http.ResponseWriter, err error) {
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
-func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
+func (c *controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
@@ -78,7 +78,7 @@ func (c *Controller) DisableIdentity(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetIdentity - List identities and associates userId
-func (c *Controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
+func (c *controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
@@ -93,7 +93,7 @@ func (c *Controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
 }
 
 // ListIdentities - List identities and associates userId
-func (c *Controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
+func (c *controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		query := r.URL.Query()
 		orgID := query.Get("orgID")
@@ -108,7 +108,7 @@ func (c *Controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateIdentity - Update a specific Identity
-func (c *Controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
+func (c *controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]

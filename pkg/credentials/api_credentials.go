@@ -10,14 +10,6 @@ import (
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
-// CredentialsApiRouter defines the required methods for binding the api requests to a responses for the CredentialsApi
-// The CredentialsApiRouter implementation should parse necessary information from the http request,
-// pass the data to a CredentialsApiServicer to perform the required actions, then write the service results to the http response.
-type CredentialsApiRouter interface {
-	DisableCredentials(http.ResponseWriter, *http.Request)
-	ListCredentials(http.ResponseWriter, *http.Request)
-}
-
 // A CredentialsApiController binds http requests to an api service and writes the service results to the http response
 type credentialsApiController struct {
 	service CredentialsService
