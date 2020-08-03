@@ -31,7 +31,7 @@ jobs:
       run: make install
 
     - name: Check
-      run: make build && make check
+      run: make check
 
     - name: Upload Code Coverage
       if: runner.os == 'Linux'

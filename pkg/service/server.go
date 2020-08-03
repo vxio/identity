@@ -12,8 +12,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base/admin"
-	_ "github.com/moov-io/identity" // need to import the embedded files
-
 	"github.com/moov-io/identity/pkg/logging"
 )
 
@@ -25,7 +23,7 @@ func (env *Environment) RunServers(await bool) func() {
 
 	adminServer := bootAdminServer(terminationListener, env.Logger, env.Config.Servers.Admin)
 
-	_, shutdownPublicServer := bootHTTPServer("public", &env.PublicRouter, terminationListener, env.Logger, env.Config.Servers.Public)
+	_, shutdownPublicServer := bootHTTPServer("public", env.PublicRouter, terminationListener, env.Logger, env.Config.Servers.Public)
 
 	if await {
 		awaitTermination(env.Logger, terminationListener)
@@ -50,11 +48,12 @@ func newTerminationListener() chan error {
 
 func awaitTermination(logger logging.Logger, terminationListener chan error) {
 	if err := <-terminationListener; err != nil {
-		logger.Fatal().LogError("Terminated", err)
+		_ = logger.Fatal().LogError("Terminated", err)
 	}
 }
 
 func bootHTTPServer(name string, routes *mux.Router, errs chan<- error, logger logging.Logger, config HTTPConfig) (*http.Server, func()) {
+
 	loggedHandler := RequestLogger(logger, routes, "http")
 
 	// Create main HTTP server
@@ -81,7 +80,7 @@ func bootHTTPServer(name string, routes *mux.Router, errs chan<- error, logger l
 
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
-			logger.Fatal().LogError(name, err)
+			_ = logger.Fatal().LogError(name, err)
 		}
 	}
 
