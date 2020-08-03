@@ -39,11 +39,11 @@ func (s *singleService) ListIdentities(claims tmw.TumblerClaims, orgID string) (
 	return []client.Identity{s.identity}, nil
 }
 
-func (s *singleService) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
+func (s *singleService) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update client.UpdateIdentity) (*api.Identity, error) {
 	panic(ErrNotImplemented)
 }
 
-func (s *singleService) Register(register api.Register, invite *api.Invite) (*api.Identity, error) {
+func (s *singleService) Register(register client.Register, invite *client.Invite) (*api.Identity, error) {
 	panic(ErrNotImplemented)
 }
 

@@ -39,7 +39,7 @@ func NewAuthnService(
 }
 
 // RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
-func (s *authnService) RegisterWithCredentials(req *http.Request, register api.Register, nonce string, ip string, isSignup bool) (*http.Cookie, *client.LoggedIn, error) {
+func (s *authnService) RegisterWithCredentials(req *http.Request, register client.Register, nonce string, ip string, isSignup bool) (*http.Cookie, *client.LoggedIn, error) {
 	logCtx := s.log.WithMap(map[string]string{
 		"tenant_id":     register.TenantID,
 		"credential_id": register.CredentialID,
@@ -121,7 +121,7 @@ func (s *authnService) LoginWithCredentials(req *http.Request, login client.Logi
 		return nil, nil, logCtx.Error().LogError("Unable to generate cookie", err)
 	}
 
-	loggedIn := api.LoggedIn{
+	loggedIn := client.LoggedIn{
 		Jwt:          cookie.Value,
 		CredentialID: credential.CredentialID,
 		TenantID:     credential.TenantID,

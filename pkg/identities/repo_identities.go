@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 )
 
 // Repository - Used for interacting identities on the data store
@@ -345,16 +346,16 @@ var addressSelect = `
 	identity_address.validated
 `
 
-func (r *sqlIdentityRepo) queryScanAddresses(query string, args ...interface{}) ([]api.Address, error) {
+func (r *sqlIdentityRepo) queryScanAddresses(query string, args ...interface{}) ([]client.Address, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	items := []api.Address{}
+	items := []client.Address{}
 	for rows.Next() {
-		item := api.Address{}
+		item := client.Address{}
 		if err := rows.Scan(
 			&item.IdentityID,
 			&item.AddressID,
@@ -389,16 +390,16 @@ var phoneSelect = `
 	identity_phone.validated
 `
 
-func (r *sqlIdentityRepo) queryScanPhone(query string, args ...interface{}) ([]api.Phone, error) {
+func (r *sqlIdentityRepo) queryScanPhone(query string, args ...interface{}) ([]client.Phone, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	items := []api.Phone{}
+	items := []client.Phone{}
 	for rows.Next() {
-		item := api.Phone{}
+		item := client.Phone{}
 		if err := rows.Scan(
 			&item.IdentityID,
 			&item.PhoneID,

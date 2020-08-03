@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/stime"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
@@ -16,9 +17,9 @@ type Service interface {
 	DisableIdentity(claims tmw.TumblerClaims, identityID string) error
 	GetIdentity(claims tmw.TumblerClaims, identityID string) (*api.Identity, error)
 	ListIdentities(claims tmw.TumblerClaims, orgID string) ([]api.Identity, error)
-	UpdateIdentity(claims tmw.TumblerClaims, identityID string, update api.UpdateIdentity) (*api.Identity, error)
+	UpdateIdentity(claims tmw.TumblerClaims, identityID string, update client.UpdateIdentity) (*api.Identity, error)
 
-	Register(register api.Register, invite *api.Invite) (*api.Identity, error)
+	Register(register client.Register, invite *client.Invite) (*api.Identity, error)
 	GetIdentityByID(identityID string) (*api.Identity, error)
 }
 
@@ -79,7 +80,7 @@ func (s *service) ListIdentities(claims tmw.TumblerClaims, orgID string) ([]api.
 }
 
 // UpdateIdentity - Update a specific Identity
-func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
+func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update client.UpdateIdentity) (*api.Identity, error) {
 	identity, err := s.GetIdentity(claims, identityID)
 	if err != nil {
 		return nil, err
@@ -94,7 +95,7 @@ func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, up
 	identity.Status = update.Status
 	identity.LastUpdatedOn = s.time.Now()
 
-	identity.Phones = []api.Phone{}
+	identity.Phones = []client.Phone{}
 	for _, p := range update.Phones {
 		_, err := uuid.Parse(p.PhoneID)
 		if err != nil {
@@ -103,7 +104,7 @@ func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, up
 
 		identity.Phones = append(
 			identity.Phones,
-			api.Phone{
+			client.Phone{
 				IdentityID: identity.IdentityID,
 				PhoneID:    p.PhoneID,
 				Number:     p.Number,
@@ -113,7 +114,7 @@ func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, up
 		)
 	}
 
-	identity.Addresses = []api.Address{}
+	identity.Addresses = []client.Address{}
 	for _, a := range update.Addresses {
 		_, err := uuid.Parse(a.AddressID)
 		if err != nil {
@@ -122,7 +123,7 @@ func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, up
 
 		identity.Addresses = append(
 			identity.Addresses,
-			api.Address{
+			client.Address{
 				IdentityID: identity.IdentityID,
 				AddressID:  a.AddressID,
 				Type:       a.Type,
@@ -148,12 +149,12 @@ func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, up
 }
 
 // Register - Takes an invite and the registration information and creates the new identity from it.
-func (s *service) Register(register api.Register, invite *api.Invite) (*api.Identity, error) {
+func (s *service) Register(register client.Register, invite *client.Invite) (*api.Identity, error) {
 	identityID := uuid.New().String()
 
-	phones := []api.Phone{}
+	phones := []client.Phone{}
 	for _, rp := range register.Phones {
-		phones = append(phones, api.Phone{
+		phones = append(phones, client.Phone{
 			IdentityID: identityID,
 			PhoneID:    uuid.New().String(),
 			Number:     rp.Number,
@@ -162,9 +163,9 @@ func (s *service) Register(register api.Register, invite *api.Invite) (*api.Iden
 		})
 	}
 
-	addresses := []api.Address{}
+	addresses := []client.Address{}
 	for _, ra := range register.Addresses {
-		addresses = append(addresses, api.Address{
+		addresses = append(addresses, client.Address{
 			IdentityID: identityID,
 			AddressID:  uuid.New().String(),
 			Type:       ra.Type,
@@ -194,7 +195,7 @@ func (s *service) Register(register api.Register, invite *api.Invite) (*api.Iden
 		Phones:        phones,
 		Addresses:     addresses,
 		RegisteredOn:  s.time.Now(),
-		LastLogin:     api.LastLogin{},
+		LastLogin:     client.LastLogin{},
 		LastUpdatedOn: s.time.Now(),
 	}
 

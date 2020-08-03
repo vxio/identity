@@ -5,15 +5,16 @@ import (
 	"fmt"
 
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 )
 
 // Repository allows for interacting with the invites data store.
 type Repository interface {
-	list(tenantID api.TenantID) ([]api.Invite, error)
-	get(tenantID api.TenantID, inviteID string) (*api.Invite, error)
-	getByCode(code string) (*api.Invite, error)
-	add(invite api.Invite, secretCode string) (*api.Invite, error)
-	update(updated api.Invite) error
+	list(tenantID api.TenantID) ([]client.Invite, error)
+	get(tenantID api.TenantID, inviteID string) (*client.Invite, error)
+	getByCode(code string) (*client.Invite, error)
+	add(invite client.Invite, secretCode string) (*client.Invite, error)
+	update(updated client.Invite) error
 }
 
 // NewInvitesRepository instantiates a new InvitesRepository
@@ -25,7 +26,7 @@ type sqlInvitesRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlInvitesRepo) list(tenantID api.TenantID) ([]api.Invite, error) {
+func (r *sqlInvitesRepo) list(tenantID api.TenantID) ([]client.Invite, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s 
 		FROM invites 
@@ -37,7 +38,7 @@ func (r *sqlInvitesRepo) list(tenantID api.TenantID) ([]api.Invite, error) {
 	return r.queryScan(qry, tenantID.String())
 }
 
-func (r *sqlInvitesRepo) get(tenantID api.TenantID, inviteID string) (*api.Invite, error) {
+func (r *sqlInvitesRepo) get(tenantID api.TenantID, inviteID string) (*client.Invite, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM invites
@@ -57,7 +58,7 @@ func (r *sqlInvitesRepo) get(tenantID api.TenantID, inviteID string) (*api.Invit
 	return &res[0], nil
 }
 
-func (r *sqlInvitesRepo) getByCode(code string) (*api.Invite, error) {
+func (r *sqlInvitesRepo) getByCode(code string) (*client.Invite, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM invites
@@ -77,7 +78,7 @@ func (r *sqlInvitesRepo) getByCode(code string) (*api.Invite, error) {
 	return &res[0], nil
 }
 
-func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite, error) {
+func (r *sqlInvitesRepo) add(invite client.Invite, secretCode string) (*client.Invite, error) {
 	qry := `
 		INSERT INTO invites(
 			invite_id,
@@ -107,7 +108,7 @@ func (r *sqlInvitesRepo) add(invite api.Invite, secretCode string) (*api.Invite,
 	return &invite, nil
 }
 
-func (r *sqlInvitesRepo) update(updated api.Invite) error {
+func (r *sqlInvitesRepo) update(updated client.Invite) error {
 	qry := `
 		UPDATE invites 
 		SET 
@@ -153,16 +154,16 @@ var inviteSelect = `
 	invites.disabled_by
 `
 
-func (r *sqlInvitesRepo) queryScan(query string, args ...interface{}) ([]api.Invite, error) {
+func (r *sqlInvitesRepo) queryScan(query string, args ...interface{}) ([]client.Invite, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	items := []api.Invite{}
+	items := []client.Invite{}
 	for rows.Next() {
-		item := api.Invite{}
+		item := client.Invite{}
 		if err := rows.Scan(
 			&item.InviteID,
 			&item.TenantID,

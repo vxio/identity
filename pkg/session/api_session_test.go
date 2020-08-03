@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 )
 
 func Test_SessionEndpoint(t *testing.T) {
 	s := NewSessionScope(t)
 
-	identity, err := s.identities.Register(api.Register{
+	identity, err := s.identities.Register(client.Register{
 		CredentialID: uuid.New().String(),
 		TenantID:     s.claims.TenantID.String(),
 		FirstName:    "John",

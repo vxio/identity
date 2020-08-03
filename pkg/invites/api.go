@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/logging"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
@@ -82,7 +83,7 @@ func (c *Controller) ListInvites(w http.ResponseWriter, r *http.Request) {
 // SendInvite - Send an email invite to a new user
 func (c *Controller) SendInvite(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
-		invite := &api.SendInvite{}
+		invite := &client.SendInvite{}
 		if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
 			w.WriteHeader(500)
 			return

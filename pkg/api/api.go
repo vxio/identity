@@ -59,7 +59,7 @@ type IdentitiesApiServicer interface {
 	DisableIdentity(tmw.TumblerClaims, string) error
 	GetIdentity(tmw.TumblerClaims, string) (*Identity, error)
 	ListIdentities(tmw.TumblerClaims, string) ([]Identity, error)
-	UpdateIdentity(tmw.TumblerClaims, string, UpdateIdentity) (*Identity, error)
+	UpdateIdentity(tmw.TumblerClaims, string, client.UpdateIdentity) (*Identity, error)
 }
 
 // AuthenticationApiServicer defines the api actions for the AuthenticationApi service
@@ -68,7 +68,7 @@ type IdentitiesApiServicer interface {
 // and updated with the logic required for the API.
 type AuthenticationApiServicer interface {
 	LoginWithCredentials(*http.Request, Login, string, string) (*http.Cookie, *client.LoggedIn, error)
-	RegisterWithCredentials(*http.Request, Register, string, string, bool) (*http.Cookie, *client.LoggedIn, error)
+	RegisterWithCredentials(*http.Request, client.Register, string, string, bool) (*http.Cookie, *client.LoggedIn, error)
 }
 
 // InvitesApiServicer defines the api actions for the InvitesApi service
@@ -77,7 +77,7 @@ type AuthenticationApiServicer interface {
 // and updated with the logic required for the API.
 type InvitesApiServicer interface {
 	DisableInvite(tmw.TumblerClaims, string) error
-	ListInvites(tmw.TumblerClaims) ([]Invite, error)
-	SendInvite(tmw.TumblerClaims, SendInvite) (*Invite, string, error)
-	Redeem(code string) (*Invite, error)
+	ListInvites(tmw.TumblerClaims) ([]client.Invite, error)
+	SendInvite(tmw.TumblerClaims, client.SendInvite) (*client.Invite, string, error)
+	Redeem(code string) (*client.Invite, error)
 }

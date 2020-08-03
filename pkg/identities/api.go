@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
@@ -111,7 +112,7 @@ func (c *Controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
-		identity := &api.UpdateIdentity{}
+		identity := &client.UpdateIdentity{}
 		if err := json.NewDecoder(r.Body).Decode(&identity); err != nil {
 			w.WriteHeader(400)
 			return
