@@ -4,8 +4,8 @@ import (
 	"flag"
 	"os"
 
-	"github.com/moov-io/identity/pkg/identity"
 	"github.com/moov-io/identity/pkg/logging"
+	"github.com/moov-io/identity/pkg/service"
 )
 
 var (
@@ -19,7 +19,7 @@ var (
 func main() {
 	logger := logging.NewDefaultLogger().WithKeyValue("app", "identity")
 
-	env, err := identity.NewEnvironment(logger, nil)
+	env, err := service.NewEnvironment(logger, nil)
 	if err != nil {
 		logger.Fatal().LogError("Error loading up environment.", err)
 		os.Exit(1)

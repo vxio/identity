@@ -8,11 +8,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/moov-io/identity/pkg/api"
-	"github.com/moov-io/identity/pkg/identity"
+	"github.com/moov-io/identity/pkg/service"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
-func sendInvite(env identity.Environment) error {
+func sendInvite(env service.Environment) error {
 	logCtx := env.Logger.WithMap(map[string]string{
 		"email":  *fEmail,
 		"tenant": *fTenantID,
