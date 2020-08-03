@@ -10,18 +10,26 @@ import (
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
+// CredentialsApiRouter defines the required methods for binding the api requests to a responses for the CredentialsApi
+// The CredentialsApiRouter implementation should parse necessary information from the http request,
+// pass the data to a CredentialsApiServicer to perform the required actions, then write the service results to the http response.
+type CredentialsApiRouter interface {
+	DisableCredentials(http.ResponseWriter, *http.Request)
+	ListCredentials(http.ResponseWriter, *http.Request)
+}
+
 // A CredentialsApiController binds http requests to an api service and writes the service results to the http response
-type CredentialsApiController struct {
-	service api.CredentialsApiServicer
+type credentialsApiController struct {
+	service CredentialsService
 }
 
 // NewCredentialsApiController creates a default api controller
-func NewCredentialsApiController(s api.CredentialsApiServicer) api.Router {
-	return &CredentialsApiController{service: s}
+func NewCredentialsApiController(s CredentialsService) api.Router {
+	return &credentialsApiController{service: s}
 }
 
 // Routes returns all of the api route for the CredentialsApiController
-func (c *CredentialsApiController) Routes() api.Routes {
+func (c *credentialsApiController) Routes() api.Routes {
 	return api.Routes{
 		{
 			Name:        "DisableCredentials",
@@ -39,7 +47,7 @@ func (c *CredentialsApiController) Routes() api.Routes {
 }
 
 // DisableCredentials - Disables a credential so it can't be used anymore to login
-func (c *CredentialsApiController) DisableCredentials(w http.ResponseWriter, r *http.Request) {
+func (c *credentialsApiController) DisableCredentials(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]
@@ -61,7 +69,7 @@ func (c *CredentialsApiController) DisableCredentials(w http.ResponseWriter, r *
 }
 
 // ListCredentials - List the credentials this user has used.
-func (c *CredentialsApiController) ListCredentials(w http.ResponseWriter, r *http.Request) {
+func (c *credentialsApiController) ListCredentials(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
 		identityID := params["identityID"]

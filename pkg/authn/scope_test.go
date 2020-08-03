@@ -74,7 +74,7 @@ func Setup(t *testing.T) Scope {
 	sessionJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, identityKeys)
 	token := sessionpkg.NewSessionService(stime, sessionJwe, sessionConfig)
 
-	service := authn.NewAuthnService(logger, *creds, identities, token, invites)
+	service := authn.NewAuthnService(logger, creds, identities, token, invites)
 
 	authnJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, webkeys.NewStaticJwksService(authnKeys))
 

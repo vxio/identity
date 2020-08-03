@@ -111,7 +111,7 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(env.Logger, *CredentialsService, IdentitiesService, SessionService, InvitesService)
+	AuthnService := authn.NewAuthnService(env.Logger, CredentialsService, IdentitiesService, SessionService, InvitesService)
 
 	// router
 	if env.PublicRouter == nil {

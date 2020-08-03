@@ -54,7 +54,7 @@ func NewScope(t *testing.T) Scope {
 		session:    session,
 		time:       times,
 		repository: repository,
-		service:    *service,
+		service:    service,
 		api:        testAPI,
 	}
 }
