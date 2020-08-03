@@ -65,7 +65,7 @@ func Setup(t *testing.T) (*require.Assertions, Scope) {
 	return a, s
 }
 
-func (s *Scope) RegisterRandom() (*api.Credential, error) {
+func (s *Scope) RegisterRandom() (*client.Credential, error) {
 	identityID := uuid.New().String()
 	credentialID := uuid.New().String()
 

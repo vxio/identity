@@ -7,7 +7,6 @@ import (
 
 	fuzz "github.com/google/gofuzz"
 	"github.com/google/uuid"
-	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/client"
 )
 
@@ -223,7 +222,7 @@ func Test_DisableAPI_NotFound(t *testing.T) {
 	a.Equal(404, resp.StatusCode)
 }
 
-func RegisterIdentity(s Scope, f *fuzz.Fuzzer) api.Identity {
+func RegisterIdentity(s Scope, f *fuzz.Fuzzer) client.Identity {
 	invite := s.RandomInvite()
 
 	register := client.Register{}

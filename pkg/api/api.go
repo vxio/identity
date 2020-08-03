@@ -47,8 +47,8 @@ type InvitesApiRouter interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type CredentialsApiServicer interface {
-	DisableCredentials(tmw.TumblerClaims, string, string) (*Credential, error)
-	ListCredentials(tmw.TumblerClaims, string) ([]Credential, error)
+	DisableCredentials(tmw.TumblerClaims, string, string) (*client.Credential, error)
+	ListCredentials(tmw.TumblerClaims, string) ([]client.Credential, error)
 }
 
 // IdentitiesApiServicer defines the api actions for the IdentitiesApi service
@@ -57,9 +57,9 @@ type CredentialsApiServicer interface {
 // and updated with the logic required for the API.
 type IdentitiesApiServicer interface {
 	DisableIdentity(tmw.TumblerClaims, string) error
-	GetIdentity(tmw.TumblerClaims, string) (*Identity, error)
-	ListIdentities(tmw.TumblerClaims, string) ([]Identity, error)
-	UpdateIdentity(tmw.TumblerClaims, string, client.UpdateIdentity) (*Identity, error)
+	GetIdentity(tmw.TumblerClaims, string) (*client.Identity, error)
+	ListIdentities(tmw.TumblerClaims, string) ([]client.Identity, error)
+	UpdateIdentity(tmw.TumblerClaims, string, client.UpdateIdentity) (*client.Identity, error)
 }
 
 // AuthenticationApiServicer defines the api actions for the AuthenticationApi service
@@ -67,7 +67,7 @@ type IdentitiesApiServicer interface {
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type AuthenticationApiServicer interface {
-	LoginWithCredentials(*http.Request, Login, string, string) (*http.Cookie, *client.LoggedIn, error)
+	LoginWithCredentials(*http.Request, client.Login, string, string) (*http.Cookie, *client.LoggedIn, error)
 	RegisterWithCredentials(*http.Request, client.Register, string, string, bool) (*http.Cookie, *client.LoggedIn, error)
 }
 

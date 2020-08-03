@@ -8,6 +8,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 	log "github.com/moov-io/identity/pkg/logging"
 )
 
@@ -63,7 +64,7 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		login := api.Login{
+		login := client.Login{
 			CredentialID: session.CredentialID,
 			TenantID:     session.TenantID,
 		}

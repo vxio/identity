@@ -1,7 +1,7 @@
 package credentials
 
 import (
-	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/stime"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
@@ -23,7 +23,7 @@ func NewCredentialsService(time stime.TimeService, repository CredentialReposito
 }
 
 // DisableCredentials - Disables a credential so it can&#39;t be used anymore to login
-func (s *CredentialsService) DisableCredentials(auth tmw.TumblerClaims, identityID string, credentialID string) (*api.Credential, error) {
+func (s *CredentialsService) DisableCredentials(auth tmw.TumblerClaims, identityID string, credentialID string) (*client.Credential, error) {
 	cred, err := s.repository.get(identityID, credentialID, auth.TenantID.String())
 	if err != nil {
 		return nil, err
@@ -45,11 +45,11 @@ func (s *CredentialsService) DisableCredentials(auth tmw.TumblerClaims, identity
 }
 
 // ListCredentials - List the credentials this user has used.
-func (s *CredentialsService) ListCredentials(auth tmw.TumblerClaims, identityID string) ([]api.Credential, error) {
+func (s *CredentialsService) ListCredentials(auth tmw.TumblerClaims, identityID string) ([]client.Credential, error) {
 	return s.repository.list(identityID, auth.TenantID.String())
 }
 
-func (s *CredentialsService) Login(login api.Login, nonce string, ip string) (*api.Credential, error) {
+func (s *CredentialsService) Login(login client.Login, nonce string, ip string) (*client.Credential, error) {
 
 	// look into the repo for any matches
 	cred, err := s.repository.lookup(login.CredentialID, login.TenantID)
@@ -75,8 +75,8 @@ func (s *CredentialsService) Login(login api.Login, nonce string, ip string) (*a
 	return saved, nil
 }
 
-func (s *CredentialsService) Register(identityID string, credentialID, tenantID string) (*api.Credential, error) {
-	cred := api.Credential{
+func (s *CredentialsService) Register(identityID string, credentialID, tenantID string) (*client.Credential, error) {
+	cred := client.Credential{
 		CredentialID: credentialID,
 		IdentityID:   identityID,
 		TenantID:     tenantID,

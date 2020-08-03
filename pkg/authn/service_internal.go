@@ -75,7 +75,7 @@ func (s *authnService) RegisterWithCredentials(req *http.Request, register clien
 	}
 
 	// Using the new creds create the login object to log the user in.
-	login := api.Login{
+	login := client.Login{
 		CredentialID: creds.CredentialID,
 		TenantID:     identity.TenantID,
 	}

@@ -10,10 +10,10 @@ import (
 
 // Repository - Used for interacting identities on the data store
 type Repository interface {
-	list(tenantID api.TenantID) ([]api.Identity, error)
-	get(identityID string) (*api.Identity, error)
-	update(updated api.Identity) (*api.Identity, error)
-	add(identity api.Identity) (*api.Identity, error)
+	list(tenantID api.TenantID) ([]client.Identity, error)
+	get(identityID string) (*client.Identity, error)
+	update(updated client.Identity) (*client.Identity, error)
+	add(identity client.Identity) (*client.Identity, error)
 }
 
 // NewIdentityRepository - Builds a new repository tied to the DB passed in.
@@ -25,7 +25,7 @@ type sqlIdentityRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]api.Identity, error) {
+func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]client.Identity, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM identity
@@ -84,7 +84,7 @@ func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]api.Identity, error) {
 	return identities, nil
 }
 
-func (r *sqlIdentityRepo) get(identityID string) (*api.Identity, error) {
+func (r *sqlIdentityRepo) get(identityID string) (*client.Identity, error) {
 
 	qry := fmt.Sprintf(`
 		SELECT %s
@@ -136,7 +136,7 @@ func (r *sqlIdentityRepo) get(identityID string) (*api.Identity, error) {
 	return &identities[0], nil
 }
 
-func (r *sqlIdentityRepo) update(updated api.Identity) (*api.Identity, error) {
+func (r *sqlIdentityRepo) update(updated client.Identity) (*client.Identity, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return nil, err
@@ -201,7 +201,7 @@ func (r *sqlIdentityRepo) update(updated api.Identity) (*api.Identity, error) {
 	return &updated, nil
 }
 
-func (r *sqlIdentityRepo) add(identity api.Identity) (*api.Identity, error) {
+func (r *sqlIdentityRepo) add(identity client.Identity) (*client.Identity, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return nil, err
@@ -291,16 +291,16 @@ var identitySelect = `
 	identity.last_updated_on
 `
 
-func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) ([]api.Identity, error) {
+func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) ([]client.Identity, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	items := []api.Identity{}
+	items := []client.Identity{}
 	for rows.Next() {
-		item := api.Identity{}
+		item := client.Identity{}
 		if err := rows.Scan(
 			&item.IdentityID,
 			&item.TenantID,
@@ -420,7 +420,7 @@ func (r *sqlIdentityRepo) queryScanPhone(query string, args ...interface{}) ([]c
 	return items, nil
 }
 
-func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) error {
+func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *client.Identity) error {
 
 	updateQry := `
 		UPDATE identity_address
@@ -507,7 +507,7 @@ func (r *sqlIdentityRepo) upsertAddresses(tx *sql.Tx, updated *api.Identity) err
 	return nil
 }
 
-func (r *sqlIdentityRepo) upsertPhones(tx *sql.Tx, updated *api.Identity) error {
+func (r *sqlIdentityRepo) upsertPhones(tx *sql.Tx, updated *client.Identity) error {
 
 	updateQry := `
 		UPDATE identity_phone

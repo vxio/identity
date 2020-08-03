@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"time"
 
-	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 )
 
 type CredentialRepository interface {
-	list(identityID string, tenantID string) ([]api.Credential, error)
-	lookup(credentialID string, tenantID string) (*api.Credential, error)
-	get(identityID string, credentialID string, tenantID string) (*api.Credential, error)
-	add(credentials api.Credential) (*api.Credential, error)
-	update(updated api.Credential) (*api.Credential, error)
+	list(identityID string, tenantID string) ([]client.Credential, error)
+	lookup(credentialID string, tenantID string) (*client.Credential, error)
+	get(identityID string, credentialID string, tenantID string) (*client.Credential, error)
+	add(credentials client.Credential) (*client.Credential, error)
+	update(updated client.Credential) (*client.Credential, error)
 	record(credentialID string, nonce string, ip string, at time.Time) error
 }
 
@@ -25,7 +25,7 @@ type sqlCredsRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlCredsRepo) list(identityID string, tenantID string) ([]api.Credential, error) {
+func (r *sqlCredsRepo) list(identityID string, tenantID string) ([]client.Credential, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM credentials
@@ -35,7 +35,7 @@ func (r *sqlCredsRepo) list(identityID string, tenantID string) ([]api.Credentia
 	return r.queryScan(qry, identityID, tenantID)
 }
 
-func (r *sqlCredsRepo) lookup(credentialID string, tenantID string) (*api.Credential, error) {
+func (r *sqlCredsRepo) lookup(credentialID string, tenantID string) (*client.Credential, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM credentials
@@ -55,7 +55,7 @@ func (r *sqlCredsRepo) lookup(credentialID string, tenantID string) (*api.Creden
 	return &results[0], nil
 }
 
-func (r *sqlCredsRepo) get(identityID string, credentialID string, tenantID string) (*api.Credential, error) {
+func (r *sqlCredsRepo) get(identityID string, credentialID string, tenantID string) (*client.Credential, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM credentials
@@ -75,7 +75,7 @@ func (r *sqlCredsRepo) get(identityID string, credentialID string, tenantID stri
 	return &results[0], nil
 }
 
-func (r *sqlCredsRepo) add(credentials api.Credential) (*api.Credential, error) {
+func (r *sqlCredsRepo) add(credentials client.Credential) (*client.Credential, error) {
 	qry := `
 		INSERT INTO credentials(
 			credential_id, 
@@ -135,7 +135,7 @@ func (r *sqlCredsRepo) record(credentialID string, nonce string, ip string, at t
 	return nil
 }
 
-func (r *sqlCredsRepo) update(updated api.Credential) (*api.Credential, error) {
+func (r *sqlCredsRepo) update(updated client.Credential) (*client.Credential, error) {
 
 	qry := `
 		UPDATE credentials
@@ -174,16 +174,16 @@ var credentialSelect = `
 	disabled_by
 `
 
-func (r *sqlCredsRepo) queryScan(query string, args ...interface{}) ([]api.Credential, error) {
+func (r *sqlCredsRepo) queryScan(query string, args ...interface{}) ([]client.Credential, error) {
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	credentials := []api.Credential{}
+	credentials := []client.Credential{}
 	for rows.Next() {
-		cred := api.Credential{}
+		cred := client.Credential{}
 		if err := rows.Scan(&cred.CredentialID, &cred.TenantID, &cred.IdentityID, &cred.CreatedOn, &cred.LastUsedOn, &cred.DisabledOn, &cred.DisabledBy); err != nil {
 			return nil, err
 		}
