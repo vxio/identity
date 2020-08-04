@@ -14,13 +14,11 @@ import (
 	"github.com/moov-io/identity/pkg/logging"
 )
 
-type Login = client.Login
-
 type loginLogContext struct {
-	login *Login
+	login *client.Login
 }
 
-func NewLoginLogContext(login *Login) logging.LogContext {
+func NewLoginLogContext(login *client.Login) logging.LogContext {
 	return &loginLogContext{login: login}
 }
 

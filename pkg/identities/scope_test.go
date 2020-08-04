@@ -68,8 +68,8 @@ func Setup(t *testing.T) (*require.Assertions, Scope, *fuzz.Fuzzer) {
 	return a, s, f
 }
 
-func (s *Scope) RandomInvite() api.Invite {
-	return api.Invite{
+func (s *Scope) RandomInvite() client.Invite {
+	return client.Invite{
 		InviteID: uuid.New().String(),
 		TenantID: s.session.TenantID.String(),
 	}

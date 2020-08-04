@@ -16,27 +16,27 @@ Project:
 # List of all the templates to run
 Templates:
   GoService:
-    # # Description to use in README.md, OpenAPI spec, and other docs.
-    # # Public service port where most services run
-    # ServicePort: 8210
-    # # Health / Admin port
-    # HealthPort: 8211
+    # Description to use in README.md, OpenAPI spec, and other docs.
+    # Public service port where most services run
+    ServicePort: 8200
+    # Health / Admin port
+    HealthPort: 8201
   GoGithubActionsPublic: 
-    #  - Executable: errorsservice
+    - Executable: identity
   # Adds new custom endpoints.
   GoEndpoint:
-    # simple endpoint
-      # Package to place this in, in the project
-    - PackageID: "session"
-      # What to name the controller
-      CollectionName: "Session"
-      # Private name of the controller
-      CollectionID: "session"
-      # List of all endpoints this controller handles
-      Endpoints:
-        # Name of the action of the endpoint
-      - EndpointID: "getSession"
-        # Method is responds to.
-        Method: "GET"
-        # Path to respond on
-        Path: "/session"
+    # # simple endpoint
+    #   # Package to place this in, in the project
+    # - PackageID: "session"
+    #   # What to name the controller
+    #   CollectionName: "Session"
+    #   # Private name of the controller
+    #   CollectionID: "session"
+    #   # List of all endpoints this controller handles
+    #   Endpoints:
+    #     # Name of the action of the endpoint
+    #   - EndpointID: "getSession"
+    #     # Method is responds to.
+    #     Method: "GET"
+    #     # Path to respond on
+    #     Path: "/session"

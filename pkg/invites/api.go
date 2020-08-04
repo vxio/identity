@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/logging"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
@@ -14,11 +15,11 @@ import (
 // A Controller binds http requests to an api service and writes the service results to the http response
 type Controller struct {
 	logger  logging.Logger
-	service api.InvitesApiServicer
+	service InvitesService
 }
 
 // NewInvitesController creates a default api controller
-func NewInvitesController(logger logging.Logger, s api.InvitesApiServicer) api.Router {
+func NewInvitesController(logger logging.Logger, s InvitesService) api.Router {
 	return &Controller{
 		logger:  logger,
 		service: s,
@@ -82,7 +83,7 @@ func (c *Controller) ListInvites(w http.ResponseWriter, r *http.Request) {
 // SendInvite - Send an email invite to a new user
 func (c *Controller) SendInvite(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
-		invite := &api.SendInvite{}
+		invite := &client.SendInvite{}
 		if err := json.NewDecoder(r.Body).Decode(&invite); err != nil {
 			w.WriteHeader(500)
 			return

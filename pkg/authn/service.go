@@ -9,16 +9,23 @@ import (
 	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/identities"
+	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/session"
 )
+
+// AuthenticationApiServicer defines the api actions for the AuthenticationApi service
+type AuthenticationService interface {
+	LoginWithCredentials(*http.Request, client.Login, string, string) (*http.Cookie, *client.LoggedIn, error)
+	RegisterWithCredentials(*http.Request, client.Register, string, string, bool) (*http.Cookie, *client.LoggedIn, error)
+}
 
 type authnService struct {
 	log         logging.Logger
 	credentials credentials.CredentialsService
 	identities  identities.Service
 	token       session.SessionService
-	invites     api.InvitesApiServicer
+	invites     invites.InvitesService
 }
 
 // NewAuthnService - Creates a default service that handles the registration and login
@@ -27,8 +34,8 @@ func NewAuthnService(
 	credentials credentials.CredentialsService,
 	identities identities.Service,
 	token session.SessionService,
-	invites api.InvitesApiServicer,
-) api.AuthenticationApiServicer {
+	invites invites.InvitesService,
+) AuthenticationService {
 	return &authnService{
 		log:         log,
 		credentials: credentials,
@@ -39,7 +46,7 @@ func NewAuthnService(
 }
 
 // RegisterWithCredentials - Register user based on OIDC credentials.  This is called by the OIDC client services we create to register the user with what  available information they have and obtain from the user.
-func (s *authnService) RegisterWithCredentials(req *http.Request, register api.Register, nonce string, ip string, isSignup bool) (*http.Cookie, *client.LoggedIn, error) {
+func (s *authnService) RegisterWithCredentials(req *http.Request, register client.Register, nonce string, ip string, isSignup bool) (*http.Cookie, *client.LoggedIn, error) {
 	logCtx := s.log.WithMap(map[string]string{
 		"tenant_id":     register.TenantID,
 		"credential_id": register.CredentialID,
@@ -75,7 +82,7 @@ func (s *authnService) RegisterWithCredentials(req *http.Request, register api.R
 	}
 
 	// Using the new creds create the login object to log the user in.
-	login := api.Login{
+	login := client.Login{
 		CredentialID: creds.CredentialID,
 		TenantID:     identity.TenantID,
 	}
@@ -121,7 +128,7 @@ func (s *authnService) LoginWithCredentials(req *http.Request, login client.Logi
 		return nil, nil, logCtx.Error().LogError("Unable to generate cookie", err)
 	}
 
-	loggedIn := api.LoggedIn{
+	loggedIn := client.LoggedIn{
 		Jwt:          cookie.Value,
 		CredentialID: credential.CredentialID,
 		TenantID:     credential.TenantID,

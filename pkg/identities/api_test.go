@@ -7,21 +7,21 @@ import (
 
 	fuzz "github.com/google/gofuzz"
 	"github.com/google/uuid"
-	"github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 )
 
 func Test_Register(t *testing.T) {
 	a, s, f := Setup(t)
 
 	invite := s.RandomInvite()
-	r := api.Register{}
+	r := client.Register{}
 	f.Fuzz(&r)
 	r.TenantID = invite.TenantID
 
-	r.Phones = make([]api.RegisterPhone, 1)
+	r.Phones = make([]client.RegisterPhone, 1)
 	f.Fuzz(&r.Phones[0])
 
-	r.Addresses = make([]api.RegisterAddress, 1)
+	r.Addresses = make([]client.RegisterAddress, 1)
 	f.Fuzz(&r.Addresses[0])
 
 	i, err := s.service.Register(r, &invite)
@@ -113,7 +113,7 @@ func Test_UpdateAPI(t *testing.T) {
 
 	s.time.Add(time.Millisecond)
 
-	updates := api.UpdateIdentity{}
+	updates := client.UpdateIdentity{}
 	f.Fuzz(&updates)
 
 	updated, resp, err := s.api.IdentitiesApi.UpdateIdentity(
@@ -185,7 +185,7 @@ func Test_UpdateAPI(t *testing.T) {
 func Test_UpdateAPI_NotFound(t *testing.T) {
 	a, s, f := Setup(t)
 
-	updates := api.UpdateIdentity{}
+	updates := client.UpdateIdentity{}
 	f.Fuzz(&updates)
 
 	_, resp, _ := s.api.IdentitiesApi.UpdateIdentity(
@@ -222,10 +222,10 @@ func Test_DisableAPI_NotFound(t *testing.T) {
 	a.Equal(404, resp.StatusCode)
 }
 
-func RegisterIdentity(s Scope, f *fuzz.Fuzzer) api.Identity {
+func RegisterIdentity(s Scope, f *fuzz.Fuzzer) client.Identity {
 	invite := s.RandomInvite()
 
-	register := api.Register{}
+	register := client.Register{}
 	f.Fuzz(&register)
 
 	identity, err := s.service.Register(register, &invite)

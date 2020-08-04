@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	authnclient "github.com/moov-io/authn/pkg/client"
+	authnlib "github.com/moov-io/authn/pkg/client"
 	"github.com/moov-io/base/docker"
-	"github.com/moov-io/identity/pkg/authn"
+	authnclient "github.com/moov-io/identity/pkg/authn/client"
 	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
 	"github.com/moov-io/identity/pkg/client"
 	log "github.com/moov-io/identity/pkg/logging"
@@ -42,7 +42,7 @@ func Test_SMTP_SendInvite(t *testing.T) {
 		LastName:  "Doe",
 	}
 
-	tenant := authnclient.Tenant{
+	tenant := authnlib.Tenant{
 		TenantID: uuid.New().String(),
 		Name:     "Tenant",
 		Alias:    "tenant",
@@ -72,7 +72,7 @@ func Test_Mock_SendInvite(t *testing.T) {
 		LastName:  "Doe",
 	}
 
-	tenant := authnclient.Tenant{
+	tenant := authnlib.Tenant{
 		TenantID: uuid.New().String(),
 		Name:     "Tenant",
 		Alias:    "tenant",
@@ -94,7 +94,7 @@ func Test_Mock_SendInvite(t *testing.T) {
 type Scope struct {
 	logger    log.Logger
 	templates TemplateRepository
-	authn     authn.AuthnClient
+	authn     authnclient.AuthnClient
 	claims    middleware.TumblerClaims
 }
 

@@ -8,17 +8,18 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 	log "github.com/moov-io/identity/pkg/logging"
 )
 
 // authnAPIController - Controller for the AuthN verification routes.
 type authnAPIController struct {
 	logger  log.Logger
-	service api.AuthenticationApiServicer
+	service AuthenticationService
 }
 
 // NewAuthnAPIController creates a default api controller
-func NewAuthnAPIController(logger log.Logger, s api.AuthenticationApiServicer) api.Router {
+func NewAuthnAPIController(logger log.Logger, s AuthenticationService) api.Router {
 	return &authnAPIController{logger: logger, service: s}
 }
 
@@ -63,7 +64,7 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		login := api.Login{
+		login := client.Login{
 			CredentialID: session.CredentialID,
 			TenantID:     session.TenantID,
 		}

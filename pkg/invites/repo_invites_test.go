@@ -11,6 +11,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/moov-io/base/docker"
 	"github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/database"
 	log "github.com/moov-io/identity/pkg/logging"
 )
@@ -186,7 +187,7 @@ func NewInMemoryInvitesRepository(t *testing.T) Repository {
 	return repo
 }
 
-func AddTestingInvite(t *testing.T, repository Repository) (api.Invite, string) {
+func AddTestingInvite(t *testing.T, repository Repository) (client.Invite, string) {
 	i := RandomInvite()
 	code, err := generateInviteCode()
 	if err != nil {
@@ -201,8 +202,8 @@ func AddTestingInvite(t *testing.T, repository Repository) (api.Invite, string) 
 	return *added, *code
 }
 
-func RandomInvite() api.Invite {
-	return api.Invite{
+func RandomInvite() client.Invite {
+	return client.Invite{
 		InviteID:   uuid.New().String(),
 		TenantID:   uuid.New().String(),
 		Email:      "someuser@domain.com",
