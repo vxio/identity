@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/authn"
+	authnclient "github.com/moov-io/identity/pkg/authn/client"
 	"github.com/moov-io/identity/pkg/config"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
@@ -31,7 +32,7 @@ type Environment struct {
 	PublicRouter *mux.Router
 	Shutdown     func()
 
-	InviteService      api.InvitesApiServicer
+	InviteService      invites.InvitesService
 	IdentitiesService  identities.Service
 	CredentialsService credentials.CredentialsService
 }
@@ -100,7 +101,7 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 	CredentialRepository := credentials.NewCredentialRepository(db)
 	CredentialsService := credentials.NewCredentialsService(env.TimeService, CredentialRepository)
 
-	AuthnClient, err := authn.NewAuthnClient(env.Logger, env.Config.Services.Authn)
+	AuthnClient, err := authnclient.NewAuthnClient(env.Logger, env.Config.Services.Authn)
 	if err != nil {
 		return nil, err
 	}

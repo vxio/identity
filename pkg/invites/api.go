@@ -15,11 +15,11 @@ import (
 // A Controller binds http requests to an api service and writes the service results to the http response
 type Controller struct {
 	logger  logging.Logger
-	service api.InvitesApiServicer
+	service InvitesService
 }
 
 // NewInvitesController creates a default api controller
-func NewInvitesController(logger logging.Logger, s api.InvitesApiServicer) api.Router {
+func NewInvitesController(logger logging.Logger, s InvitesService) api.Router {
 	return &Controller{
 		logger:  logger,
 		service: s,

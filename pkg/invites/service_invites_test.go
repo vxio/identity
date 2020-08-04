@@ -7,7 +7,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/moov-io/identity/pkg/api"
 	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
 	"github.com/moov-io/identity/pkg/client"
 	identitiestestutils "github.com/moov-io/identity/pkg/identities/testutils"
@@ -19,7 +18,7 @@ import (
 
 type InvitesServiceScope struct {
 	session tmw.TumblerClaims
-	service api.InvitesApiServicer
+	service InvitesService
 	time    stime.StaticTimeService
 }
 

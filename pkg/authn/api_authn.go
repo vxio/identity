@@ -15,11 +15,11 @@ import (
 // authnAPIController - Controller for the AuthN verification routes.
 type authnAPIController struct {
 	logger  log.Logger
-	service api.AuthenticationApiServicer
+	service AuthenticationService
 }
 
 // NewAuthnAPIController creates a default api controller
-func NewAuthnAPIController(logger log.Logger, s api.AuthenticationApiServicer) api.Router {
+func NewAuthnAPIController(logger log.Logger, s AuthenticationService) api.Router {
 	return &authnAPIController{logger: logger, service: s}
 }
 

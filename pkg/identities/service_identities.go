@@ -12,7 +12,6 @@ import (
 
 // Service - Service that implents the logic for the IdentitiesApiServicer
 // This service should implement the business logic for every endpoint for the IdentitiesApi API.
-// Include any external packages or services that will be required by this service.
 type Service interface {
 	DisableIdentity(claims tmw.TumblerClaims, identityID string) error
 	GetIdentity(claims tmw.TumblerClaims, identityID string) (*client.Identity, error)

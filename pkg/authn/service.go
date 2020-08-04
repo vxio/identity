@@ -9,16 +9,23 @@ import (
 	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/identities"
+	"github.com/moov-io/identity/pkg/invites"
 	"github.com/moov-io/identity/pkg/logging"
 	"github.com/moov-io/identity/pkg/session"
 )
+
+// AuthenticationApiServicer defines the api actions for the AuthenticationApi service
+type AuthenticationService interface {
+	LoginWithCredentials(*http.Request, client.Login, string, string) (*http.Cookie, *client.LoggedIn, error)
+	RegisterWithCredentials(*http.Request, client.Register, string, string, bool) (*http.Cookie, *client.LoggedIn, error)
+}
 
 type authnService struct {
 	log         logging.Logger
 	credentials credentials.CredentialsService
 	identities  identities.Service
 	token       session.SessionService
-	invites     api.InvitesApiServicer
+	invites     invites.InvitesService
 }
 
 // NewAuthnService - Creates a default service that handles the registration and login
@@ -27,8 +34,8 @@ func NewAuthnService(
 	credentials credentials.CredentialsService,
 	identities identities.Service,
 	token session.SessionService,
-	invites api.InvitesApiServicer,
-) api.AuthenticationApiServicer {
+	invites invites.InvitesService,
+) AuthenticationService {
 	return &authnService{
 		log:         log,
 		credentials: credentials,
