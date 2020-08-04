@@ -125,7 +125,6 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 	jwksController.AppendRoutes(jwksRouter)
 
 	// authn endpoints
-
 	AuthnMiddleware, err := authn.NewMiddleware(env.Logger, env.TimeService, AuthnTokenService)
 	if err != nil {
 		return nil, env.Logger.Fatal().LogErrorF("Can't startup the Authn middleware - %w", err)
@@ -137,7 +136,7 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 	authnRouter = api.AppendRouters(env.Logger, authnRouter, AuthnController)
 	authnRouter.Use(AuthnMiddleware.Handler)
 
-	// auth middleware for the tokens coming from the gateway
+	// gateway middleware for the tokens coming from the gateway
 	GatewayMiddleware, err := tmw.NewServerFromConfig(env.Logger, env.TimeService, env.Config.Gateway)
 	if err != nil {
 		return nil, env.Logger.Fatal().LogErrorF("Can't startup the Gateway middleware - %w", err)

@@ -40,8 +40,7 @@ func AppendRouters(log logging.Logger, appendTo *mux.Router, routers ...Router) 
 	router := appendTo.StrictSlash(true)
 	for _, api := range routers {
 		for _, route := range api.Routes() {
-			var handler http.Handler
-			handler = route.HandlerFunc
+			handler := route.HandlerFunc
 
 			router.
 				Methods(route.Method).
