@@ -23,7 +23,7 @@ type Scope struct {
 	time          stime.StaticTimeService
 	notifications notifications.NotificationsService
 	repository    Repository
-	service       api.InvitesApiServicer
+	service       InvitesService
 	routes        *mux.Router
 	api           *client.APIClient
 }

@@ -14,14 +14,11 @@ import (
 	"github.com/moov-io/identity/pkg/logging"
 )
 
-// Credential - Description of a successful OpenID connect credential
-type Credential = client.Credential
-
 type credentialLogContext struct {
-	credential *Credential
+	credential *client.Credential
 }
 
-func NewCredentialLogContext(credential *Credential) logging.LogContext {
+func NewCredentialLogContext(credential *client.Credential) logging.LogContext {
 	return &credentialLogContext{credential: credential}
 }
 

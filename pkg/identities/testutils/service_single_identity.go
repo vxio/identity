@@ -3,7 +3,6 @@ package identitiestestutils
 import (
 	"errors"
 
-	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/identities"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
@@ -29,25 +28,25 @@ func (s *singleService) DisableIdentity(claims tmw.TumblerClaims, identityID str
 	panic(ErrNotImplemented)
 }
 
-func (s *singleService) GetIdentity(claims tmw.TumblerClaims, identityID string) (*api.Identity, error) {
+func (s *singleService) GetIdentity(claims tmw.TumblerClaims, identityID string) (*client.Identity, error) {
 	shallowCopy := s.identity
 	shallowCopy.IdentityID = identityID
 	return &shallowCopy, nil
 }
 
-func (s *singleService) ListIdentities(claims tmw.TumblerClaims, orgID string) ([]api.Identity, error) {
+func (s *singleService) ListIdentities(claims tmw.TumblerClaims, orgID string) ([]client.Identity, error) {
 	return []client.Identity{s.identity}, nil
 }
 
-func (s *singleService) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update api.UpdateIdentity) (*api.Identity, error) {
+func (s *singleService) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update client.UpdateIdentity) (*client.Identity, error) {
 	panic(ErrNotImplemented)
 }
 
-func (s *singleService) Register(register api.Register, invite *api.Invite) (*api.Identity, error) {
+func (s *singleService) Register(register client.Register, invite *client.Invite) (*client.Identity, error) {
 	panic(ErrNotImplemented)
 }
 
-func (s *singleService) GetIdentityByID(identityID string) (*api.Identity, error) {
+func (s *singleService) GetIdentityByID(identityID string) (*client.Identity, error) {
 	shallowCopy := s.identity
 	shallowCopy.IdentityID = identityID
 	return &shallowCopy, nil

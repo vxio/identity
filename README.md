@@ -9,7 +9,8 @@ moov-io/identity
 
 Moov Identity is a RESTful API for managing users that can interact with the system. It handles the last piece of authentication converting an authentication session into an authenticated session that can be used for checking authorization.
 
-Docs: [docs](docs/README.md) | [open api specification](api/identityapi.yml)
+
+Docs: [docs](docs/README.md) | [open api specification](api/api.yml)
 
 ## Project Status
 
@@ -17,17 +18,17 @@ This project is currently under development and could introduce breaking changes
 
 ## Getting Started
 
-Read through the [project docs](docs/README.md) over here to get an understanding of the purpose of Identity and how to run it.
+Read through the [project docs](docs/README.md) over here to get an understanding of the purpose of this project and how to run it.
 
 ## Getting Help
 
  channel | info
  ------- | -------
- [Project Documentation](https://docs.moov.io/) | Our project documentation available online.
+ [Project Documentation](https://github.com/moov-io/identity/tree/master/docs/) | Our project documentation available online.
  Google Group [moov-users](https://groups.google.com/forum/#!forum/moov-users)| The Moov users Google group is for contributors other people contributing to the Moov project. You can join them without a google account by sending an email to [moov-users+subscribe@googlegroups.com](mailto:moov-users+subscribe@googlegroups.com). After receiving the join-request message, you can simply reply to that to confirm the subscription.
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
-[GitHub Issue](https://github.com/moov-io) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
-[moov-io slack](https://slack.moov.io/) | Join our slack channel to have an interactive discussion about the development of the project.
+[GitHub Issue](https://github.com/moov-io/identity/issues) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
+[moov-io slack](https://slack.moov.io/) | Join our slack channel (`#identity`) to have an interactive discussion about the development of the project.
 
 ## Supported and Tested Platforms
 

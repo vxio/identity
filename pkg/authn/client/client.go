@@ -1,4 +1,4 @@
-package authn
+package authnclient
 
 import (
 	"net/http"

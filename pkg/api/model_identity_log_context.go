@@ -14,14 +14,11 @@ import (
 	"github.com/moov-io/identity/pkg/logging"
 )
 
-// Identity - Properties of an Identity. These users will under-go KYC checks thus all the information
-type Identity = client.Identity
-
 type identityLogContext struct {
-	identity *Identity
+	identity *client.Identity
 }
 
-func NewIdentityLogContext(identity *Identity) logging.LogContext {
+func NewIdentityLogContext(identity *client.Identity) logging.LogContext {
 	return &identityLogContext{identity: identity}
 }
 

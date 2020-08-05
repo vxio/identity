@@ -1,4 +1,4 @@
-package identity
+package service
 
 import (
 	"github.com/moov-io/identity/pkg/authn"

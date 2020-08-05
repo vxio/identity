@@ -1,9 +1,9 @@
-inputSpec: /local/api/identityapi.yml
+inputSpec: /local/api/api.yml
 outputDir: /local/pkg/client
 generatorName: go
-artifactId: identities-client
+artifactId: "identity-client"
 gitUserId: moov-io
-gitRepoId: identity
+gitRepoId: "identity"
 additionalProperties:
   isGoSubmodule: true
   packageName: client

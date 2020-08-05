@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/client"
 )
 
 func Test_Register(t *testing.T) {
@@ -95,7 +95,7 @@ func Test_Login(t *testing.T) {
 	_, _ = s.RegisterRandom()
 	_, _ = s.RegisterRandom()
 
-	login := api.Login{CredentialID: cred.CredentialID, TenantID: cred.TenantID}
+	login := client.Login{CredentialID: cred.CredentialID, TenantID: cred.TenantID}
 	nonce := uuid.New().String()
 	ip := "1.2.3.4"
 
@@ -124,7 +124,7 @@ func Test_NoLogin(t *testing.T) {
 	_, _ = s.RegisterRandom()
 	_, _ = s.RegisterRandom()
 
-	login := api.Login{CredentialID: uuid.New().String()}
+	login := client.Login{CredentialID: uuid.New().String()}
 	nonce := uuid.New().String()
 	ip := "1.2.3.4"
 

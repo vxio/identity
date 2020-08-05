@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/moov-io/identity/pkg/authn"
+	authnclient "github.com/moov-io/identity/pkg/authn/client"
+	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
@@ -18,18 +19,26 @@ import (
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
 
+// InvitesApiServicer defines the api actions for the InvitesApi service
+type InvitesService interface {
+	DisableInvite(tmw.TumblerClaims, string) error
+	ListInvites(tmw.TumblerClaims) ([]client.Invite, error)
+	SendInvite(tmw.TumblerClaims, client.SendInvite) (*client.Invite, string, error)
+	Redeem(code string) (*client.Invite, error)
+}
+
 type invitesService struct {
 	sendToURL     *template.Template
 	expiration    time.Duration
 	time          stime.TimeService
 	repository    Repository
 	notifications notifications.NotificationsService
-	authnClient   authn.AuthnClient
+	authnClient   authnclient.AuthnClient
 	identity      identities.Service
 }
 
 // NewInvitesService instantiates a new invitesService for interacting with Invites from outside of the package.
-func NewInvitesService(config Config, time stime.TimeService, repository Repository, notifications notifications.NotificationsService, authnClient authn.AuthnClient, identity identities.Service) (api.InvitesApiServicer, error) {
+func NewInvitesService(config Config, time stime.TimeService, repository Repository, notifications notifications.NotificationsService, authnClient authnclient.AuthnClient, identity identities.Service) (InvitesService, error) {
 
 	urlTemplate, err := template.New("send").Parse(config.SendToHost + config.SendToPath)
 	if err != nil {
@@ -48,14 +57,14 @@ func NewInvitesService(config Config, time stime.TimeService, repository Reposit
 }
 
 // ListInvites - List outstanding invites
-func (s *invitesService) ListInvites(claims tmw.TumblerClaims) ([]api.Invite, error) {
+func (s *invitesService) ListInvites(claims tmw.TumblerClaims) ([]client.Invite, error) {
 	invites, err := s.repository.list(api.TenantID(claims.TenantID))
 	return invites, err
 }
 
 // SendInvite - Send an email invite to a new user
-func (s *invitesService) SendInvite(claims tmw.TumblerClaims, send api.SendInvite) (*api.Invite, string, error) {
-	invite := api.Invite{
+func (s *invitesService) SendInvite(claims tmw.TumblerClaims, send client.SendInvite) (*client.Invite, string, error) {
+	invite := client.Invite{
 		InviteID:   uuid.New().String(),
 		TenantID:   claims.TenantID.String(),
 		Email:      send.Email,
@@ -117,7 +126,7 @@ func (s *invitesService) DisableInvite(claims tmw.TumblerClaims, inviteID string
 	return s.repository.update(*invite)
 }
 
-func (s *invitesService) Redeem(code string) (*api.Invite, error) {
+func (s *invitesService) Redeem(code string) (*client.Invite, error) {
 	invite, err := s.repository.getByCode(strings.TrimSpace(code))
 	if err != nil {
 		return nil, err
@@ -153,7 +162,7 @@ func generateInviteCode() (*string, error) {
 	return &code, nil
 }
 
-func generateRedeemURL(sendToURL template.Template, invite api.Invite, code *string) (*url.URL, error) {
+func generateRedeemURL(sendToURL template.Template, invite client.Invite, code *string) (*url.URL, error) {
 	data := struct {
 		TenantID string
 	}{invite.TenantID}

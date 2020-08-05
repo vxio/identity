@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/moov-io/identity/pkg/api"
 	authntestutils "github.com/moov-io/identity/pkg/authn/testutils"
+	"github.com/moov-io/identity/pkg/client"
 	identitiestestutils "github.com/moov-io/identity/pkg/identities/testutils"
 	"github.com/moov-io/identity/pkg/notifications"
 	"github.com/moov-io/identity/pkg/stime"
@@ -18,14 +18,14 @@ import (
 
 type InvitesServiceScope struct {
 	session tmw.TumblerClaims
-	service api.InvitesApiServicer
+	service InvitesService
 	time    stime.StaticTimeService
 }
 
 func TestSendInvite(t *testing.T) {
 	s := NewInvitesScope(t)
 
-	sendInvite := api.SendInvite{Email: "testuser@moov.io"}
+	sendInvite := client.SendInvite{Email: "testuser@moov.io"}
 
 	invite, code, err := s.service.SendInvite(s.session, sendInvite)
 	if err != nil {
@@ -57,7 +57,7 @@ func TestSendInvite(t *testing.T) {
 func Test_RedeemExpired(t *testing.T) {
 	s := NewInvitesScope(t)
 
-	sendInvite := api.SendInvite{Email: "testuser@moov.io"}
+	sendInvite := client.SendInvite{Email: "testuser@moov.io"}
 
 	_, _, err := s.service.SendInvite(s.session, sendInvite)
 	if err != nil {
@@ -73,7 +73,7 @@ func Test_RedeemExpired(t *testing.T) {
 func TestDisableInvite(t *testing.T) {
 	s := NewInvitesScope(t)
 
-	sendInvite := api.SendInvite{Email: "testuser@moov.io"}
+	sendInvite := client.SendInvite{Email: "testuser@moov.io"}
 
 	invite, code, err := s.service.SendInvite(s.session, sendInvite)
 	if err != nil {
@@ -93,7 +93,7 @@ func TestDisableInvite(t *testing.T) {
 func TestExpiredInvite(t *testing.T) {
 	s := NewInvitesScope(t)
 
-	sendInvite := api.SendInvite{Email: "testuser@moov.io"}
+	sendInvite := client.SendInvite{Email: "testuser@moov.io"}
 
 	invite, code, err := s.service.SendInvite(s.session, sendInvite)
 	if err != nil {
