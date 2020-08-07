@@ -1,170 +1,194 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html>
   <head>
-    <meta name="viewport" content="width=device-width">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
     <title>{{.Subject}}</title>
-    <style>
-    /* -------------------------------------
-        INLINED WITH htmlemail.io/inline
-    ------------------------------------- */
-    /* -------------------------------------
-        RESPONSIVE AND MOBILE FRIENDLY STYLES
-    ------------------------------------- */
-    @media only screen and (max-width: 620px) {
-      table[class=body] h1 {
-        font-size: 28px !important;
-        margin-bottom: 10px !important;
-      }
-      table[class=body] p,
-            table[class=body] ul,
-            table[class=body] ol,
-            table[class=body] td,
-            table[class=body] span,
-            table[class=body] a {
-        font-size: 16px !important;
-      }
-      table[class=body] .wrapper,
-            table[class=body] .article {
-        padding: 10px !important;
-      }
-      table[class=body] .content {
-        padding: 0 !important;
-      }
-      table[class=body] .container {
-        padding: 0 !important;
-        width: 100% !important;
-      }
-      table[class=body] .main {
-        border-left-width: 0 !important;
-        border-radius: 0 !important;
-        border-right-width: 0 !important;
-      }
-      table[class=body] .btn table {
-        width: 100% !important;
-      }
-      table[class=body] .btn a {
-        width: 100% !important;
-      }
-      table[class=body] .img-responsive {
-        height: auto !important;
-        max-width: 100% !important;
-        width: auto !important;
-      }
-    }
+    <style type="text/css" rel="stylesheet" media="all">
+@media only screen and (max-width: 500px) {
+  .button {
+    width: 100% !important;
+    text-align: center !important;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .email-masthead_container,
+.email-body_inner,
+.email-footer,
+.body-links {
+    width: 100% !important;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  body,
+.email-body,
+.email-content,
+.email-wrapper,
+.email-masthead,
+.email-footer {
+    background-color: #000 !important;
+    color: #FFF !important;
+  }
 
-    /* -------------------------------------
-        PRESERVE THESE STYLES IN THE HEAD
-    ------------------------------------- */
-    @media all {
-      .ExternalClass {
-        width: 100%;
+  .email-body_inner {
+    background-color: #222 !important;
+    color: #FFF !important;
+  }
+
+  p,
+ul,
+ol,
+blockquote,
+h1,
+h2,
+h3 {
+    color: #FFF !important;
+  }
+
+  .email-footer p {
+    color: #999 !important;
+  }
+
+  .body-sub {
+    border-top: 1px solid #666;
+  }
+
+  .dark-logo {
+    display: block !important;
+    width: auto !important;
+    overflow: visible !important;
+    float: none !important;
+    max-height: inherit !important;
+    max-width: inherit !important;
+    line-height: auto !important;
+    margin-top: 0px !important;
+    visibility: inherit !important;
+  }
+
+  .light-logo {
+    display: none !important;
+  }
+}
+</style>
+    <!--[if mso]>
+    <style type="text/css">
+      .f-fallback  {
+        font-family: Arial, sans-serif;
       }
-      .ExternalClass,
-            .ExternalClass p,
-            .ExternalClass span,
-            .ExternalClass font,
-            .ExternalClass td,
-            .ExternalClass div {
-        line-height: 100%;
-      }
-      .apple-link a {
-        color: inherit !important;
-        font-family: inherit !important;
-        font-size: inherit !important;
-        font-weight: inherit !important;
-        line-height: inherit !important;
-        text-decoration: none !important;
-      }
-      #MessageViewBody a {
-        color: inherit;
-        text-decoration: none;
-        font-size: inherit;
-        font-family: inherit;
-        font-weight: inherit;
-        line-height: inherit;
-      }
-      .btn-primary table td:hover {
-        background-color: #34495e !important;
-      }
-      .btn-primary a:hover {
-        background-color: #34495e !important;
-        border-color: #34495e !important;
-      }
-    }
     </style>
+  <![endif]-->
   </head>
-  <body class="" style="background-color: #f6f6f6; font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; margin: 0; padding: 0; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;">
-    <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background-color: #f6f6f6;">
+  <body style="height: 100%; margin: 0; -webkit-text-size-adjust: none; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; background-color: #fff; color: #222222; width: 100%;">
+    <span class="preheader" style="visibility: hidden; mso-hide: all; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; display: none;">{{.Inviter.Email}} with {{.Tenant.Name}} has invited you to join Moov.</span>
+    <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; margin: 0; padding: 0; -premailer-width: 100%; -premailer-cellpadding: 0; -premailer-cellspacing: 0; background-color: #fff;" bgcolor="#fff">
       <tr>
-        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
-        <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; Margin: 0 auto; max-width: 580px; padding: 10px; width: 580px;">
-          <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
-
-            <!-- START CENTERED WHITE CONTAINER -->
-            <span class="preheader" style="color: transparent; display: none; height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; visibility: hidden; width: 0;">Welcome to Moov!</span>
-            <table class="main" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #ffffff; border-radius: 3px;">
-
-              <!-- START MAIN CONTENT AREA -->
-              <tr>
-                <td class="wrapper" style="font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 20px;">
-                  <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
-                    <tr>
-                      <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Hello,</p>
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Welcome to Moov.io! Please click the link below to complete registration.</p>
-                        <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;">
-                          <tbody>
-                            <tr>
-                              <td align="left" style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;">
-                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
-                                  <tbody>
-                                    <tr>
-                                      <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 5px; text-align: center;"> 
-                                        <a href="{{.AcceptInvitationURL}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;">
-                                            Complete Registration
-                                        </a> 
-                                    </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </td>
-                            </tr>
-                          </tbody>
+        <td align="center" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+          <table class="email-content" align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; margin: 0; padding: 0; -premailer-width: 100%; -premailer-cellpadding: 0; -premailer-cellspacing: 0;">
+            <tr>
+              <td style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                <table align="center" class="email-masthead_container" width="570" cellpadding="0" cellspacing="0" role="presentation" style="width: 570px;">
+                  <tr>
+                    <td class="email-masthead" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px; padding: 12px 0 12px; text-align: left;" align="left">
+                      <a href="https://moov.io" class="f-fallback email-masthead_logo" style="color: #0D80F2; width: 114px; margin-left: 20px;">
+                        <img class="light-logo" src="https://moov.io/images/email/logo-black.png" width="114" height="33" alt="Moov" style="border: none; color: #33373E; font-family: Helvetica, Arial, sans-serif; font-weight: bold; font-size: 36px; line-height: 40px; text-decoration: none; margin: 0 auto; padding: 0;" border="0">
+                        <!--[if !mso]><! -->
+                          <div class="dark-logo" style="display:none; overflow:hidden; float:left; width:0px; max-height:0px; max-width:0px; line-height:0px; visibility:hidden;">
+                            <img src="https://moov.io/images/email/logo-white.png" width="114" height="33" alt="Moov" style="border: none; color: #ffffff; font-family: Helvetica, Arial, sans-serif; text-align: center; font-weight: bold; font-size: 36px; line-height: 40px; text-decoration: none; margin: 0 auto; padding: 0;" border="0">
+                          </div>
+                        <!--<![endif]-->
+                      </a>
+                    </td>
+                    <td align="right" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                      <img src="https://moov.io/images/email/masthead.png" alt="" width="115" height="58">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <!-- Email Body -->
+            <tr>
+              <td class="email-body" width="100%" cellpadding="0" cellspacing="0" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px; width: 100%; margin: 0; padding: 0; -premailer-width: 100%; -premailer-cellpadding: 0; -premailer-cellspacing: 0; background-color: #FFFFFF;" bgcolor="#FFFFFF">
+                <table class="email-body_inner" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation" style="width: 570px; margin: 0 auto; padding: 0; -premailer-width: 570px; -premailer-cellpadding: 0; -premailer-cellspacing: 0; background-color: #F5F5F4;" bgcolor="#F5F5F4">
+                  <!-- Body content -->
+                  <tr>
+                    <td class="content-cell" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px; padding: 20px;">
+                      <div class="f-fallback">
+                        <p style="margin: .4em 0 1.1875em; font-size: 16px; line-height: 1.625; color: #222222;">{{.Inviter.Email}} has invited you to join <b style="font-weight: 600;">{{.Tenant.Name}}</b> on Moov.</p>
+                        <!-- Action -->
+                        <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; margin: 30px auto; padding: 0; -premailer-width: 100%; -premailer-cellpadding: 0; -premailer-cellspacing: 0; text-align: center;">
+                          <tr>
+                            <td align="center" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                              <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
+                                <tr>
+                                  <td align="center" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                                    <a href="{{.AcceptInvitationURL}}" class="f-fallback button" target="_blank" style="background-color: #0D80F2; border-top: 10px solid #0D80F2; border-right: 18px solid #0D80F2; border-bottom: 10px solid #0D80F2; border-left: 18px solid #0D80F2; display: inline-block; color: #FFF; font-weight: 600; text-decoration: none; border-radius: 7px; -webkit-text-size-adjust: none; box-sizing: border-box;">Set up account</a>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
                         </table>
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
-                            If you have any problems email us at <a style="color:inherit" href="mailto:support@moov.io">support@moov.io</a>
-                        </p>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-
-            <!-- END MAIN CONTENT AREA -->
-            </table>
-
-            <!-- START FOOTER -->
-            <div class="footer" style="clear: both; Margin-top: 10px; text-align: center; width: 100%;">
-              <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
-                <tr>
-                  <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
-                    <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">You're recieving this email because someone invited you to join moov.io.</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-bottom: 10px; padding-top: 10px; font-size: 12px; color: #999999; text-align: center;">
-                    Powered by <a href="https://moov.io" target="_blank" style="color: #999999; font-size: 12px; text-align: center; text-decoration: none;">moov</a>
-                  </td>
-                </tr>
-              </table>
-            </div>
-            <!-- END FOOTER -->
-
-          <!-- END CENTERED WHITE CONTAINER -->
-          </div>
+                        <p class="sub" style="margin: .4em 0 1.1875em; line-height: 1.625; font-size: 14px; color: #333333;">If you accept the invite, you will be given access to the org’s dashboard including information about customers, their payments, and much more.</p>
+                        <!-- Sub copy -->
+                        <table class="body-sub" role="presentation" style="margin-top: 25px; padding-top: 25px; border-top: 1px solid #EAEAEC;">
+                          <tr>
+                            <td style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                              <img src="https://moov.io/images/email/slack.png" width="40" height="42" alt="">
+                            </td>
+                            <td style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                              <p class="f-fallback sub" style="margin: .4em 0 1.1875em; line-height: 1.625; font-size: 14px; color: #333333;">Join hundreds of like-minded builders and doers in the <a href="https://slack.moov.io" class="fancy-link" style="color: #0D80F2; background-color: rgba(13,128,242,.1); text-decoration-style: dotted; text-decoration-thickness: 2px;">Moov Slack</a></p>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                              <img src="https://moov.io/images/email/support.png" width="40" height="42" alt="">
+                            </td>
+                            <td style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                              <p class="f-fallback sub" style="margin: .4em 0 1.1875em; line-height: 1.625; font-size: 14px; color: #333333;">Need help? Reach out to <a href="mailto:support@moov.io" class="fancy-link" style="color: #0D80F2; background-color: rgba(13,128,242,.1); text-decoration-style: dotted; text-decoration-thickness: 2px;">support@moov.io</a></p>
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                <table class="body-links" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation" style="width: 570px; margin-top: 0; padding-top: 25px; border-bottom: 1px solid #EAEAEC;">
+                  <tr>
+                    <td align="left" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                      <p style="margin: .4em 0 1.1875em; line-height: 1.625; color: #222222; padding: 0 20px; font-size: 12px;">Login to <a href="https://app.moov.io" class="fancy-link" style="color: #0D80F2; background-color: rgba(13,128,242,.1); text-decoration-style: dotted; text-decoration-thickness: 2px; font-size: 12px;">Moov</a></p>
+                    </td>
+                    <td class="content-cell" align="center" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px; padding: 20px;">
+                      <p style="margin: .4em 0 1.1875em; line-height: 1.625; color: #222222; padding: 0 20px; font-size: 12px;">Learn with <a href="https://docs.moov.io" class="fancy-link" style="color: #0D80F2; background-color: rgba(13,128,242,.1); text-decoration-style: dotted; text-decoration-thickness: 2px; font-size: 12px;">Documentation</a></p>
+                    </td>
+                    <td align="right" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                      <p style="margin: .4em 0 1.1875em; line-height: 1.625; color: #222222; padding: 0 20px; font-size: 12px;">Read our <a href="https://moov.io/blog" class="fancy-link" style="color: #0D80F2; background-color: rgba(13,128,242,.1); text-decoration-style: dotted; text-decoration-thickness: 2px; font-size: 12px;">Blog</a></p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px;">
+                <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation" style="width: 570px; margin: 0 auto; padding: 0; -premailer-width: 570px; -premailer-cellpadding: 0; -premailer-cellspacing: 0; text-align: center;">
+                  <tr>
+                    <td class="content-cell" align="center" style="word-break: break-word; font-family: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 16px; padding: 20px;">
+                      <p class="f-fallback sub align-center" style="margin: .4em 0 1.1875em; line-height: 1.625; text-align: center; font-size: 12px; color: #686868;">&copy; 2020 Moov Financial, Inc. &bullet; <a href="https://moov.io" class="fancy-link" style="color: #0D80F2; background-color: rgba(13,128,242,.1); text-decoration-style: dotted; text-decoration-thickness: 2px;">moov.io</a></p>
+                      <p class="f-fallback sub align-center" style="margin: .4em 0 1.1875em; line-height: 1.625; text-align: center; font-size: 12px; color: #686868;">
+                        You’re receiving our system emails so that we can keep you in the loop with updates to your account.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
         </td>
-        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">&nbsp;</td>
       </tr>
     </table>
   </body>
