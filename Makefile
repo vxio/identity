@@ -73,7 +73,7 @@ quay-push:
 
 # Custom to go-services
 
-docker-run:
+docker-run: docker
 	docker run -v ${PWD}/data:/data -v ${PWD}/configs:/configs --env APP_CONFIG="/configs/config.yml" -it --rm moov/identity:$(VERSION)
 
 install:

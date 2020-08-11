@@ -41,7 +41,7 @@ var identityKeys, _ = webkeys.NewGenerateJwksService()
 func Setup(t *testing.T) Scope {
 	a := require.New(t)
 
-	logger := log.NewDefaultLogger()
+	logger := log.NewNopLogger()
 	session := tmwt.NewRandomClaims()
 
 	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, logger, nil)

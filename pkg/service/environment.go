@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	_ "github.com/moov-io/identity"
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/authn"
 	authnclient "github.com/moov-io/identity/pkg/authn/client"
