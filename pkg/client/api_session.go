@@ -10,6 +10,7 @@
 package client
 
 import (
+	_bytes "bytes"
 	_context "context"
 	_ioutil "io/ioutil"
 	_nethttp "net/http"
@@ -74,6 +75,7 @@ func (a *SessionApiService) GetSessionDetails(ctx _context.Context) (SessionDeta
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}

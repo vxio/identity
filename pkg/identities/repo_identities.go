@@ -225,8 +225,9 @@ func (r *sqlIdentityRepo) add(identity client.Identity) (*client.Identity, error
 			invite_id,
 			disabled_on,
 			disabled_by,
-			last_updated_on
-		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+			last_updated_on,
+			image_url
+		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	`
 
 	res, err := tx.Exec(qry,
@@ -245,7 +246,8 @@ func (r *sqlIdentityRepo) add(identity client.Identity) (*client.Identity, error
 		identity.InviteID,
 		identity.DisabledOn,
 		identity.DisabledBy,
-		identity.LastUpdatedOn)
+		identity.LastUpdatedOn,
+		identity.ImageUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +290,8 @@ var identitySelect = `
 	identity.invite_id,
 	identity.disabled_on, 
 	identity.disabled_by,
-	identity.last_updated_on
+	identity.last_updated_on,
+	identity.image_url
 `
 
 func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) ([]client.Identity, error) {
@@ -318,6 +321,7 @@ func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) (
 			&item.DisabledOn,
 			&item.DisabledBy,
 			&item.LastUpdatedOn,
+			&item.ImageUrl,
 		); err != nil {
 			return nil, err
 		}

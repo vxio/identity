@@ -728,6 +728,7 @@ components:
         emailVerified: true
         disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        imageUrl: http://example.com/aeiou
         tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         lastUpdatedOn: 2000-01-23T04:56:07.000+00:00
         middleName: Jimmy
@@ -835,6 +836,11 @@ components:
           maxLength: 36
           nullable: true
           pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
+        imageUrl:
+          format: url
+          maxLength: 255
+          nullable: true
           type: string
       required:
       - email
@@ -1289,6 +1295,7 @@ components:
         jwt: jwt
         identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         nickName: nickName
+        imageUrl: imageUrl
         tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
@@ -1330,12 +1337,16 @@ components:
           nullable: true
           pattern: ^\w+$
           type: string
+        imageUrl:
+          maxLength: 255
+          nullable: true
+          pattern: ^\w+$
+          type: string
       type: object
     Register:
       additionalProperties: false
       description: Request to register a user in the system
       example:
-        firstName: John
         lastName: Doe
         addresses:
         - country: US
@@ -1374,9 +1385,6 @@ components:
           state: IA
           type: primary
         nickName: nickName
-        inviteCode: inviteCode
-        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
-        credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         phones:
         - number: number
           type: home
@@ -1388,9 +1396,14 @@ components:
           type: home
         - number: number
           type: home
-        middleName: Jimmy
         suffix: suffix
         birthDate: 2000-01-23T04:56:07.000+00:00
+        firstName: John
+        inviteCode: inviteCode
+        imageUrl: http://example.com/aeiou
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        middleName: Jimmy
         email: john.doe@gmail.com
       properties:
         credentialID:
@@ -1428,6 +1441,11 @@ components:
           maxLength: 255
           nullable: true
           pattern: ^\w+$
+          type: string
+        imageUrl:
+          format: url
+          maxLength: 255
+          nullable: true
           type: string
         suffix:
           maxLength: 255

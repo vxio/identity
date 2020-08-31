@@ -1,0 +1,1 @@
+ALTER TABLE identity ADD image_url VARCHAR(36) NULL DEFAULT '';

@@ -10,6 +10,7 @@
 package client
 
 import (
+	_bytes "bytes"
 	_context "context"
 	_ioutil "io/ioutil"
 	_nethttp "net/http"
@@ -42,9 +43,9 @@ func (a *CredentialsApiService) DisableCredentials(ctx _context.Context, identit
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/identities/{identityID}/credentials/{credentialID}"
-	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.QueryEscape(parameterToString(identityID, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.PathEscape(parameterToString(identityID, "")), -1)
 
-	localVarPath = strings.Replace(localVarPath, "{"+"credentialID"+"}", _neturl.QueryEscape(parameterToString(credentialID, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"credentialID"+"}", _neturl.PathEscape(parameterToString(credentialID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -85,6 +86,7 @@ func (a *CredentialsApiService) DisableCredentials(ctx _context.Context, identit
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -135,7 +137,7 @@ func (a *CredentialsApiService) ListCredentials(ctx _context.Context, identityID
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/identities/{identityID}/credentials"
-	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.QueryEscape(parameterToString(identityID, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.PathEscape(parameterToString(identityID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -173,6 +175,7 @@ func (a *CredentialsApiService) ListCredentials(ctx _context.Context, identityID
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}

@@ -17,6 +17,8 @@ func Test_Register(t *testing.T) {
 	r := client.Register{}
 	f.Fuzz(&r)
 	r.TenantID = invite.TenantID
+	imageUrl := "http://kittens.com/img123.jpg"
+	r.ImageUrl = &imageUrl
 
 	r.Phones = make([]client.RegisterPhone, 1)
 	f.Fuzz(&r.Phones[0])
@@ -37,6 +39,7 @@ func Test_Register(t *testing.T) {
 	a.Equal(r.Suffix, i.Suffix)
 	a.Equal(r.BirthDate, i.BirthDate)
 	a.Equal(r.Email, i.Email)
+	a.Equal(r.ImageUrl, i.ImageUrl)
 
 	a.Len(i.Phones, 1)
 	for x, rp := range r.Phones {

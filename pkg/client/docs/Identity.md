@@ -23,6 +23,7 @@ Name | Type | Description | Notes
 **DisabledBy** | Pointer to **string** | UUID v4 | [optional] 
 **LastUpdatedOn** | [**time.Time**](time.Time.md) |  | [optional] 
 **InviteID** | Pointer to **string** | UUID v4 | [optional] 
+**ImageUrl** | Pointer to **string** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

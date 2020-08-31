@@ -19,6 +19,7 @@ func (a Register) Validate() error {
 		validation.Field(&a.Suffix, validation.Length(2, 20)),
 		validation.Field(&a.BirthDate, validation.Date(time.RFC3339).Max(time.Now())),
 		validation.Field(&a.Email, validation.Required, is.Email),
+		validation.Field(&a.ImageUrl, is.URL),
 		validation.Field(&a.Phones),
 		validation.Field(&a.Addresses),
 	)
