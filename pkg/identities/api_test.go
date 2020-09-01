@@ -93,9 +93,7 @@ func Test_ListAPI(t *testing.T) {
 	identity3 := RegisterIdentity(s, f)
 
 	var identities []client.Identity
-	identities = append(identities, identity1)
-	identities = append(identities, identity2)
-	identities = append(identities, identity3)
+	identities = append(identities, identity1, identity2, identity3)
 
 	found, resp, err := s.api.IdentitiesApi.ListIdentities(context.Background(), nil)
 	a.Nil(err)
