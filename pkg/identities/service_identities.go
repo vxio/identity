@@ -196,6 +196,7 @@ func (s *service) Register(register client.Register, invite *client.Invite) (*cl
 		RegisteredOn:  s.time.Now(),
 		LastLogin:     client.LastLogin{},
 		LastUpdatedOn: s.time.Now(),
+		ImageUrl:      register.ImageUrl,
 	}
 
 	if invite != nil {

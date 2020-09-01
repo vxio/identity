@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **MiddleName** | **string** |  | [optional] 
 **LastName** | **string** |  | [optional] 
 **NickName** | Pointer to **string** |  | [optional] 
+**ImageUrl** | Pointer to **string** |  | [optional] 
 **Suffix** | Pointer to **string** |  | [optional] 
 **BirthDate** | [**time.Time**](time.Time.md) |  | [optional] 
 **Email** | **string** | Email Address | [optional] 

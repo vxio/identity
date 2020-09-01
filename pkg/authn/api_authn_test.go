@@ -28,6 +28,48 @@ func Test_Register(t *testing.T) {
 	s.assert.Equal(200, resp.StatusCode)
 }
 
+func Test_Register_Success_Returns_ImageURL_If_Available(t *testing.T) {
+	s := Setup(t)
+
+	invite, code, err := s.invites.SendInvite(s.session, client.SendInvite{Email: "test@moovtest.io"})
+	s.assert.Nil(err)
+
+	ls := LoginSession{}
+
+	s.fuzz.Fuzz(&ls)
+	imageUrl := "http://images.com/123.jpg"
+	ls.Register.ImageUrl = &imageUrl
+	ls.TenantID = invite.TenantID
+	ls.InviteCode = code
+	ls.Scopes = []string{"register", "finished"}
+
+	c := s.NewClient(ls)
+	loggedIn, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
+	s.assert.Equal(ls.Register.ImageUrl, loggedIn.ImageUrl)
+	s.assert.Nil(err)
+	s.assert.Equal(200, resp.StatusCode)
+}
+
+func Test_Register_Success_Returns_Empty_ImageURL(t *testing.T) {
+	s := Setup(t)
+
+	invite, code, err := s.invites.SendInvite(s.session, client.SendInvite{Email: "test@moovtest.io"})
+	s.assert.Nil(err)
+
+	ls := LoginSession{}
+
+	s.fuzz.Fuzz(&ls)
+	ls.TenantID = invite.TenantID
+	ls.InviteCode = code
+	ls.Scopes = []string{"register", "finished"}
+
+	c := s.NewClient(ls)
+	loggedIn, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
+	s.assert.Equal(ls.Register.ImageUrl, loggedIn.ImageUrl)
+	s.assert.Nil(err)
+	s.assert.Equal(200, resp.StatusCode)
+}
+
 func Test_Signup(t *testing.T) {
 	s := Setup(t)
 

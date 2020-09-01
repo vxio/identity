@@ -24,6 +24,7 @@ type Register struct {
 	MiddleName string    `json:"middleName,omitempty"`
 	LastName   string    `json:"lastName,omitempty"`
 	NickName   *string   `json:"nickName,omitempty"`
+	ImageUrl   *string   `json:"imageUrl,omitempty"`
 	Suffix     *string   `json:"suffix,omitempty"`
 	BirthDate  time.Time `json:"birthDate,omitempty"`
 	// Email Address

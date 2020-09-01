@@ -40,4 +40,5 @@ type Identity struct {
 	LastUpdatedOn time.Time `json:"lastUpdatedOn,omitempty"`
 	// UUID v4
 	InviteID *string `json:"inviteID,omitempty"`
+	ImageUrl *string `json:"imageUrl,omitempty"`
 }

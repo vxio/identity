@@ -136,6 +136,7 @@ func (s *authnService) LoginWithCredentials(req *http.Request, login client.Logi
 		FirstName:    identity.FirstName,
 		LastName:     identity.LastName,
 		NickName:     identity.NickName,
+		ImageUrl:     identity.ImageUrl,
 	}
 
 	return cookie, &loggedIn, nil

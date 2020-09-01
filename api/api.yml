@@ -561,6 +561,11 @@ components:
         inviteID:
           description: Invite ID that was used to register.
           $ref: '#/components/schemas/OptionalUUID'
+        imageUrl:
+          type: string
+          format: url
+          nullable: true
+          maxLength: 255
 
       required:
         - firstName
@@ -881,6 +886,11 @@ components:
           nullable: true
           maxLength: 255
           pattern: ^\w+$
+        imageUrl:
+          type: string
+          format: url
+          nullable: true
+          maxLength: 255
 
 
     Register:
@@ -916,6 +926,11 @@ components:
           nullable: true
           maxLength: 255
           pattern: ^\w+$
+        imageUrl:
+          type: string
+          format: url
+          nullable: true
+          maxLength: 255
         suffix:
           type: string
           nullable: true

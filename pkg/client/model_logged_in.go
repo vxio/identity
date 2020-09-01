@@ -22,4 +22,5 @@ type LoggedIn struct {
 	FirstName  string  `json:"firstName,omitempty"`
 	LastName   string  `json:"lastName,omitempty"`
 	NickName   *string `json:"nickName,omitempty"`
+	ImageUrl   *string `json:"imageUrl,omitempty"`
 }
