@@ -75,6 +75,7 @@ func Test_GetAPI(t *testing.T) {
 	a.Nil(err)
 	a.Equal(200, resp.StatusCode)
 	a.Equal(identity, found)
+	a.Equal(identity.ImageUrl, found.ImageUrl)
 }
 
 func Test_GetAPI_NotFound(t *testing.T) {

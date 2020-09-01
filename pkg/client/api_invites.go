@@ -10,6 +10,7 @@
 package client
 
 import (
+	_bytes "bytes"
 	_context "context"
 	"github.com/antihax/optional"
 	_ioutil "io/ioutil"
@@ -42,7 +43,7 @@ func (a *InvitesApiService) DisableInvite(ctx _context.Context, inviteID string)
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/invites/{inviteID}"
-	localVarPath = strings.Replace(localVarPath, "{"+"inviteID"+"}", _neturl.QueryEscape(parameterToString(inviteID, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"inviteID"+"}", _neturl.PathEscape(parameterToString(inviteID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -80,6 +81,7 @@ func (a *InvitesApiService) DisableInvite(ctx _context.Context, inviteID string)
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -172,6 +174,7 @@ func (a *InvitesApiService) ListInvites(ctx _context.Context, localVarOptionals 
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -256,6 +259,7 @@ func (a *InvitesApiService) SendInvite(ctx _context.Context, sendInvite SendInvi
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
