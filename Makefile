@@ -98,7 +98,7 @@ openapitools:
 	docker run --rm \
 		-u $(USERID):$(GROUPID) \
 		-e OPENAPI_GENERATOR_VERSION='4.2.0' \
-		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/.openapi-generator/client-generator-config.yml
+		-v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 batch -- /local/.openapi-generator/client-generator-config.yml
 	gofmt -w ./pkg/client/
 
 

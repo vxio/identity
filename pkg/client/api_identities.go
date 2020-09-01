@@ -10,7 +10,6 @@
 package client
 
 import (
-	_bytes "bytes"
 	_context "context"
 	"github.com/antihax/optional"
 	_ioutil "io/ioutil"
@@ -43,7 +42,7 @@ func (a *IdentitiesApiService) DisableIdentity(ctx _context.Context, identityID 
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/identities/{identityID}"
-	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.PathEscape(parameterToString(identityID, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.QueryEscape(parameterToString(identityID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -81,7 +80,6 @@ func (a *IdentitiesApiService) DisableIdentity(ctx _context.Context, identityID 
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarHTTPResponse, err
 	}
@@ -132,7 +130,7 @@ func (a *IdentitiesApiService) GetIdentity(ctx _context.Context, identityID stri
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/identities/{identityID}"
-	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.PathEscape(parameterToString(identityID, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.QueryEscape(parameterToString(identityID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -170,7 +168,6 @@ func (a *IdentitiesApiService) GetIdentity(ctx _context.Context, identityID stri
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -272,7 +269,6 @@ func (a *IdentitiesApiService) ListIdentities(ctx _context.Context, localVarOpti
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -323,7 +319,7 @@ func (a *IdentitiesApiService) UpdateIdentity(ctx _context.Context, identityID s
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/identities/{identityID}"
-	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.PathEscape(parameterToString(identityID, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"identityID"+"}", _neturl.QueryEscape(parameterToString(identityID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -363,7 +359,6 @@ func (a *IdentitiesApiService) UpdateIdentity(ctx _context.Context, identityID s
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = _ioutil.NopCloser(_bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
