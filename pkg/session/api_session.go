@@ -76,6 +76,7 @@ func (c *sessionController) getSessionHandler(w http.ResponseWriter, r *http.Req
 			LastName:     identity.LastName,
 			NickName:     identity.NickName,
 			ExpiresIn:    c.stime.Now().Unix() - claims.Expiry.Time().Unix(),
+			ImageUrl:     identity.ImageUrl,
 		}
 
 		c.jsonResponse(w, &details)

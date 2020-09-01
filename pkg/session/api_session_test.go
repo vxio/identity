@@ -10,13 +10,14 @@ import (
 
 func Test_SessionEndpoint(t *testing.T) {
 	s := NewSessionScope(t)
-
+	imageUrl := "http://kittens.com/123.jpg"
 	identity, err := s.identities.Register(client.Register{
 		CredentialID: uuid.New().String(),
 		TenantID:     s.claims.TenantID.String(),
 		FirstName:    "John",
 		LastName:     "Doe",
 		NickName:     nil,
+		ImageUrl:     &imageUrl,
 	}, nil)
 	s.assert.Nil(err)
 
@@ -24,9 +25,10 @@ func Test_SessionEndpoint(t *testing.T) {
 
 	api := s.APIClient()
 
-	_, resp, err := api.SessionApi.GetSessionDetails(context.Background())
+	sessionDetails, resp, err := api.SessionApi.GetSessionDetails(context.Background())
 	s.assert.Equal(200, resp.StatusCode)
 	s.assert.Nil(err)
+	s.assert.Equal(identity.ImageUrl, sessionDetails.ImageUrl)
 }
 
 func Test_SessionEndpoint_Identity_Not_Found(t *testing.T) {

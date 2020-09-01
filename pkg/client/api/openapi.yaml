@@ -1663,6 +1663,7 @@ components:
         lastName: Doe
         identityID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         nickName: nickName
+        imageUrl: http://example.com/aeiou
         tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
         credentialID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
       properties:
@@ -1698,6 +1699,11 @@ components:
           maxLength: 255
           nullable: true
           pattern: ^\w+$
+          type: string
+        imageUrl:
+          format: url
+          maxLength: 255
+          nullable: true
           type: string
         expiresIn:
           description: Expires in seconds
