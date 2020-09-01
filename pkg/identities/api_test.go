@@ -92,9 +92,17 @@ func Test_ListAPI(t *testing.T) {
 	identity2 := RegisterIdentity(s, f)
 	identity3 := RegisterIdentity(s, f)
 
+	var identities []client.Identity
+	identities = append(identities, identity1)
+	identities = append(identities, identity2)
+	identities = append(identities, identity3)
+
 	found, resp, err := s.api.IdentitiesApi.ListIdentities(context.Background(), nil)
 	a.Nil(err)
 	a.Equal(200, resp.StatusCode)
+	for i := 0; i < len(identities); i++ {
+		a.Equal(identities[i].ImageUrl, found[i].ImageUrl)
+	}
 
 	a.Len(found, 3)
 	a.Contains(found, identity1, identity2, identity3)
