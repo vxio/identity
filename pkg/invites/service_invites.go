@@ -68,7 +68,7 @@ func (s *invitesService) SendInvite(claims tmw.TumblerClaims, send client.SendIn
 		InviteID:   uuid.New().String(),
 		TenantID:   claims.TenantID.String(),
 		Email:      send.Email,
-		InvitedBy:  claims.IdentityID.String(),
+		InvitedBy:  claims.Subject,
 		InvitedOn:  s.time.Now(),
 		RedeemedOn: nil,
 		ExpiresOn:  s.time.Now().Add(s.expiration),
@@ -91,7 +91,7 @@ func (s *invitesService) SendInvite(claims tmw.TumblerClaims, send client.SendIn
 		return nil, "", err
 	}
 
-	inviter, err := s.identity.GetIdentity(claims, claims.IdentityID.String())
+	inviter, err := s.identity.GetIdentity(claims, claims.Subject)
 	if err != nil {
 		return nil, "", err
 	}
@@ -118,7 +118,7 @@ func (s *invitesService) DisableInvite(claims tmw.TumblerClaims, inviteID string
 		return err
 	}
 
-	disabledBy := claims.IdentityID.String()
+	disabledBy := claims.Subject
 	disabledOn := s.time.Now()
 	invite.DisabledBy = &disabledBy
 	invite.DisabledOn = &disabledOn

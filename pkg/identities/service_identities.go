@@ -43,7 +43,7 @@ func (s *service) DisableIdentity(claims tmw.TumblerClaims, identityID string) e
 	}
 
 	now := s.time.Now()
-	callerIdentityID := claims.IdentityID.String()
+	callerIdentityID := claims.Subject
 
 	identity.DisabledOn = &now
 	identity.DisabledBy = &callerIdentityID

@@ -74,7 +74,7 @@ func Test_Disable(t *testing.T) {
 
 	a.NotNil(disabled.DisabledBy)
 	a.NotNil(disabled.DisabledOn)
-	a.Equal(s.session.IdentityID.String(), *disabled.DisabledBy)
+	a.Equal(s.session.Subject, *disabled.DisabledBy)
 	a.Equal(s.time.Now(), *disabled.DisabledOn)
 
 	found, err := s.service.ListCredentials(s.session, cred.IdentityID)

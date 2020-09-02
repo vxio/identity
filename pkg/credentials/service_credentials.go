@@ -41,7 +41,7 @@ func (s *credentialsService) DisableCredentials(auth tmw.TumblerClaims, identity
 		return nil, err
 	}
 
-	caller := auth.IdentityID.String()
+	caller := auth.Subject
 	now := s.time.Now()
 	cred.DisabledOn = &now
 	cred.DisabledBy = &caller
