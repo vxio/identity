@@ -61,7 +61,7 @@ func (c *sessionController) errorResponse(w http.ResponseWriter, err error) {
 
 func (c *sessionController) getSessionHandler(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
-		identity, err := c.identities.GetIdentity(claims, claims.IdentityID.String())
+		identity, err := c.identities.GetIdentity(claims, claims.Subject)
 		if err != nil {
 			c.logger.Info().Log("Unable to lookup identity")
 			c.errorResponse(w, err)

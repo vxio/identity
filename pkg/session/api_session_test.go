@@ -20,7 +20,9 @@ func Test_SessionEndpoint(t *testing.T) {
 	}, nil)
 	s.assert.Nil(err)
 
-	s.claims.IdentityID = uuid.MustParse(identity.IdentityID)
+	iid := uuid.MustParse(identity.IdentityID)
+	s.claims.Subject = iid.String()
+	s.claims.IdentityID = &iid
 
 	api := s.APIClient()
 
