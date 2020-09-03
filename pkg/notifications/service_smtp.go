@@ -18,7 +18,10 @@ type smtpService struct {
 func NewSmtpNotificationsService(logger log.Logger, config SMTPConfig, templates TemplateRepository) NotificationsService {
 	d := *gomail.NewDialer(config.Host, config.Port, config.User, config.Pass)
 	d.SSL = config.SSL
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: config.InsecureSSL}
+	d.TLSConfig = &tls.Config{
+		ServerName:         config.Host,
+		InsecureSkipVerify: config.InsecureSSL,
+	}
 
 	return &smtpService{
 		logger:    logger,
