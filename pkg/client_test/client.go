@@ -23,6 +23,8 @@ func NewTestClient(handler http.Handler) *client.APIClient {
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
+
+		Timeout: 0,
 	}
 
 	config := client.NewConfiguration()
