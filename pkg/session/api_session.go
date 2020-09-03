@@ -72,10 +72,10 @@ func (c *sessionController) getSessionHandler(w http.ResponseWriter, r *http.Req
 			CredentialID: claims.CredentialID.String(),
 			TenantID:     claims.TenantID.String(),
 			IdentityID:   claims.IdentityID.String(),
+			ExpiresIn:    claims.Expiry.Time().Unix(),
 			FirstName:    identity.FirstName,
 			LastName:     identity.LastName,
 			NickName:     identity.NickName,
-			ExpiresIn:    c.stime.Now().Unix() - claims.Expiry.Time().Unix(),
 			ImageUrl:     identity.ImageUrl,
 		}
 
