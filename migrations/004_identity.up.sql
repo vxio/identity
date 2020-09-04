@@ -20,6 +20,5 @@ CREATE TABLE identity (
 
     last_updated_on TIMESTAMP NOT NULL,
     
-    CONSTRAINT identity_pk PRIMARY KEY (identity_id),
-    CONSTRAINT email_tenant_uniq UNIQUE (tenant_id, email)
+    CONSTRAINT identity_pk PRIMARY KEY (identity_id)
 );
