@@ -90,6 +90,7 @@ func (s *credentialsService) Login(login client.Login, nonce string, ip string) 
 
 	return saved, nil
 }
+
 func (s *credentialsService) Exists(credentialID, tenantID string) (bool, error) {
 	_, err := s.repository.lookup(credentialID, tenantID)
 	if err == nil {
