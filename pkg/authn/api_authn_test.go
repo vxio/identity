@@ -26,6 +26,9 @@ func Test_Register(t *testing.T) {
 
 	c := s.NewClient(ls)
 	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
+	if err != nil {
+		fmt.Printf("%s", s.logOutput.String())
+	}
 	s.assert.Nil(err)
 	s.assert.Equal(200, resp.StatusCode)
 }
@@ -79,6 +82,9 @@ func Test_Register_TwiceSameTenant(t *testing.T) {
 
 	c := s.NewClient(ls)
 	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
+	if err != nil {
+		fmt.Printf("%s", s.logOutput.String())
+	}
 	s.assert.Nil(err)
 	s.assert.Equal(200, resp.StatusCode)
 
