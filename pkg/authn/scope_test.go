@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strings"
 	"testing"
 	"time"
 
@@ -42,7 +41,7 @@ var identityKeys, _ = webkeys.NewGenerateJwksService()
 func Setup(t *testing.T) Scope {
 	a := require.New(t)
 
-	output, logger := log.NewBufferLogger()
+	logger := log.NewDefaultLogger()
 	session := tmwt.NewRandomClaims()
 
 	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, logger, nil)
@@ -82,7 +81,7 @@ func Setup(t *testing.T) Scope {
 	f := fuzz.New().Funcs(
 		func(e *authn.LoginSession, c fuzz.Continue) {
 			e.IP = "1.2.3.4"
-			e.State = c.RandString()
+			e.State = "state" + c.RandString()
 
 			e.Claims = jwe.Claims{
 				Expiry:    jwt.NewNumericDate(stime.Now().Add(time.Hour)),
@@ -115,7 +114,7 @@ func Setup(t *testing.T) Scope {
 		invites:       invites,
 		authnJwe:      authnJwe,
 		identityJwe:   sessionJwe,
-		logOutput:     *output,
+		//logOutput:     *output,
 	}
 }
 
@@ -130,7 +129,7 @@ type Scope struct {
 	invites       invites.InvitesService
 	authnJwe      jwe.JWEService
 	identityJwe   jwe.JWEService
-	logOutput     strings.Builder
+	//logOutput     strings.Builder
 }
 
 func (s *Scope) NewClient(loginSession authn.LoginSession) *client.APIClient {
