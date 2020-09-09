@@ -37,7 +37,7 @@ func NewAndMigrate(config DatabaseConfig, logger log.Logger, ctx context.Context
 	}
 
 	shutdown := func() {
-		db.Close()
+		//db.Close()
 	}
 
 	err = RunMigrations(logger, db, config)

@@ -131,7 +131,7 @@ func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 		cookie, loggedIn, err := c.service.RegisterWithCredentials(r, *registration, session.State, session.IP, isSignup)
 		if err != nil {
 			c.logger.Error().LogError("Unable to RegisterWithCredentials", err)
-			w.WriteHeader(400)
+			w.WriteHeader(404)
 			return
 		}
 

@@ -1,4 +1,4 @@
-CREATE TABLE identity (
+CREATE TABLE "identity" (
     identity_id     VARCHAR(36) NOT NULL,
     tenant_id       VARCHAR(36) NOT NULL,
 
@@ -11,6 +11,7 @@ CREATE TABLE identity (
     status          VARCHAR(20) NOT NULL,
     email           VARCHAR(255) NOT NULL,
     email_verified  BOOLEAN DEFAULT false,
+    image_url       VARCHAR(36),
 
     registered_on   TIMESTAMP NOT NULL,
     invite_id       VARCHAR(36),

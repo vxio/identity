@@ -59,10 +59,6 @@ func Test_Register(t *testing.T) {
 		a.Equal(ra.State, ia.State)
 		a.Equal(ra.Type, ia.Type)
 	}
-
-	// Fail on second register
-	_, err = s.service.Register(r, &invite)
-	a.NotNil(err)
 }
 
 func Test_GetAPI(t *testing.T) {
