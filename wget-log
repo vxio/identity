@@ -1,11 +1,0 @@
---2020-09-09 10:58:33--  https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
-Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 151.101.184.133
-Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|151.101.184.133|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 5618 (5.5K) [text/plain]
-Saving to: ‘lint-project.sh’
-
-lint-project.sh                                                                                0%[                                                                                                                                                                                                                                            ]       0  --.-KB/s               lint-project.sh                                                                              100%[===========================================================================================================================================================================================================================================>]   5.49K  --.-KB/s    in 0s      
-
-2020-09-09 10:58:34 (67.3 MB/s) - ‘lint-project.sh’ saved [5618/5618]
-
