@@ -1,9 +1,9 @@
 package client_test
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	client "github.com/moov-io/identity/pkg/client"
 )
@@ -24,7 +24,7 @@ func NewTestClient(handler http.Handler) *client.APIClient {
 			return http.ErrUseLastResponse
 		},
 
-		Timeout: 0,
+		Timeout: 15 * time.Minute,
 	}
 
 	config := client.NewConfiguration()
@@ -36,7 +36,6 @@ func NewTestClient(handler http.Handler) *client.APIClient {
 
 type MockClientHandler struct {
 	handler http.Handler
-	ctx     *context.Context
 }
 
 func (h *MockClientHandler) RoundTrip(request *http.Request) (*http.Response, error) {

@@ -15,7 +15,15 @@ func Test_Register(t *testing.T) {
 	credentialID := uuid.New().String()
 	tenantID := uuid.New().String()
 
+	found, err := s.service.Exists(credentialID, tenantID)
+	a.False(found)
+	a.Nil(err)
+
 	cred, err := s.service.Register(identityID, credentialID, tenantID)
+	a.Nil(err)
+
+	found, err = s.service.Exists(credentialID, tenantID)
+	a.True(found)
 	a.Nil(err)
 
 	a.Equal(identityID, cred.IdentityID)
@@ -31,6 +39,7 @@ func Test_Register(t *testing.T) {
 	// register again should fail.
 	_, err = s.service.Register(identityID, credentialID, tenantID)
 	a.NotNil(err)
+
 }
 
 func Test_List(t *testing.T) {
