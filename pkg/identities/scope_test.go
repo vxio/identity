@@ -9,6 +9,7 @@ import (
 	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
+	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
 	. "github.com/moov-io/identity/pkg/identities"
 	identitiestestutils "github.com/moov-io/identity/pkg/identities/testutils"
@@ -20,11 +21,12 @@ import (
 )
 
 type Scope struct {
-	session    tmw.TumblerClaims
-	time       stime.StaticTimeService
-	repository Repository
-	service    Service
-	api        *client.APIClient
+	session     tmw.TumblerClaims
+	time        stime.StaticTimeService
+	credentials credentials.CredentialsService
+	repository  Repository
+	service     Service
+	api         *client.APIClient
 }
 
 func NewScope(t *testing.T) Scope {
@@ -38,9 +40,12 @@ func NewScope(t *testing.T) Scope {
 		t.Error(err)
 	}
 
+	credRepo := credentials.NewCredentialRepository(db)
+	credentials := credentials.NewCredentialsService(times, credRepo)
+
 	repository := NewIdentityRepository(db)
 
-	service := NewIdentitiesService(times, repository)
+	service := NewIdentitiesService(times, repository, credentials)
 
 	controller := NewIdentitiesController(service)
 
@@ -53,11 +58,12 @@ func NewScope(t *testing.T) Scope {
 	testAPI := clienttest.NewTestClient(routes)
 
 	return Scope{
-		session:    session,
-		time:       times,
-		repository: repository,
-		service:    service,
-		api:        testAPI,
+		session:     session,
+		time:        times,
+		credentials: credentials,
+		repository:  repository,
+		service:     service,
+		api:         testAPI,
 	}
 }
 

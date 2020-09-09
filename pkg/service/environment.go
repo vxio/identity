@@ -96,11 +96,11 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 		return nil, err
 	}
 
-	IdentityRepository := identities.NewIdentityRepository(db)
-	IdentitiesService := identities.NewIdentitiesService(env.TimeService, IdentityRepository)
-
 	CredentialRepository := credentials.NewCredentialRepository(db)
 	CredentialsService := credentials.NewCredentialsService(env.TimeService, CredentialRepository)
+
+	IdentityRepository := identities.NewIdentityRepository(db)
+	IdentitiesService := identities.NewIdentitiesService(env.TimeService, IdentityRepository, CredentialsService)
 
 	AuthnClient, err := authnclient.NewAuthnClient(env.Logger, env.Config.Services.Authn)
 	if err != nil {

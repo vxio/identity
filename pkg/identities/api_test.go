@@ -243,5 +243,12 @@ func RegisterIdentity(s Scope, f *fuzz.Fuzzer) client.Identity {
 		panic(err)
 	}
 
+	credID := uuid.New().String()
+
+	_, err = s.credentials.Register(identity.IdentityID, credID, s.session.TenantID.String())
+	if err != nil {
+		panic(err)
+	}
+
 	return *identity
 }

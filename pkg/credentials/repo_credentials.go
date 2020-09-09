@@ -11,10 +11,13 @@ import (
 type CredentialRepository interface {
 	list(identityID string, tenantID string) ([]client.Credential, error)
 	lookup(credentialID string, tenantID string) (*client.Credential, error)
+
 	get(identityID string, credentialID string, tenantID string) (*client.Credential, error)
+	getByID(credentialID string) ([]client.Credential, error)
+
 	add(credentials client.Credential) (*client.Credential, error)
 	update(updated client.Credential) (*client.Credential, error)
-	record(credentialID string, nonce string, ip string, at time.Time) error
+	record(credentialID string, tenantID string, nonce string, ip string, at time.Time) error
 }
 
 func NewCredentialRepository(db *sql.DB) CredentialRepository {
@@ -75,12 +78,22 @@ func (r *sqlCredsRepo) get(identityID string, credentialID string, tenantID stri
 	return &results[0], nil
 }
 
+func (r *sqlCredsRepo) getByID(credentialID string) ([]client.Credential, error) {
+	qry := fmt.Sprintf(`
+		SELECT %s
+		FROM credentials
+		WHERE credential_id = ?
+	`, credentialSelect)
+
+	return r.queryScan(qry, credentialID)
+}
+
 func (r *sqlCredsRepo) add(credentials client.Credential) (*client.Credential, error) {
 	qry := `
 		INSERT INTO credentials(
 			credential_id, 
-			tenant_id,
 			identity_id,
+			tenant_id,
 			created_on, 
 			last_used_on, 
 			disabled_on, 
@@ -89,8 +102,8 @@ func (r *sqlCredsRepo) add(credentials client.Credential) (*client.Credential, e
 	`
 	res, err := r.db.Exec(qry,
 		credentials.CredentialID,
-		credentials.TenantID,
 		credentials.IdentityID,
+		credentials.TenantID,
 		credentials.CreatedOn,
 		credentials.LastUsedOn,
 		credentials.DisabledOn,
@@ -107,18 +120,20 @@ func (r *sqlCredsRepo) add(credentials client.Credential) (*client.Credential, e
 	return &credentials, nil
 }
 
-func (r *sqlCredsRepo) record(credentialID string, nonce string, ip string, at time.Time) error {
+func (r *sqlCredsRepo) record(credentialID string, tenantID string, nonce string, ip string, at time.Time) error {
 	qry := `
 		INSERT INTO credential_logins(
 			credential_id,
+			tenant_id,
 			nonce,
 			ip,
 			created_on
-		) VALUES (?, ?, ?, ?)
+		) VALUES (?, ?, ?, ?, ?)
 	`
 
 	res, err := r.db.Exec(qry,
 		credentialID,
+		tenantID,
 		nonce,
 		ip,
 		at,
@@ -166,9 +181,10 @@ func (r *sqlCredsRepo) update(updated client.Credential) (*client.Credential, er
 
 var credentialSelect = `
 	credential_id, 
-	tenant_id, 
 	identity_id, 
+	tenant_id, 
 	created_on, 
+	invite_id, 
 	last_used_on, 
 	disabled_on, 
 	disabled_by
@@ -184,7 +200,7 @@ func (r *sqlCredsRepo) queryScan(query string, args ...interface{}) ([]client.Cr
 	credentials := []client.Credential{}
 	for rows.Next() {
 		cred := client.Credential{}
-		if err := rows.Scan(&cred.CredentialID, &cred.TenantID, &cred.IdentityID, &cred.CreatedOn, &cred.LastUsedOn, &cred.DisabledOn, &cred.DisabledBy); err != nil {
+		if err := rows.Scan(&cred.CredentialID, &cred.IdentityID, &cred.TenantID, &cred.CreatedOn, &cred.LastUsedOn, &cred.DisabledOn, &cred.DisabledBy); err != nil {
 			return nil, err
 		}
 

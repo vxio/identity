@@ -42,7 +42,7 @@ func (s *singleService) UpdateIdentity(claims tmw.TumblerClaims, identityID stri
 	panic(ErrNotImplemented)
 }
 
-func (s *singleService) Register(register client.Register, invite *client.Invite) (*client.Identity, error) {
+func (s *singleService) Register(register client.Register) (*client.Identity, error) {
 	panic(ErrNotImplemented)
 }
 

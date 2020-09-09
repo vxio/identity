@@ -56,9 +56,10 @@ func (s *authnService) RegisterWithCredentials(req *http.Request, register clien
 	})
 
 	var invite *client.Invite = nil
+	var inviteID *string = nil
 
 	if !isSignup {
-		invite, err := s.invites.Redeem(register.InviteCode)
+		found, err := s.invites.Redeem(register.InviteCode)
 		if err != nil {
 			return nil, nil, logCtx.Error().LogErrorF("Unable to redeem token", err)
 		}
@@ -67,6 +68,8 @@ func (s *authnService) RegisterWithCredentials(req *http.Request, register clien
 		if register.TenantID != invite.TenantID {
 			return nil, nil, logCtx.Error().LogErrorF("register TenantID and Invite TenantID don't match")
 		}
+		invite = found
+		inviteID = &invite.InviteID
 	}
 
 	// Create the identity so we can login with it and give the user access.
@@ -76,7 +79,7 @@ func (s *authnService) RegisterWithCredentials(req *http.Request, register clien
 	}
 
 	// Register the credentials with the new Identity created.
-	creds, err := s.credentials.Register(identity.IdentityID, register.CredentialID, register.TenantID)
+	creds, err := s.credentials.Register(identity.IdentityID, register.CredentialID, register.TenantID, inviteID)
 	if err != nil {
 		return nil, nil, logCtx.Error().LogErrorF("Unable to register credential", err)
 	}
@@ -84,7 +87,7 @@ func (s *authnService) RegisterWithCredentials(req *http.Request, register clien
 	// Using the new creds create the login object to log the user in.
 	login := client.Login{
 		CredentialID: creds.CredentialID,
-		TenantID:     identity.TenantID,
+		TenantID:     creds.TenantID,
 	}
 
 	return s.LoginWithCredentials(req, login, nonce, ip)
@@ -119,7 +122,7 @@ func (s *authnService) LoginWithCredentials(req *http.Request, login client.Logi
 
 	session := session.Session{
 		IdentityID:   uuid.MustParse(identity.IdentityID),
-		TenantID:     uuid.MustParse(identity.TenantID),
+		TenantID:     uuid.MustParse(credential.TenantID),
 		CredentialID: uuid.MustParse(credential.CredentialID),
 	}
 

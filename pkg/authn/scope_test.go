@@ -60,15 +60,15 @@ func Setup(t *testing.T) Scope {
 
 	authnClient := authntestutils.NewMockAuthnClient()
 
+	credsRepo := credentials.NewCredentialRepository(db)
+	creds := credentials.NewCredentialsService(stime, credsRepo)
+
 	identitiesRepo := identities.NewIdentityRepository(db)
-	identities := identities.NewIdentitiesService(stime, identitiesRepo)
+	identities := identities.NewIdentitiesService(stime, identitiesRepo, creds)
 
 	invitesRepo := invites.NewInvitesRepository(db)
 	invites, err := invites.NewInvitesService(invitesConfig, stime, invitesRepo, notifications, authnClient, identitiestestutils.NewSingleService(nil))
 	a.Nil(err)
-
-	credsRepo := credentials.NewCredentialRepository(db)
-	creds := credentials.NewCredentialsService(stime, credsRepo)
 
 	sessionConfig := sessionpkg.Config{Expiration: time.Hour}
 	sessionJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, identityKeys)

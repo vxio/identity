@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/moov-io/identity/pkg/client"
 	clienttest "github.com/moov-io/identity/pkg/client_test"
+	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/database"
 	"github.com/moov-io/identity/pkg/identities"
 	"github.com/moov-io/identity/pkg/logging"
@@ -36,8 +37,11 @@ func NewSessionScope(t *testing.T) SessionScope {
 	t.Cleanup(close)
 	a.Nil(err)
 
+	credRepo := credentials.NewCredentialRepository(db)
+	credService := credentials.NewCredentialsService(times, credRepo)
+
 	identitiesRepository := identities.NewIdentityRepository(db)
-	identities := identities.NewIdentitiesService(times, identitiesRepository)
+	identities := identities.NewIdentitiesService(times, identitiesRepository, credService)
 
 	controller := session.NewSessionController(logging, identities, times)
 

@@ -18,7 +18,7 @@ func Test_SessionEndpoint(t *testing.T) {
 		LastName:     "Doe",
 		NickName:     nil,
 		ImageUrl:     &imageUrl,
-	}, nil)
+	})
 	s.assert.Nil(err)
 
 	iid := uuid.MustParse(identity.IdentityID)

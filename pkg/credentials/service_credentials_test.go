@@ -31,6 +31,11 @@ func Test_Register(t *testing.T) {
 	// register again should fail.
 	_, err = s.service.Register(identityID, credentialID, tenantID)
 	a.NotNil(err)
+
+	// make sure we can get it to allow users to check if they wish to re-use any of its values
+	found, err := s.service.GetByID(cred.CredentialID)
+	a.Nil(err)
+	a.Contains(found, *cred)
 }
 
 func Test_List(t *testing.T) {

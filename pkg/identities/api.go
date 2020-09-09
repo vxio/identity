@@ -3,6 +3,7 @@ package identities
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -53,7 +54,10 @@ func (c *controller) Routes() api.Routes {
 }
 
 func errorHandling(w http.ResponseWriter, err error) {
+	fmt.Println(err.Error())
 	switch err {
+	case ErrIdentityNotFound:
+		w.WriteHeader(404)
 	case sql.ErrNoRows:
 		w.WriteHeader(404)
 	default:

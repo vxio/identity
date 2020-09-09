@@ -29,7 +29,8 @@ func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]client.Identity, error)
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM identity
-		WHERE identity.tenant_id = ?
+		INNER JOIN tenant_identity ON tenant_identity.identity_id = identity.identity_id
+		WHERE tenant_identity.tenant_id = ? AND tenant_identity.disabled_on IS NULL
 	`, identitySelect)
 
 	identities, err := r.queryScanIdentity(qry, tenantID.String())
@@ -45,7 +46,8 @@ func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]client.Identity, error)
 		SELECT %s
 		FROM identity_address
 		INNER JOIN identity ON identity_address.identity_id = identity.identity_id
-		WHERE identity.tenant_id = ?
+		INNER JOIN tenant_identity ON tenant_identity.identity_id = identity.identity_id
+		WHERE tenant_identity.tenant_id = ? AND tenant_identity.disabled_on IS NULL
 	`, addressSelect)
 
 	addresses, err := r.queryScanAddresses(qry, tenantID.String())
@@ -57,7 +59,8 @@ func (r *sqlIdentityRepo) list(tenantID api.TenantID) ([]client.Identity, error)
 		SELECT %s
 		FROM identity_phone
 		INNER JOIN identity ON identity_phone.identity_id = identity.identity_id
-		WHERE identity.tenant_id = ?
+		INNER JOIN tenant_identity ON tenant_identity.identity_id = identity.identity_id
+		WHERE tenant_identity.tenant_id = ? AND tenant_identity.disabled_on IS NULL
 	`, phoneSelect)
 
 	phones, err := r.queryScanPhone(qry, tenantID.String())
@@ -89,6 +92,7 @@ func (r *sqlIdentityRepo) get(identityID string) (*client.Identity, error) {
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM identity
+		INNER JOIN tenant_identity ON tenant_identity.identity_id = identity.identity_id
 		WHERE identity.identity_id = ?
 		LIMIT 1
 	`, identitySelect)
@@ -106,6 +110,7 @@ func (r *sqlIdentityRepo) get(identityID string) (*client.Identity, error) {
 		SELECT %s
 		FROM identity_address
 		INNER JOIN identity ON identity_address.identity_id = identity.identity_id
+		INNER JOIN tenant_identity ON tenant_identity.identity_id = identity.identity_id
 		WHERE identity.identity_id = ?
 	`, addressSelect)
 
@@ -118,6 +123,7 @@ func (r *sqlIdentityRepo) get(identityID string) (*client.Identity, error) {
 		SELECT %s
 		FROM identity_phone
 		INNER JOIN identity ON identity_phone.identity_id = identity.identity_id
+		INNER JOIN tenant_identity ON tenant_identity.identity_id = identity.identity_id
 		WHERE identity.identity_id = ?
 	`, phoneSelect)
 
@@ -153,16 +159,12 @@ func (r *sqlIdentityRepo) update(updated client.Identity) (*client.Identity, err
 			suffix = ?,
 			birth_date = ?,
 			status = ?,
-			disabled_on = ?,
-			disabled_by = ?,
 			last_updated_on = ?
 		WHERE
-			tenant_id = ? AND
 			identity_id = ?
 	`
 
 	res, err := tx.Exec(qry,
-
 		updated.FirstName,
 		updated.MiddleName,
 		updated.LastName,
@@ -170,11 +172,8 @@ func (r *sqlIdentityRepo) update(updated client.Identity) (*client.Identity, err
 		updated.Suffix,
 		updated.BirthDate,
 		updated.Status,
-		updated.DisabledOn,
-		updated.DisabledBy,
 		updated.LastUpdatedOn,
 
-		updated.TenantID,
 		updated.IdentityID)
 	if err != nil {
 		return nil, err
@@ -211,28 +210,22 @@ func (r *sqlIdentityRepo) add(identity client.Identity) (*client.Identity, error
 	qry := `
 		INSERT INTO identity(
 			identity_id, 
-			tenant_id, 
 			first_name, 
 			middle_name, 
 			last_name, 
 			nick_name, 
 			suffix, 
 			birth_date, 
-			status, 
 			email, 
 			email_verified,
 			registered_on,
-			invite_id,
-			disabled_on,
-			disabled_by,
 			last_updated_on,
 			image_url
-		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
 	`
 
 	res, err := tx.Exec(qry,
 		identity.IdentityID,
-		identity.TenantID,
 		identity.FirstName,
 		identity.MiddleName,
 		identity.LastName,
@@ -243,9 +236,6 @@ func (r *sqlIdentityRepo) add(identity client.Identity) (*client.Identity, error
 		identity.Email,
 		identity.EmailVerified,
 		identity.RegisteredOn,
-		identity.InviteID,
-		identity.DisabledOn,
-		identity.DisabledBy,
 		identity.LastUpdatedOn,
 		identity.ImageUrl)
 	if err != nil {
@@ -253,6 +243,37 @@ func (r *sqlIdentityRepo) add(identity client.Identity) (*client.Identity, error
 	}
 
 	cnt, err := res.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if cnt != 1 {
+		return nil, sql.ErrNoRows
+	}
+
+	qry := `
+		INSERT INTO tenant_identity(
+			identity_id, 
+			tenant_id, 
+			invite_id, 
+			status, 
+			disabled_on, 
+			disabled_by, 
+		) VALUES (?,?,?,?,?,?)
+	`
+
+	res, err = tx.Exec(qry,
+		identity.IdentityID,
+		identity.TenantID,
+		identity.InviteID,
+		identity.Status,
+		identity.DisabledOn,
+		identity.DisabledBy,
+		identity.ImageUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	cnt, err = res.RowsAffected()
 	if err != nil {
 		return nil, err
 	}
@@ -276,20 +297,20 @@ func (r *sqlIdentityRepo) add(identity client.Identity) (*client.Identity, error
 // Matches the order pulled in by the rows.Scan below in queryScanIdentity
 var identitySelect = `
 	identity.identity_id, 
-	identity.tenant_id,
+	tenant_identity.tenant_id,
 	identity.first_name, 
 	identity.middle_name, 
 	identity.last_name, 
 	identity.nick_name, 
 	identity.suffix, 
 	identity.birth_date, 
-	identity.status, 
+	tenant_identity.status, 
 	identity.email, 
 	identity.email_verified, 
 	identity.registered_on, 
-	identity.invite_id,
-	identity.disabled_on, 
-	identity.disabled_by,
+	tenant_identity.invite_id,
+	tenant_identity.disabled_on, 
+	tenant_identity.disabled_by,
 	identity.last_updated_on,
 	identity.image_url
 `

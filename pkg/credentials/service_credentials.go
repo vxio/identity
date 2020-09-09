@@ -11,10 +11,11 @@ import (
 // while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type CredentialsService interface {
-	DisableCredentials(tmw.TumblerClaims, string, string) (*client.Credential, error)
+	DisableCredentials(auth tmw.TumblerClaims, identityID string, credentialID string) (*client.Credential, error)
 	ListCredentials(tmw.TumblerClaims, string) ([]client.Credential, error)
 
-	Register(string, string, string) (*client.Credential, error)
+	GetByID(credentialID string) ([]client.Credential, error)
+	Register(identityID, credentialID, tenantID string) (*client.Credential, error)
 	Login(client.Login, string, string) (*client.Credential, error)
 }
 
@@ -72,7 +73,7 @@ func (s *credentialsService) Login(login client.Login, nonce string, ip string) 
 	cred.LastUsedOn = s.time.Now()
 
 	// Record the login happened and that the nonce is unique.
-	err = s.repository.record(cred.CredentialID, nonce, ip, cred.LastUsedOn)
+	err = s.repository.record(cred.CredentialID, cred.TenantID, nonce, ip, cred.LastUsedOn)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +88,11 @@ func (s *credentialsService) Login(login client.Login, nonce string, ip string) 
 	return saved, nil
 }
 
-func (s *credentialsService) Register(identityID string, credentialID, tenantID string) (*client.Credential, error) {
+func (s *credentialsService) GetByID(credentialID string) ([]client.Credential, error) {
+	return s.repository.getByID(credentialID)
+}
+
+func (s *credentialsService) Register(identityID, credentialID, tenantID string) (*client.Credential, error) {
 	cred := client.Credential{
 		CredentialID: credentialID,
 		IdentityID:   identityID,

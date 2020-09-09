@@ -1,11 +1,10 @@
 package identities
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 	api "github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/client"
+	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/stime"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
 )
@@ -18,40 +17,41 @@ type Service interface {
 	ListIdentities(claims tmw.TumblerClaims, orgID string) ([]client.Identity, error)
 	UpdateIdentity(claims tmw.TumblerClaims, identityID string, update client.UpdateIdentity) (*client.Identity, error)
 
-	Register(register client.Register, invite *client.Invite) (*client.Identity, error)
+	Register(register client.Register) (*client.Identity, error)
 	GetIdentityByID(identityID string) (*client.Identity, error)
 }
 
 type service struct {
-	time       stime.TimeService
-	repository Repository
+	time        stime.TimeService
+	repository  Repository
+	credentials credentials.CredentialsService
 }
 
 // NewIdentitiesService creates a default service
-func NewIdentitiesService(time stime.TimeService, repository Repository) Service {
+func NewIdentitiesService(time stime.TimeService, repository Repository, credentials credentials.CredentialsService) Service {
 	return &service{
-		time:       time,
-		repository: repository,
+		time:        time,
+		repository:  repository,
+		credentials: credentials,
 	}
 }
 
 // DisableIdentity - Disable an identity. Its left around for historical reporting
 func (s *service) DisableIdentity(claims tmw.TumblerClaims, identityID string) error {
-	identity, err := s.GetIdentity(claims, identityID)
+	creds, err := s.credentials.ListCredentials(claims, identityID)
 	if err != nil {
 		return err
 	}
 
-	now := s.time.Now()
-	callerIdentityID := claims.Subject
+	if len(creds) == 0 {
+		return ErrIdentityNotFound
+	}
 
-	identity.DisabledOn = &now
-	identity.DisabledBy = &callerIdentityID
-	identity.LastUpdatedOn = s.time.Now()
-
-	_, nil := s.repository.update(*identity)
-	if err != nil {
-		return err
+	for _, cred := range creds {
+		_, err := s.credentials.DisableCredentials(claims, cred.IdentityID, cred.CredentialID)
+		if err != nil {
+			return err
+		}
 	}
 
 	// supposed to be 204 no content...
@@ -65,14 +65,10 @@ func (s *service) GetIdentity(claims tmw.TumblerClaims, identityID string) (*cli
 		return nil, e
 	}
 
-	if i.TenantID != claims.TenantID.String() {
-		return nil, errors.New("TenantID of session user doesn't match retrieved identity")
-	}
-
 	return i, nil
 }
 
-// ListIdentities - List identities and associates userId
+//ListIdentities - List identities and associates userId
 func (s *service) ListIdentities(claims tmw.TumblerClaims, orgID string) ([]client.Identity, error) {
 	identities, err := s.repository.list(api.TenantID(claims.TenantID))
 	return identities, err
@@ -148,7 +144,7 @@ func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, up
 }
 
 // Register - Takes an invite and the registration information and creates the new identity from it.
-func (s *service) Register(register client.Register, invite *client.Invite) (*client.Identity, error) {
+func (s *service) Register(register client.Register) (*client.Identity, error) {
 	identityID := uuid.New().String()
 
 	phones := []client.Phone{}
@@ -180,8 +176,6 @@ func (s *service) Register(register client.Register, invite *client.Invite) (*cl
 
 	identity := client.Identity{
 		IdentityID:    identityID,
-		TenantID:      register.TenantID,
-		InviteID:      nil,
 		FirstName:     register.FirstName,
 		MiddleName:    register.MiddleName,
 		LastName:      register.LastName,
@@ -197,11 +191,6 @@ func (s *service) Register(register client.Register, invite *client.Invite) (*cl
 		LastLogin:     client.LastLogin{},
 		LastUpdatedOn: s.time.Now(),
 		ImageUrl:      register.ImageUrl,
-	}
-
-	if invite != nil {
-		identity.TenantID = invite.TenantID
-		identity.InviteID = &invite.InviteID
 	}
 
 	saved, err := s.repository.add(identity)
