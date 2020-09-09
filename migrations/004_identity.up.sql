@@ -1,4 +1,4 @@
-CREATE TABLE "identity" (
+CREATE TABLE identity (
     identity_id     VARCHAR(36) NOT NULL,
     tenant_id       VARCHAR(36) NOT NULL,
 
