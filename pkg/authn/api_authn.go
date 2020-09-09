@@ -99,6 +99,7 @@ func (c *authnAPIController) SubmitRegistration(w http.ResponseWriter, r *http.R
 			validation.Field(&session.State, validation.Required),
 			validation.Field(&session.IP, validation.Required, is.IP),
 		); err != nil {
+			c.logger.Error().LogError("unable to validate session", err)
 			w.WriteHeader(404)
 			return
 		}
