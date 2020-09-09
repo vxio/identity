@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/moov-io/base/docker"
@@ -31,6 +32,7 @@ func Test_NewAndMigration_MySql(t *testing.T) {
 
 	_, close, err := NewAndMigrate(config, nil, nil)
 	if err != nil {
+		fmt.Printf("%s", err.Error())
 		t.FailNow()
 	}
 	close()

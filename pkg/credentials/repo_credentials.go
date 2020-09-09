@@ -11,10 +11,11 @@ import (
 type CredentialRepository interface {
 	list(identityID string, tenantID string) ([]client.Credential, error)
 	lookup(credentialID string, tenantID string) (*client.Credential, error)
+
 	get(identityID string, credentialID string, tenantID string) (*client.Credential, error)
 	add(credentials client.Credential) (*client.Credential, error)
 	update(updated client.Credential) (*client.Credential, error)
-	record(credentialID string, nonce string, ip string, at time.Time) error
+	record(credentialID string, tenantID string, nonce string, ip string, at time.Time) error
 }
 
 func NewCredentialRepository(db *sql.DB) CredentialRepository {
@@ -59,11 +60,11 @@ func (r *sqlCredsRepo) get(identityID string, credentialID string, tenantID stri
 	qry := fmt.Sprintf(`
 		SELECT %s
 		FROM credentials
-		WHERE credential_id = ? AND identity_id = ? AND tenant_id = ?
+		WHERE credential_id = ? AND tenant_id = ? AND identity_id = ? 
 		LIMIT 1
 	`, credentialSelect)
 
-	results, err := r.queryScan(qry, credentialID, identityID, tenantID)
+	results, err := r.queryScan(qry, credentialID, tenantID, identityID)
 	if err != nil {
 		return nil, err
 	}
@@ -107,18 +108,20 @@ func (r *sqlCredsRepo) add(credentials client.Credential) (*client.Credential, e
 	return &credentials, nil
 }
 
-func (r *sqlCredsRepo) record(credentialID string, nonce string, ip string, at time.Time) error {
+func (r *sqlCredsRepo) record(credentialID string, tenantID string, nonce string, ip string, at time.Time) error {
 	qry := `
 		INSERT INTO credential_logins(
 			credential_id,
+			tenant_id,
 			nonce,
 			ip,
 			created_on
-		) VALUES (?, ?, ?, ?)
+		) VALUES (?, ?, ?, ?, ?)
 	`
 
 	res, err := r.db.Exec(qry,
 		credentialID,
+		tenantID,
 		nonce,
 		ip,
 		at,
@@ -145,8 +148,8 @@ func (r *sqlCredsRepo) update(updated client.Credential) (*client.Credential, er
 			disabled_by = ?
 		WHERE
 			credential_id = ? AND
-			identity_id = ? AND
-			tenant_id = ?
+			tenant_id = ? AND
+			identity_id = ?
 	`
 	_, err := r.db.Exec(qry,
 		updated.LastUsedOn,
@@ -154,8 +157,8 @@ func (r *sqlCredsRepo) update(updated client.Credential) (*client.Credential, er
 		updated.DisabledBy,
 
 		updated.CredentialID,
-		updated.IdentityID,
-		updated.TenantID)
+		updated.TenantID,
+		updated.IdentityID)
 
 	if err != nil {
 		return nil, err

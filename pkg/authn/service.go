@@ -69,6 +69,14 @@ func (s *authnService) RegisterWithCredentials(req *http.Request, register clien
 		}
 	}
 
+	// See if this credential is already registered with the tenant and if so bomb out.
+	found, err := s.credentials.Exists(register.CredentialID, register.TenantID)
+	if err != nil {
+		return nil, nil, err
+	} else if found {
+		return nil, nil, logCtx.Error().LogErrorF("credential already registered with tenant")
+	}
+
 	// Create the identity so we can login with it and give the user access.
 	identity, err := s.identities.Register(register, invite)
 	if err != nil {

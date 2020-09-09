@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	. "github.com/moov-io/identity/pkg/authn"
 	"github.com/moov-io/identity/pkg/client"
 )
@@ -26,6 +27,67 @@ func Test_Register(t *testing.T) {
 	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
 	s.assert.Nil(err)
 	s.assert.Equal(200, resp.StatusCode)
+}
+
+func Test_Register_TwoTenants(t *testing.T) {
+	s := Setup(t)
+
+	credential := uuid.New().String()
+
+	ls := LoginSession{}
+
+	// Do the first tenant
+	s.fuzz.Fuzz(&ls)
+	ls.CredentialID = credential
+	ls.TenantID = uuid.New().String()
+	ls.Scopes = []string{"register", "finished", "signup"}
+
+	c := s.NewClient(ls)
+	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
+	s.assert.Nil(err)
+	s.assert.Equal(200, resp.StatusCode)
+
+	// Lets do the second one.
+	s.fuzz.Fuzz(&ls)
+	ls.CredentialID = credential
+	ls.TenantID = uuid.New().String()
+	ls.Scopes = []string{"register", "finished", "signup"}
+
+	c = s.NewClient(ls)
+	_, resp, err = c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
+	s.assert.Nil(err)
+	s.assert.Equal(200, resp.StatusCode)
+}
+
+func Test_Register_TwiceSameTenant(t *testing.T) {
+	s := Setup(t)
+
+	credential := uuid.New().String()
+	tenant := uuid.New().String()
+
+	ls := LoginSession{}
+
+	// Do the first tenant
+	s.fuzz.Fuzz(&ls)
+	ls.CredentialID = credential
+	ls.TenantID = tenant
+	ls.Scopes = []string{"register", "finished", "signup"}
+
+	c := s.NewClient(ls)
+	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
+	s.assert.Nil(err)
+	s.assert.Equal(200, resp.StatusCode)
+
+	// Lets do the second one.
+	s.fuzz.Fuzz(&ls)
+	ls.CredentialID = credential
+	ls.TenantID = tenant
+	ls.Scopes = []string{"register", "finished", "signup"}
+
+	c = s.NewClient(ls)
+	_, resp, err = c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
+	s.assert.NotNil(err)
+	s.assert.Equal(404, resp.StatusCode)
 }
 
 func Test_Register_Success_Returns_ImageURL_If_Available(t *testing.T) {
@@ -183,7 +245,7 @@ func Test_Register_InvalidInviteCode(t *testing.T) {
 	c := s.NewClient(ls)
 	_, resp, err := c.AuthenticationApi.RegisterWithCredentials(context.Background(), ls.Register)
 	s.assert.NotNil(err)
-	s.assert.Equal(400, resp.StatusCode)
+	s.assert.Equal(404, resp.StatusCode)
 }
 
 func Test_Register_Invalid_Scope(t *testing.T) {
