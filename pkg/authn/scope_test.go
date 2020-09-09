@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -41,7 +42,7 @@ var identityKeys, _ = webkeys.NewGenerateJwksService()
 func Setup(t *testing.T) Scope {
 	a := require.New(t)
 
-	logger := log.NewNopLogger()
+	output, logger := log.NewBufferLogger()
 	session := tmwt.NewRandomClaims()
 
 	db, close, err := database.NewAndMigrate(database.InMemorySqliteConfig, logger, nil)
@@ -114,6 +115,7 @@ func Setup(t *testing.T) Scope {
 		invites:       invites,
 		authnJwe:      authnJwe,
 		identityJwe:   sessionJwe,
+		logOutput:     *output,
 	}
 }
 
@@ -128,6 +130,7 @@ type Scope struct {
 	invites       invites.InvitesService
 	authnJwe      jwe.JWEService
 	identityJwe   jwe.JWEService
+	logOutput     strings.Builder
 }
 
 func (s *Scope) NewClient(loginSession authn.LoginSession) *client.APIClient {
