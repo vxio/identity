@@ -20,6 +20,7 @@ type CredentialsService interface {
 	Register(identityID, credentialID, tenantID string) (*client.Credential, error)
 
 	Login(client.Login, string, string) (*client.Credential, error)
+	Record(credentialID string, tenantID string, nonce string, ip string) error
 }
 
 // CredentialsService is a service that implents the logic for the CredentialsApiServicer
@@ -73,14 +74,13 @@ func (s *credentialsService) Login(login client.Login, nonce string, ip string) 
 		return nil, err
 	}
 
-	cred.LastUsedOn = s.time.Now()
-
 	// Record the login happened and that the nonce is unique.
-	err = s.repository.record(cred.CredentialID, cred.TenantID, nonce, ip, cred.LastUsedOn)
+	err = s.Record(cred.CredentialID, cred.TenantID, nonce, ip)
 	if err != nil {
 		return nil, err
 	}
 
+	cred.LastUsedOn = s.time.Now()
 	saved, err := s.repository.update(*cred)
 	if err != nil {
 		return nil, err
@@ -89,6 +89,16 @@ func (s *credentialsService) Login(login client.Login, nonce string, ip string) 
 	// @TODO record login in a queue
 
 	return saved, nil
+}
+
+// Record the login happened and that the nonce is unique.
+func (s *credentialsService) Record(credentialID string, tenantID string, nonce string, ip string) error {
+	err := s.repository.record(credentialID, tenantID, nonce, ip, s.time.Now())
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *credentialsService) Exists(credentialID, tenantID string) (bool, error) {

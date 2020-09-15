@@ -95,9 +95,7 @@ func (c *controller) GetIdentity(w http.ResponseWriter, r *http.Request) {
 // ListIdentities - List identities and associates userId
 func (c *controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
-		query := r.URL.Query()
-		orgID := query.Get("orgID")
-		result, err := c.service.ListIdentities(claims, orgID)
+		result, err := c.service.ListIdentities(claims)
 		if err != nil {
 			errorHandling(w, err)
 			return

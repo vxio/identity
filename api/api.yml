@@ -109,6 +109,31 @@ paths:
           $ref: '#/components/responses/Empty'
         default:
           $ref: '#/components/responses/Empty'
+    put:
+      operationId: ChangeSessionDetails
+      summary: Changes the details of the session allowing to change tenants or identities. This much be locked down with an authorization.
+      tags:
+      - session
+      security:
+      - GatewayAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeSessionDetails'
+      responses:
+        '200':
+          description: Information about the current session and user logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDetails'
+        '404':
+          description: "Authentication failed"
+          $ref: '#/components/responses/Empty'
+        default:
+          $ref: '#/components/responses/Empty'
 
   /invites:
     get:
@@ -118,12 +143,6 @@ paths:
       - invites
       security:
       - GatewayAuth: []
-      parameters:
-      - in: query
-        name: orgID
-        description: Filter in only for specific Organization
-        schema:
-          $ref: '#/components/schemas/UUID'
       responses:
         '200':
           description: Invites that are outstanding
@@ -192,12 +211,6 @@ paths:
       - identities
       security:
       - GatewayAuth: []
-      parameters:
-      - in: query
-        name: orgID
-        description: Filter in only for specific Organization
-        schema:
-          $ref: '#/components/schemas/UUID'
       responses:
         '200':
           description: List of identities/users in the system
@@ -1115,3 +1128,11 @@ components:
           type: integer
           format: int64
           description: Expires in seconds
+            
+    ChangeSessionDetails:
+      description: User has logged in and is being given a token to proof identity
+      type: object
+      additionalProperties: false
+      properties:
+        tenantID:
+          $ref: '#/components/schemas/OptionalUUID'

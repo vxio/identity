@@ -91,7 +91,7 @@ func Test_ListAPI(t *testing.T) {
 	var identities []client.Identity
 	identities = append(identities, identity1, identity2, identity3)
 
-	found, resp, err := s.api.IdentitiesApi.ListIdentities(context.Background(), nil)
+	found, resp, err := s.api.IdentitiesApi.ListIdentities(context.Background())
 	a.Nil(err)
 	a.Equal(200, resp.StatusCode)
 	for i := 0; i < len(identities); i++ {
@@ -105,7 +105,7 @@ func Test_ListAPI(t *testing.T) {
 func Test_ListAPI_Empty(t *testing.T) {
 	a, s, _ := Setup(t)
 
-	found, resp, err := s.api.IdentitiesApi.ListIdentities(context.Background(), nil)
+	found, resp, err := s.api.IdentitiesApi.ListIdentities(context.Background())
 	a.Nil(err)
 	a.Equal(200, resp.StatusCode)
 

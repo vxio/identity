@@ -45,12 +45,14 @@ Class | Method | HTTP request | Description
 *InvitesApi* | [**DisableInvite**](docs/InvitesApi.md#disableinvite) | **Delete** /invites/{inviteID} | Delete an invite that was sent and invalidate the token.
 *InvitesApi* | [**ListInvites**](docs/InvitesApi.md#listinvites) | **Get** /invites | List outstanding invites
 *InvitesApi* | [**SendInvite**](docs/InvitesApi.md#sendinvite) | **Post** /invites | Send an email invite to a new user
+*SessionApi* | [**ChangeSessionDetails**](docs/SessionApi.md#changesessiondetails) | **Put** /session | Changes the details of the session allowing to change tenants or identities
 *SessionApi* | [**GetSessionDetails**](docs/SessionApi.md#getsessiondetails) | **Get** /session | Return information about the current session
 
 
 ## Documentation For Models
 
  - [Address](docs/Address.md)
+ - [ChangeSessionDetails](docs/ChangeSessionDetails.md)
  - [Credential](docs/Credential.md)
  - [Identity](docs/Identity.md)
  - [Invite](docs/Invite.md)

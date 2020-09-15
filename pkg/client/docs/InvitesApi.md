@@ -44,26 +44,13 @@ Name | Type | Description  | Notes
 
 ## ListInvites
 
-> []Invite ListInvites(ctx, optional)
+> []Invite ListInvites(ctx, )
 
 List outstanding invites
 
 ### Required Parameters
 
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
- **optional** | ***ListInvitesOpts** | optional parameters | nil if no parameters
-
-### Optional Parameters
-
-Optional parameters are passed through a pointer to a ListInvitesOpts struct
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **orgID** | [**optional.Interface of string**](.md)| Filter in only for specific Organization | 
+This endpoint does not need any parameter.
 
 ### Return type
 

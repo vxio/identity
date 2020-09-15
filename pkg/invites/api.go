@@ -68,8 +68,6 @@ func (c *Controller) DeleteInvite(w http.ResponseWriter, r *http.Request) {
 // ListInvites - List outstanding invites
 func (c *Controller) ListInvites(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
-		//query := r.URL.Query()
-		//orgID := query.Get("orgID")
 		result, err := c.service.ListInvites(claims)
 		if err != nil {
 			w.WriteHeader(500)

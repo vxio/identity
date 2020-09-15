@@ -72,7 +72,7 @@ func Setup(t *testing.T) Scope {
 
 	sessionConfig := sessionpkg.Config{Expiration: time.Hour}
 	sessionJwe := jwe.NewJWEService(stime, sessionConfig.Expiration, identityKeys)
-	token := sessionpkg.NewSessionService(stime, sessionJwe, sessionConfig)
+	token := sessionpkg.NewTokenService(stime, sessionJwe, sessionConfig)
 
 	service := authn.NewAuthnService(logger, creds, identities, token, invites)
 
