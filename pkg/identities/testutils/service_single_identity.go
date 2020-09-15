@@ -34,7 +34,7 @@ func (s *singleService) GetIdentity(claims tmw.TumblerClaims, identityID string)
 	return &shallowCopy, nil
 }
 
-func (s *singleService) ListIdentities(claims tmw.TumblerClaims, orgID string) ([]client.Identity, error) {
+func (s *singleService) ListIdentities(claims tmw.TumblerClaims) ([]client.Identity, error) {
 	return []client.Identity{s.identity}, nil
 }
 

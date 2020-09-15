@@ -40,6 +40,7 @@ Identity:
     #     - ./configs/authn-jwks-sig-pub.json
   Session:
     Expiration: 1h
+    EnablePutSession: false
     # keys:
     #   paths:
     #   - ./configs/identity-jwks-sig-pub.json

@@ -11,7 +11,6 @@ package client
 
 import (
 	_context "context"
-	"github.com/antihax/optional"
 	_ioutil "io/ioutil"
 	_nethttp "net/http"
 	_neturl "net/url"
@@ -112,19 +111,12 @@ func (a *InvitesApiService) DisableInvite(ctx _context.Context, inviteID string)
 	return localVarHTTPResponse, nil
 }
 
-// ListInvitesOpts Optional parameters for the method 'ListInvites'
-type ListInvitesOpts struct {
-	OrgID optional.Interface
-}
-
 /*
 ListInvites List outstanding invites
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param optional nil or *ListInvitesOpts - Optional Parameters:
- * @param "OrgID" (optional.Interface of string) -  Filter in only for specific Organization
 @return []Invite
 */
-func (a *InvitesApiService) ListInvites(ctx _context.Context, localVarOptionals *ListInvitesOpts) ([]Invite, *_nethttp.Response, error) {
+func (a *InvitesApiService) ListInvites(ctx _context.Context) ([]Invite, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -140,9 +132,6 @@ func (a *InvitesApiService) ListInvites(ctx _context.Context, localVarOptionals 
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
-	if localVarOptionals != nil && localVarOptionals.OrgID.IsSet() {
-		localVarQueryParams.Add("orgID", parameterToString(localVarOptionals.OrgID.Value(), ""))
-	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

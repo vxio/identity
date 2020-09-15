@@ -144,18 +144,47 @@ paths:
       summary: Return information about the current session
       tags:
       - session
+    put:
+      operationId: ChangeSessionDetails
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeSessionDetails'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDetails'
+          description: Information about the current session and user logged in.
+        "404":
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+        default:
+          content:
+            text/plain:
+              schema:
+                maxLength: 0
+                pattern: //i
+                type: string
+          description: Empty response for unauthorized or any other returned http
+            status code
+      security:
+      - GatewayAuth: []
+      summary: Changes the details of the session allowing to change tenants or identities
+      tags:
+      - session
   /invites:
     get:
       operationId: ListInvites
-      parameters:
-      - description: Filter in only for specific Organization
-        explode: true
-        in: query
-        name: orgID
-        required: false
-        schema:
-          $ref: '#/components/schemas/UUID'
-        style: form
       responses:
         "200":
           content:
@@ -250,15 +279,6 @@ paths:
   /identities:
     get:
       operationId: ListIdentities
-      parameters:
-      - description: Filter in only for specific Organization
-        explode: true
-        in: query
-        name: orgID
-        required: false
-        schema:
-          $ref: '#/components/schemas/UUID'
-        style: form
       responses:
         "200":
           content:
@@ -1709,6 +1729,20 @@ components:
           description: Expires in seconds
           format: int64
           type: integer
+      type: object
+    ChangeSessionDetails:
+      additionalProperties: false
+      description: User has logged in and is being given a token to proof identity
+      example:
+        tenantID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        tenantID:
+          description: UUID v4
+          format: uuid
+          maxLength: 36
+          nullable: true
+          pattern: ^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$
+          type: string
       type: object
   securitySchemes:
     GatewayAuth:

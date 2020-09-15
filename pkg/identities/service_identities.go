@@ -15,7 +15,7 @@ import (
 type Service interface {
 	DisableIdentity(claims tmw.TumblerClaims, identityID string) error
 	GetIdentity(claims tmw.TumblerClaims, identityID string) (*client.Identity, error)
-	ListIdentities(claims tmw.TumblerClaims, orgID string) ([]client.Identity, error)
+	ListIdentities(claims tmw.TumblerClaims) ([]client.Identity, error)
 	UpdateIdentity(claims tmw.TumblerClaims, identityID string, update client.UpdateIdentity) (*client.Identity, error)
 
 	Register(register client.Register, invite *client.Invite) (*client.Identity, error)
@@ -73,7 +73,7 @@ func (s *service) GetIdentity(claims tmw.TumblerClaims, identityID string) (*cli
 }
 
 // ListIdentities - List identities and associates userId
-func (s *service) ListIdentities(claims tmw.TumblerClaims, orgID string) ([]client.Identity, error) {
+func (s *service) ListIdentities(claims tmw.TumblerClaims) ([]client.Identity, error) {
 	identities, err := s.repository.list(api.TenantID(claims.TenantID))
 	return identities, err
 }

@@ -74,17 +74,14 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 	if err != nil {
 		return nil, env.Logger.Fatal().LogErrorF("Unable to load up the Authentication JSON Web Key Set - %w", err)
 	}
-
 	AuthnTokenService := jwe.NewJWEService(env.TimeService, time.Second, AuthnKeys)
 
-	SessionKeys, err := webkeys.NewWebKeysService(env.Logger, env.Config.Session.Keys)
+	IdentityTokenKeys, err := webkeys.NewWebKeysService(env.Logger, env.Config.Session.Keys)
 	if err != nil {
 		return nil, env.Logger.Fatal().LogErrorF("Unable to load up up the Session JSON Web Key Set - %w", err)
 	}
-
-	SessionJwe := jwe.NewJWEService(env.TimeService, env.Config.Session.Expiration, SessionKeys)
-
-	SessionService := session.NewSessionService(env.TimeService, SessionJwe, env.Config.Session)
+	IdentityTokenJwe := jwe.NewJWEService(env.TimeService, env.Config.Session.Expiration, IdentityTokenKeys)
+	IdentityTokenService := session.NewTokenService(env.TimeService, IdentityTokenJwe, env.Config.Session)
 
 	templateService, err := notifications.NewTemplateRepository(env.Logger)
 	if err != nil {
@@ -102,6 +99,8 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 	CredentialRepository := credentials.NewCredentialRepository(db)
 	CredentialsService := credentials.NewCredentialsService(env.TimeService, CredentialRepository)
 
+	SessionService := session.NewSessionService(env.Logger, IdentitiesService, IdentityTokenService, CredentialsService, env.Config.Session)
+
 	AuthnClient, err := authnclient.NewAuthnClient(env.Logger, env.Config.Services.Authn)
 	if err != nil {
 		return nil, err
@@ -113,7 +112,7 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 		return nil, err
 	}
 
-	AuthnService := authn.NewAuthnService(env.Logger, CredentialsService, IdentitiesService, SessionService, InvitesService)
+	AuthnService := authn.NewAuthnService(env.Logger, CredentialsService, IdentitiesService, IdentityTokenService, InvitesService)
 
 	// router
 	if env.PublicRouter == nil {
@@ -121,7 +120,7 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 	}
 
 	// public endpoint
-	jwksController := webkeys.NewJWKSController(SessionKeys)
+	jwksController := webkeys.NewJWKSController(IdentityTokenKeys)
 	jwksRouter := env.PublicRouter.NewRoute().Subrouter()
 	jwksController.AppendRoutes(jwksRouter)
 
@@ -143,7 +142,7 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 		return nil, env.Logger.Fatal().LogErrorF("Can't startup the Gateway middleware - %w", err)
 	}
 
-	SessionController := session.NewSessionController(env.Logger, IdentitiesService, env.TimeService)
+	SessionController := session.NewSessionController(env.Logger, SessionService)
 	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(env.Logger, InvitesService)

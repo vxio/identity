@@ -11,7 +11,6 @@ package client
 
 import (
 	_context "context"
-	"github.com/antihax/optional"
 	_ioutil "io/ioutil"
 	_nethttp "net/http"
 	_neturl "net/url"
@@ -209,19 +208,12 @@ func (a *IdentitiesApiService) GetIdentity(ctx _context.Context, identityID stri
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-// ListIdentitiesOpts Optional parameters for the method 'ListIdentities'
-type ListIdentitiesOpts struct {
-	OrgID optional.Interface
-}
-
 /*
 ListIdentities List identities and associates userId
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param optional nil or *ListIdentitiesOpts - Optional Parameters:
- * @param "OrgID" (optional.Interface of string) -  Filter in only for specific Organization
 @return []Identity
 */
-func (a *IdentitiesApiService) ListIdentities(ctx _context.Context, localVarOptionals *ListIdentitiesOpts) ([]Identity, *_nethttp.Response, error) {
+func (a *IdentitiesApiService) ListIdentities(ctx _context.Context) ([]Identity, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -237,9 +229,6 @@ func (a *IdentitiesApiService) ListIdentities(ctx _context.Context, localVarOpti
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
-	if localVarOptionals != nil && localVarOptionals.OrgID.IsSet() {
-		localVarQueryParams.Add("orgID", parameterToString(localVarOptionals.OrgID.Value(), ""))
-	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

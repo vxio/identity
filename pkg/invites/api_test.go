@@ -72,7 +72,7 @@ func sendInvite(a *assert.Assertions, s Scope, email string) client.Invite {
 }
 
 func listInvites(a *assert.Assertions, s Scope) []client.Invite {
-	invites, _, err := s.api.InvitesApi.ListInvites(context.Background(), nil)
+	invites, _, err := s.api.InvitesApi.ListInvites(context.Background())
 	a.Nil(err)
 	return invites
 }

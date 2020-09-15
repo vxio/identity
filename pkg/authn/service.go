@@ -24,7 +24,7 @@ type authnService struct {
 	log         logging.Logger
 	credentials credentials.CredentialsService
 	identities  identities.Service
-	token       session.SessionService
+	token       session.TokenService
 	invites     invites.InvitesService
 }
 
@@ -33,7 +33,7 @@ func NewAuthnService(
 	log logging.Logger,
 	credentials credentials.CredentialsService,
 	identities identities.Service,
-	token session.SessionService,
+	token session.TokenService,
 	invites invites.InvitesService,
 ) AuthenticationService {
 	return &authnService{
