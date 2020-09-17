@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **LastName** | **string** |  | 
 **NickName** | Pointer to **string** |  | [optional] 
 **Suffix** | Pointer to **string** |  | [optional] 
-**BirthDate** | [**time.Time**](time.Time.md) |  | [optional] 
+**BirthDate** | Pointer to **string** |  | [optional] 
 **Status** | **string** |  | [optional] 
 **Phones** | [**[]UpdatePhone**](UpdatePhone.md) |  | [optional] 
 **Addresses** | [**[]UpdateAddress**](UpdateAddress.md) |  | [optional] 

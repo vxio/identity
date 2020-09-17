@@ -18,14 +18,14 @@ type Identity struct {
 	// UUID v4
 	IdentityID string `json:"identityID,omitempty"`
 	// UUID v4
-	TenantID   string    `json:"tenantID,omitempty"`
-	FirstName  string    `json:"firstName"`
-	MiddleName string    `json:"middleName,omitempty"`
-	LastName   string    `json:"lastName"`
-	NickName   *string   `json:"nickName,omitempty"`
-	Suffix     *string   `json:"suffix,omitempty"`
-	BirthDate  time.Time `json:"birthDate,omitempty"`
-	Status     string    `json:"status,omitempty"`
+	TenantID   string  `json:"tenantID,omitempty"`
+	FirstName  string  `json:"firstName"`
+	MiddleName string  `json:"middleName,omitempty"`
+	LastName   string  `json:"lastName"`
+	NickName   *string `json:"nickName,omitempty"`
+	Suffix     *string `json:"suffix,omitempty"`
+	BirthDate  *string `json:"birthDate,omitempty"`
+	Status     string  `json:"status,omitempty"`
 	// Email Address
 	Email string `json:"email"`
 	// The user has verified they have access to this email

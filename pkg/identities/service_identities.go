@@ -80,6 +80,10 @@ func (s *service) ListIdentities(claims tmw.TumblerClaims) ([]client.Identity, e
 
 // UpdateIdentity - Update a specific Identity
 func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, update client.UpdateIdentity) (*client.Identity, error) {
+	if err := update.Validate(); err != nil {
+		return nil, err
+	}
+
 	identity, err := s.GetIdentity(claims, identityID)
 	if err != nil {
 		return nil, err
@@ -149,6 +153,10 @@ func (s *service) UpdateIdentity(claims tmw.TumblerClaims, identityID string, up
 
 // Register - Takes an invite and the registration information and creates the new identity from it.
 func (s *service) Register(register client.Register, invite *client.Invite) (*client.Identity, error) {
+	if err := register.Validate(); err != nil {
+		return nil, err
+	}
+
 	identityID := uuid.New().String()
 
 	phones := []client.Phone{}

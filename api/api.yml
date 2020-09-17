@@ -111,7 +111,7 @@ paths:
           $ref: '#/components/responses/Empty'
     put:
       operationId: ChangeSessionDetails
-      summary: Changes the details of the session allowing to change tenants or identities. This much be locked down with an authorization.
+      summary: Changes the details of the session allowing to change tenants or identities. This must be locked down with an authorization.
       tags:
       - session
       security:
@@ -421,6 +421,12 @@ components:
       format: date-time
       maxLength: 24
 
+    OptionalDate:
+      type: string
+      format: date
+      maxLength: 24
+      nullable: true
+
     OptionalDateTime:
       type: string
       format: date-time
@@ -524,7 +530,7 @@ components:
           pattern: ^\w+$
           maxLength: 255
         birthDate:
-          $ref: '#/components/schemas/DateTime'
+          $ref: '#/components/schemas/OptionalDate'
         status:
           type: string
           enum:
@@ -617,7 +623,7 @@ components:
           pattern: ^\w+$
           maxLength: 255
         birthDate:
-          $ref: '#/components/schemas/DateTime'
+          $ref: '#/components/schemas/OptionalDate'
         status:
           type: string
           enum:
@@ -950,7 +956,7 @@ components:
           pattern: ^\w+$
           maxLength: 255
         birthDate:
-          $ref: '#/components/schemas/DateTime'
+          $ref: '#/components/schemas/OptionalDate'
         email:
           $ref: '#/components/schemas/Email'
           writeOnly: true

@@ -143,7 +143,7 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 	}
 
 	SessionController := session.NewSessionController(env.Logger, SessionService)
-	IdentitiesController := identities.NewIdentitiesController(IdentitiesService)
+	IdentitiesController := identities.NewIdentitiesController(env.Logger, IdentitiesService)
 	CredentialsController := credentials.NewCredentialsApiController(CredentialsService)
 	InvitesController := invites.NewInvitesController(env.Logger, InvitesService)
 
