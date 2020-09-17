@@ -42,7 +42,7 @@ func NewScope(t *testing.T) Scope {
 
 	service := NewIdentitiesService(times, repository)
 
-	controller := NewIdentitiesController(service)
+	controller := NewIdentitiesController(logging, service)
 
 	routes := mux.NewRouter()
 	api.AppendRouters(logging, routes, controller)

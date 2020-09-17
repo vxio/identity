@@ -18,6 +18,7 @@ func Test_SessionEndpoint(t *testing.T) {
 		LastName:     "Doe",
 		NickName:     nil,
 		ImageUrl:     &imageUrl,
+		Email:        "john.doe@moov.io",
 	}, nil)
 	s.assert.Nil(err)
 

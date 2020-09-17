@@ -179,7 +179,8 @@ paths:
             status code
       security:
       - GatewayAuth: []
-      summary: Changes the details of the session allowing to change tenants or identities
+      summary: Changes the details of the session allowing to change tenants or identities.
+        This must be locked down with an authorization.
       tags:
       - session
   /invites:
@@ -556,6 +557,11 @@ components:
       format: date-time
       maxLength: 24
       type: string
+    OptionalDate:
+      format: date
+      maxLength: 24
+      nullable: true
+      type: string
     OptionalDateTime:
       format: date-time
       maxLength: 24
@@ -743,7 +749,7 @@ components:
           phoneID: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
           type: home
         suffix: suffix
-        birthDate: 2000-01-23T04:56:07.000+00:00
+        birthDate: 2000-01-23
         firstName: John
         emailVerified: true
         disabledBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
@@ -795,8 +801,9 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          format: date-time
+          format: date
           maxLength: 24
+          nullable: true
           type: string
         status:
           enum:
@@ -944,7 +951,7 @@ components:
           type: home
         middleName: Jimmy
         suffix: suffix
-        birthDate: 2000-01-23T04:56:07.000+00:00
+        birthDate: 2000-01-23
         status: rejected
       properties:
         firstName:
@@ -973,8 +980,9 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          format: date-time
+          format: date
           maxLength: 24
+          nullable: true
           type: string
         status:
           enum:
@@ -1417,7 +1425,7 @@ components:
         - number: number
           type: home
         suffix: suffix
-        birthDate: 2000-01-23T04:56:07.000+00:00
+        birthDate: 2000-01-23
         firstName: John
         inviteCode: inviteCode
         imageUrl: http://example.com/aeiou
@@ -1473,8 +1481,9 @@ components:
           pattern: ^\w+$
           type: string
         birthDate:
-          format: date-time
+          format: date
           maxLength: 24
+          nullable: true
           type: string
         email:
           description: Email Address

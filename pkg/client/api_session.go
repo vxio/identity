@@ -25,7 +25,7 @@ var (
 type SessionApiService service
 
 /*
-ChangeSessionDetails Changes the details of the session allowing to change tenants or identities
+ChangeSessionDetails Changes the details of the session allowing to change tenants or identities. This must be locked down with an authorization.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param changeSessionDetails
 @return SessionDetails

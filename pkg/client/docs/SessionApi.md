@@ -4,7 +4,7 @@ All URIs are relative to *https://local.moov.io*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**ChangeSessionDetails**](SessionApi.md#ChangeSessionDetails) | **Put** /session | Changes the details of the session allowing to change tenants or identities
+[**ChangeSessionDetails**](SessionApi.md#ChangeSessionDetails) | **Put** /session | Changes the details of the session allowing to change tenants or identities. This must be locked down with an authorization.
 [**GetSessionDetails**](SessionApi.md#GetSessionDetails) | **Get** /session | Return information about the current session
 
 
@@ -13,7 +13,7 @@ Method | HTTP request | Description
 
 > SessionDetails ChangeSessionDetails(ctx, changeSessionDetails)
 
-Changes the details of the session allowing to change tenants or identities
+Changes the details of the session allowing to change tenants or identities. This must be locked down with an authorization.
 
 ### Required Parameters
 

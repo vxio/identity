@@ -2,6 +2,7 @@ package identities_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -99,7 +100,7 @@ func Test_ListAPI(t *testing.T) {
 	}
 
 	a.Len(found, 3)
-	a.Contains(found, identity1, identity2, identity3)
+	a.ElementsMatch(found, identities)
 }
 
 func Test_ListAPI_Empty(t *testing.T) {
@@ -236,8 +237,75 @@ func RegisterIdentity(s Scope, f *fuzz.Fuzzer) client.Identity {
 
 	identity, err := s.service.Register(register, &invite)
 	if err != nil {
+		fmt.Printf("%+v\n", err)
 		panic(err)
 	}
 
 	return *identity
+}
+
+func Test_UpdateAPI_DoB_AllowDateFormat(t *testing.T) {
+	a, s, f := Setup(t)
+
+	identity := RegisterIdentity(s, f)
+
+	updates := client.UpdateIdentity{}
+	f.Fuzz(&updates)
+
+	dob := "1967-12-31"
+	updates.BirthDate = &dob
+
+	updated, resp, err := s.api.IdentitiesApi.UpdateIdentity(
+		context.Background(),
+		identity.IdentityID,
+		updates,
+	)
+
+	a.Nil(err)
+	a.Equal(200, resp.StatusCode)
+
+	a.Contains(*updated.BirthDate, dob)
+}
+
+func Test_Register_DoB_AllowDateFormat(t *testing.T) {
+	a, s, f := Setup(t)
+
+	invite := s.RandomInvite()
+
+	register := client.Register{}
+	f.Fuzz(&register)
+
+	dob := "1967-12-31"
+	register.BirthDate = &dob
+
+	identity, err := s.service.Register(register, &invite)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+		panic(err)
+	}
+	a.Nil(err)
+
+	a.Contains(*identity.BirthDate, dob)
+}
+
+// We don't want to store dates where we only get the year which can happen from OpenID
+func Test_Register_DoB_AllowYearFormat(t *testing.T) {
+	a, s, f := Setup(t)
+
+	invite := s.RandomInvite()
+
+	register := client.Register{}
+	f.Fuzz(&register)
+
+	dob := "1967"
+	register.BirthDate = &dob
+
+	identity, err := s.service.Register(register, &invite)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+		panic(err)
+	}
+	a.Nil(err)
+
+	a.Nil(identity.BirthDate)
 }

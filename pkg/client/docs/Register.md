@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **NickName** | Pointer to **string** |  | [optional] 
 **ImageUrl** | Pointer to **string** |  | [optional] 
 **Suffix** | Pointer to **string** |  | [optional] 
-**BirthDate** | [**time.Time**](time.Time.md) |  | [optional] 
+**BirthDate** | Pointer to **string** |  | [optional] 
 **Email** | **string** | Email Address | [optional] 
 **Phones** | [**[]RegisterPhone**](RegisterPhone.md) |  | [optional] 
 **Addresses** | [**[]RegisterAddress**](RegisterAddress.md) |  | [optional] 

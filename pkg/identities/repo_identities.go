@@ -162,7 +162,6 @@ func (r *sqlIdentityRepo) update(updated client.Identity) (*client.Identity, err
 	`
 
 	res, err := tx.Exec(qry,
-
 		updated.FirstName,
 		updated.MiddleName,
 		updated.LastName,

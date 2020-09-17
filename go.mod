@@ -3,6 +3,7 @@ module github.com/moov-io/identity
 go 1.14
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/go-kit/kit v0.10.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.2.2
 	github.com/go-sql-driver/mysql v1.5.0

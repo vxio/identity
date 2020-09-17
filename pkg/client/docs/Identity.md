@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **LastName** | **string** |  | 
 **NickName** | Pointer to **string** |  | [optional] 
 **Suffix** | Pointer to **string** |  | [optional] 
-**BirthDate** | [**time.Time**](time.Time.md) |  | [optional] 
+**BirthDate** | Pointer to **string** |  | [optional] 
 **Status** | **string** |  | [optional] 
 **Email** | **string** | Email Address | 
 **EmailVerified** | **bool** | The user has verified they have access to this email | [optional] [readonly] 
