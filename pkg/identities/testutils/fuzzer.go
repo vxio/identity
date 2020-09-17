@@ -20,12 +20,6 @@ func RandStringN(c fuzz.Continue, n int) string {
 
 func RandBirthDate(c fuzz.Continue) string {
 	return time.Unix(c.Int63n(time.Now().Unix()), 0).In(time.UTC).Format(time.RFC3339)
-	// yr := (1900 + c.Intn(100))
-	// if c.RandBool() {
-	// 	return fmt.Sprintf("%d-12-31", yr)
-	// } else {
-	// 	return fmt.Sprintf("%d", yr)
-	// }
 }
 
 func RandCountryCode(c fuzz.Continue) string {
