@@ -226,7 +226,7 @@ func (r *sqlIdentityRepo) add(identity client.Identity) (*client.Identity, error
 			disabled_on,
 			disabled_by,
 			last_updated_on,
-			image_url
+			photo_url
 		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	`
 
@@ -291,7 +291,7 @@ var identitySelect = `
 	identity.disabled_on, 
 	identity.disabled_by,
 	identity.last_updated_on,
-	identity.image_url
+	identity.photo_url
 `
 
 func (r *sqlIdentityRepo) queryScanIdentity(query string, args ...interface{}) ([]client.Identity, error) {
