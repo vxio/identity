@@ -4,4 +4,4 @@
 
 package identity
 
-const Version = "v0.3.4"
+const Version = "v0.3.5"
