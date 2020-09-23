@@ -155,7 +155,8 @@ func (r *sqlIdentityRepo) update(updated client.Identity) (*client.Identity, err
 			status = ?,
 			disabled_on = ?,
 			disabled_by = ?,
-			last_updated_on = ?
+			last_updated_on = ?,
+			photo_url = ?
 		WHERE
 			tenant_id = ? AND
 			identity_id = ?
@@ -172,6 +173,7 @@ func (r *sqlIdentityRepo) update(updated client.Identity) (*client.Identity, err
 		updated.DisabledOn,
 		updated.DisabledBy,
 		updated.LastUpdatedOn,
+		updated.ImageUrl,
 
 		updated.TenantID,
 		updated.IdentityID)

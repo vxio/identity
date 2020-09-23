@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/stime"
 	tmw "github.com/moov-io/tumbler/pkg/middleware"
@@ -20,6 +20,8 @@ type Service interface {
 
 	Register(register client.Register, invite *client.Invite) (*client.Identity, error)
 	GetIdentityByID(identityID string) (*client.Identity, error)
+
+	UpdateInsecure(identity *client.Identity) (*client.Identity, error)
 }
 
 type service struct {
@@ -232,4 +234,14 @@ func (s *service) GetIdentityByID(identityID string) (*client.Identity, error) {
 	}
 
 	return i, nil
+}
+
+// UpdateInsecure - Updates an Identity with new values
+func (s *service) UpdateInsecure(identity *client.Identity) (*client.Identity, error) {
+	u, e := s.repository.update(*identity)
+	if e != nil {
+		return nil, e
+	}
+
+	return u, nil
 }

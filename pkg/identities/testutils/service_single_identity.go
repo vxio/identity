@@ -24,6 +24,10 @@ type singleService struct {
 	identity client.Identity
 }
 
+func (s *singleService) UpdateInsecure(identity *client.Identity) (*client.Identity, error) {
+	panic(ErrNotImplemented)
+}
+
 func (s *singleService) DisableIdentity(claims tmw.TumblerClaims, identityID string) error {
 	panic(ErrNotImplemented)
 }

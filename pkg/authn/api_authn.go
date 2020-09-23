@@ -69,7 +69,7 @@ func (c *authnAPIController) Authenticated(w http.ResponseWriter, r *http.Reques
 			TenantID:     session.TenantID,
 		}
 
-		cookie, loggedIn, err := c.service.LoginWithCredentials(r, login, session.State, session.IP)
+		cookie, loggedIn, err := c.service.LoginWithCredentials(r, login, session.State, session.IP, session.ImageUrl)
 		if err != nil {
 			c.logger.Error().LogError("Not able to exchange login token for session token", err)
 			w.WriteHeader(404)
