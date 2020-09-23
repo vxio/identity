@@ -290,7 +290,7 @@ func (a *IdentitiesApiService) ListIdentities(ctx _context.Context) ([]Identity,
 }
 
 /*
-UpdateIdentity Update a specific Identity
+UpdateIdentity UpdateInsecure a specific Identity
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param identityID ID of the Identity to lookup
  * @param updateIdentity

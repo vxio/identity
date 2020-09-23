@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/identities"
@@ -16,7 +16,7 @@ import (
 
 // AuthenticationApiServicer defines the api actions for the AuthenticationApi service
 type AuthenticationService interface {
-	LoginWithCredentials(*http.Request, client.Login, string, string) (*http.Cookie, *client.LoggedIn, error)
+	LoginWithCredentials(req *http.Request, credentials client.Login, nonce string, ip string, photoURL *string) (*http.Cookie, *client.LoggedIn, error)
 	RegisterWithCredentials(*http.Request, client.Register, string, string, bool) (*http.Cookie, *client.LoggedIn, error)
 }
 
@@ -95,11 +95,11 @@ func (s *authnService) RegisterWithCredentials(req *http.Request, register clien
 		TenantID:     identity.TenantID,
 	}
 
-	return s.LoginWithCredentials(req, login, nonce, ip)
+	return s.LoginWithCredentials(req, login, nonce, ip, register.ImageUrl)
 }
 
 // LoginWithCredentials - Complete a login via a OIDC. Once the OIDC client service has authenticated their identity the client service will call  this endpoint to record and finish the login to get their token to use the API.  If the client service receives a 404 they must send them to registration if its allowed per the client or check for an invite for authenticated users email before sending to registration.
-func (s *authnService) LoginWithCredentials(req *http.Request, login client.Login, nonce string, ip string) (*http.Cookie, *client.LoggedIn, error) {
+func (s *authnService) LoginWithCredentials(req *http.Request, login client.Login, nonce string, ip string, photoURL *string) (*http.Cookie, *client.LoggedIn, error) {
 	logCtx := s.log.WithMap(map[string]string{
 		"tenant_id":     login.TenantID,
 		"credential_id": login.CredentialID,
@@ -121,6 +121,16 @@ func (s *authnService) LoginWithCredentials(req *http.Request, login client.Logi
 
 	if identity.TenantID != credential.TenantID {
 		return nil, nil, logCtx.LogErrorF("guard triggered - identity and credential tenantID's don't match")
+	}
+
+	if photoURL != nil && identity.ImageUrl != photoURL {
+		logCtx.WithMap(map[string]string{
+			"photo_old":   fmt.Sprintf("%+v", identity.ImageUrl),
+			"photo_new":   *photoURL,
+			"identity_id": identity.IdentityID,
+		}).Log("Photo URL Updated")
+		identity.ImageUrl = photoURL
+		s.identities.UpdateInsecure(identity)
 	}
 
 	logCtx = logCtx.With(api.NewIdentityLogContext(identity))

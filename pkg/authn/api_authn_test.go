@@ -322,6 +322,30 @@ func Test_Login_Success(t *testing.T) {
 	s.assert.Nil(err)
 }
 
+func Test_Login_Updates_PhotoURL_Success(t *testing.T) {
+	s := Setup(t)
+
+	registerSession := RegisterRandomIdentity(s)
+
+	loginSession := LoginSession{}
+	s.fuzz.Fuzz(&loginSession)
+	imgUrl := "http://profiles.com/123.jpg"
+	loginSession.Register.ImageUrl = &imgUrl
+
+	// These are the values that have to match up to what was registered.
+	loginSession.CredentialID = registerSession.CredentialID
+	loginSession.TenantID = registerSession.TenantID
+	loginSession.Scopes = []string{"authenticate", "finished"}
+
+	// Test if we can login with it.
+	c := s.NewClient(loginSession)
+	loggedIn, resp, err := c.AuthenticationApi.Authenticated(context.Background())
+	s.assert.NotNil(loggedIn)
+	s.assert.Equal(loginSession.Register.ImageUrl, loggedIn.ImageUrl)
+	s.assert.Equal(200, resp.StatusCode)
+	s.assert.Nil(err)
+}
+
 func RegisterRandomIdentity(s Scope) LoginSession {
 	req := httptest.NewRequest("GET", "https://local.moov.io", strings.NewReader(""))
 	req.Header.Add("X-Forwarded-For", "1.2.3.4")

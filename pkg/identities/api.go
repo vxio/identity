@@ -110,7 +110,7 @@ func (c *controller) ListIdentities(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// UpdateIdentity - Update a specific Identity
+// UpdateIdentity - UpdateInsecure a specific Identity
 func (c *controller) UpdateIdentity(w http.ResponseWriter, r *http.Request) {
 	tmw.WithClaimsFromRequest(w, r, func(claims tmw.TumblerClaims) {
 		params := mux.Vars(r)
