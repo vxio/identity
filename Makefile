@@ -21,14 +21,14 @@ endif
 
 dist: clean build
 ifeq ($(OS),Windows_NT)
-	CGO_ENABLED=1 GOOS=windows go build -o bin/identity.exe cmd/identity/*
+	CGO_ENABLED=1 GOOS=windows go build -o bin/identity.exe ./cmd/identity/*
 else
-	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -o bin/identity-$(PLATFORM)-amd64 cmd/identity/*
+	CGO_ENABLED=1 GOOS=$(PLATFORM) go build -o bin/identity-$(PLATFORM)-amd64 ./cmd/identity/*
 endif
 
 docker: clean install
 	pkger
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o ${PWD}/bin/.docker/identity cmd/identity/*
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o ${PWD}/bin/.docker/identity ./cmd/identity/*
 
 # Docker image
 	docker build --pull -t moov/identity:$(VERSION) -f Dockerfile .
@@ -82,7 +82,7 @@ install:
 
 identity:
 	pkger
-	go build -o ${PWD}/bin/identity cmd/identity/*
+	go build -o ${PWD}/bin/identity ./cmd/identity/*
 
 run: identity
 	./bin/identity
