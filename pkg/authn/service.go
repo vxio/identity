@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	api "github.com/moov-io/identity/pkg/api"
+	"github.com/moov-io/identity/pkg/api"
 	"github.com/moov-io/identity/pkg/client"
 	"github.com/moov-io/identity/pkg/credentials"
 	"github.com/moov-io/identity/pkg/identities"
@@ -125,8 +125,8 @@ func (s *authnService) LoginWithCredentials(req *http.Request, login client.Logi
 
 	if photoURL != nil && identity.ImageUrl != photoURL {
 		logCtx.WithMap(map[string]string{
-			"photo_old": fmt.Sprintf("%+v", identity.ImageUrl),
-			"photo_new": *photoURL,
+			"photo_old":   fmt.Sprintf("%+v", identity.ImageUrl),
+			"photo_new":   *photoURL,
 			"identity_id": identity.IdentityID,
 		}).Log("Photo URL Updated")
 		identity.ImageUrl = photoURL
