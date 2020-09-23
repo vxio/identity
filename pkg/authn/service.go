@@ -124,9 +124,11 @@ func (s *authnService) LoginWithCredentials(req *http.Request, login client.Logi
 	}
 
 	if photoURL != nil && identity.ImageUrl != photoURL {
-		logCtx.Info().Log("OIDC image updated")
-		logCtx.Info().WithKeyValue("Old ImageUrl", *identity.ImageUrl)
-		logCtx.Info().WithKeyValue("New ImageUrl", *photoURL)
+		logCtx.WithMap(map[string]string{
+			"photo_old": fmt.Sprintf("%+v", identity.ImageUrl),
+			"photo_new": *photoURL,
+			"identity_id": identity.IdentityID,
+		}).Log("Photo URL Updated")
 		identity.ImageUrl = photoURL
 		s.identities.UpdateInsecure(identity)
 	}
