@@ -14,6 +14,7 @@ type Repository interface {
 	get(identityID string) (*client.Identity, error)
 	update(updated client.Identity) (*client.Identity, error)
 	add(identity client.Identity) (*client.Identity, error)
+
 }
 
 // NewIdentityRepository - Builds a new repository tied to the DB passed in.

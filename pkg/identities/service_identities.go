@@ -20,6 +20,8 @@ type Service interface {
 
 	Register(register client.Register, invite *client.Invite) (*client.Identity, error)
 	GetIdentityByID(identityID string) (*client.Identity, error)
+
+	UpdatePhoto(photoURL *string) error
 }
 
 type service struct {
@@ -232,4 +234,8 @@ func (s *service) GetIdentityByID(identityID string) (*client.Identity, error) {
 	}
 
 	return i, nil
+}
+
+func (s *service) UpdatePhoto(photoURL *string) error {
+	
 }
